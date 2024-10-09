@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Container color="light" size="true" margin="m-0" padding="p-0" >
+    
+    <Select>
+        <Text>Function</Text>
+        <Text>Adapter</Text>
+        <Text>Port</Text>
+        <Text>Action</Text>
+        <Text>View</Text>
+    </Select>
+    <Input>def anomi(asas): return True</Input>
+    <Input type="div">
+        {{ code or '' }}
+    </Input>
+    <Input>(name,integer,boolean) or (user)</Input>
+</Container>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Column size="full">
+    <Row color="#0e1d49" width="250px"  size="expand"  >
+        <Container position="fixed" start="0">
+            <Route url="application/view/page/orakom/dashboard.xml"><Text><Icon icon="bi-speedometer" color="white"/>Repository</Text></Route>
+            <Route url="application/view/page/orakom/clients.xml"><Text><Icon icon="bi-people" color="white"/>Clients</Text></Route>
+            <Route url="application/view/page/orakom/contracts.xml"><Text><Icon icon="bi-pass" color="white"/>Contracts</Text></Route>
+            <Route url="application/view/page/orakom/invoices.xml"><Text><Icon icon="bi-receipt" color="white"/>Invoices</Text></Route>
+        </Container>
+    </Row>
+    <Row size="expand" class="container-fluid">
+        <Row type="container-fluid">
+            <Alert type="danger">Errore</Alert>
+        </Row>
+        <C-Editor>
+
+        </C-Editor>
+        <Row margin="mt-auto" color="#0e1d49">
+            <Nav class="nav-tabs" margin="m-0;" padding="p-0">
+                <Route href="#contracts" data-bs-toggle="tab"><Icon icon="bi-pass"/><Text>GIT</Text></Route>
+                <Route href="#credit-notes" data-bs-toggle="tab"><Icon icon="bi-journal-bookmark"/><Text>DEVELOPMENT</Text></Route>
+                <Route href="#invoices" data-bs-toggle="tab"><Icon icon="bi-receipt"/><Text>TEST</Text></Route>
+                <Route href="#calls" data-bs-toggle="tab"><Icon icon="bi-telephone"/><Text>BUILD</Text></Route>
+                <Route href="#tickets" data-bs-toggle="tab"><Icon icon="bi-ticket-perforated"/><Text>DISTRIBUTION</Text></Route>
+            </Nav>
+            <Tab>
+                <Container id="contracts">
+                    
+                        <Container class="card" padding="p-0" margin="m-0">
+                            <Container class="card-header"><Text>Profilo</Text></Container>
+                            <Column class="card-body">
+                                <Row>
+                                    <Text>Codice Cliente</Text>
+                                    <Text>Nome</Text>
+                                    <Text>Cognome</Text>
+                                    <Text>Nato</Text>
+                                    <Text>Codice Fiscale</Text>
+                                </Row>
+                                <Row>
+                                    <Text var="storekeeper.result.identifier" />
+                                    <Text var="storekeeper.result.person.first" />
+                                    <Text var="storekeeper.result.person.last" />
+                                    <Text var="storekeeper.result.person.cf" />
+                                    <Text var="storekeeper.result.person.cf" />
+                                </Row>
+                            </Column>
+                        </Container>
+                </Container>
+                <Container id="invoices">
+                    <Text>2</Text>
+                </Container>
+                <Container id="credit-notes">
+                    <Text>3</Text>
+                </Container>
+                <Container id="calls">
+                    <Text>4</Text>
+                </Container>
+                <Container id="tickets">
+                    <Text>5</Text>
+                </Container>
+                <Container id="historical">
+                    <Text>6</Text>
+                </Container>
+            </Tab>
+        </Row>
+    </Row>
+    <Row color="#0e1d49" width="250px"  size="expand" >
+        <Text>Data</Text>
+        <Text>Infrastructure</Text>
+        <Text>Application</Text>
+        <Text>Framework</Text>
+        <Text>Attribute</Text>
+    </Row>
+</Column>

@@ -1,0 +1,13 @@
+prohibited::create::user[role::agent]
+limited::speed[]
+
+authenticated
+authorized
+encrypted
+compiled
+limited
+prohibited
+
+interpreted
+assured:={intact, available, confidential}
+speed:={compiled,interpreted}
