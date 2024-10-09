@@ -1,1 +1,1 @@
-web: gunicorn example_django.wsgi
+web: python3 public/app.py
