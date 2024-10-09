@@ -32,7 +32,7 @@ url = "http://localhost:8000/infrastructure/"
 
 [presentation.app]
 adapter = "wasm"
-host = "127.0.0.1"
+host = "0.0.0.0"
 port = "8000"
 view = "src/domain/view/layout/page.xml"
 routes = "src/application/route/api.xml"
