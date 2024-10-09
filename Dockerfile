@@ -23,4 +23,5 @@ COPY src src
 
 EXPOSE ${PORT}
 
-CMD gunicorn --bind :${PORT} --workers 2 example_django.wsgi
+#CMD gunicorn --bind :${PORT} --workers 2 example_django.wsgi
+CMD python3 public/app.py
