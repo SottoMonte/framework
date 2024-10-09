@@ -40,7 +40,7 @@ else:
         if service not in di:
             di[service] = lambda di: list([])
         req = js.XMLHttpRequest.new()
-        req.open("GET", f"http://0.0.0.0:8000/infrastructure/{service}/{adapter}.py", False)
+        req.open("GET", f"infrastructure/{service}/{adapter}.py", False)
         req.send()
         try:
             spec = importlib.util.spec_from_loader(adapter, loader=None)
@@ -60,7 +60,7 @@ def bootstrap_adapter() -> None:
                 config = tomli.loads(f.read())
         else:
             req = js.XMLHttpRequest.new()
-            req.open("GET", "http://0.0.0.0:8000/static/pyproject.toml", False)
+            req.open("GET", "static/pyproject.toml", False)
             req.send()
             config = tomli.loads(str(req.response))
 

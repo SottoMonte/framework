@@ -55,7 +55,7 @@
                     cwd = os.getcwd()
                     print(cwd)
                 `);
-                pyodide.runPython(await (await fetch("http://0.0.0.0:8000/static/app.py")).text());
+                pyodide.runPython(await (await fetch("static/app.py")).text());
                 console.log(msg);
                 return pyodide;
             }

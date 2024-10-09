@@ -269,7 +269,7 @@ else:
         async def builder(self,**constants):
           
           if 'url' not in constants:
-            url="http://0.0.0.0:8000/static/index.xml"
+            url="static/index.xml"
           else:
             url = constants['url']
 
