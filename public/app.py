@@ -24,7 +24,7 @@ if sys.platform == 'emscripten':
             print(f"error load 'infrastructure.{service}.{adapter}'")
     run = loader_provider(service='service',adapter='run') 
 else:
-    sys.path.insert(1, '../accent/src')
+    sys.path.insert(1, '../framework/src')
     import framework.service.run as run
 
 

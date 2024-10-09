@@ -1,0 +1,38 @@
+[build-system]
+requires = [
+    "flit_core >=3.2,<4",
+]
+
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "hub"
+identifier ="it.orakom.hub"
+key = "t0RZQLdUDpweGc7hvcDhMcoKuOaJBo+jgsjJ6huk2rQRLrpfPyFl/A=="
+version = "0.0.1"
+readme = "README.md"
+requires-python = ">=3.8"
+
+dependencies = [
+    "kink",
+    "flet",
+    "redis",
+    "aiofiles",
+    "aiohttp",
+    "toml",
+    "jinja2",
+    "sqlalchemy",
+    "starlette",
+]
+
+
+[persistence.infrastructure]
+adapter = "wasm"
+url = "http://localhost:8000/infrastructure/"
+
+[presentation.app]
+adapter = "wasm"
+host = "127.0.0.1"
+port = "8000"
+view = "src/domain/view/layout/page.xml"
+routes = "src/application/route/api.xml"

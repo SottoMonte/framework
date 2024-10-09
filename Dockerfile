@@ -19,7 +19,7 @@ ENV PORT=8000
 WORKDIR /app
 
 COPY --from=builder /app/venv venv
-COPY example_django example_django
+COPY src src
 
 EXPOSE ${PORT}
 

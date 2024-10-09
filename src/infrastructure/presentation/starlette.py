@@ -18,7 +18,7 @@ import uuid
 from uvicorn import Config, Server
 
 # Auth 
-from starlette.middleware.sessions import SessionMiddleware
+#from starlette.middleware.sessions import SessionMiddleware
 from datetime import timedelta
 #from starlette_login.middleware import AuthenticationMiddleware
 
@@ -192,8 +192,8 @@ class DefenderMiddleware:
 
 class adapter(presentation.presentation):
 
-    @flow.function(ports=('defender',))
-    def __init__(defender,self,**constants):
+    #@flow.function(ports=('defender',))
+    def __init__(self,**constants):
         self.config = constants['config']
         cwd = os.getcwd()
 
@@ -208,8 +208,8 @@ class adapter(presentation.presentation):
 
         middleware = [
             Middleware(CORSMiddleware, allow_origins=['*'],allow_methods=['*'],allow_headers=['*']),
-            Middleware(SessionMiddleware, secret_key='secret'),
-            Middleware(DefenderMiddleware,backend=self,manager=defender,allow_websocket=False,),
+            #Middleware(SessionMiddleware, secret_key='secret'),
+            #Middleware(DefenderMiddleware,backend=self,manager=defender,allow_websocket=False,),
             #Middleware(AuthorizationMiddleware,)
         ]
 
