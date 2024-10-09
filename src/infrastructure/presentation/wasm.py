@@ -131,7 +131,7 @@ else:
               case 'identifier':
                 element.setAttribute('name',value)
               case 'url':
-                element.setAttribute('url','http://127.0.0.1:8000/'+value)
+                element.setAttribute('url','http://0.0.0.0:8000/'+value)
                 element.addEventListener('click',pyodide.create_proxy(self.route))
               case 'click':
                 element.setAttribute(key,value)
@@ -246,12 +246,12 @@ else:
         
         async def rebuild(self,id,tag,**constants):
                   
-          response = js.fetch(f"http://localhost:8000/gather?model={self.components[id]['model']}&row={self.components[id]['pageRow']}&page={self.components[id]['pageCurrent']}&order={self.components[id]['sortField']}",{'method':'GET'})
+          response = js.fetch(f"http://0.0.0.0:8000/gather?model={self.components[id]['model']}&row={self.components[id]['pageRow']}&page={self.components[id]['pageCurrent']}&order={self.components[id]['sortField']}",{'method':'GET'})
           file = await response
           aa = await file.text()
           bb = json.loads(aa)
 
-          url = f'http://127.0.0.1:8000/application/view/component/{tag.replace("C_","")}.xml'
+          url = f'http://0.0.0.0:8000/application/view/component/{tag.replace("C_","")}.xml'
                   
                   
           test = await self.builder(url=url,data=bb,component=self.components[id])
@@ -269,7 +269,7 @@ else:
         async def builder(self,**constants):
           
           if 'url' not in constants:
-            url="http://127.0.0.1:8000/static/index.xml"
+            url="http://0.0.0.0:8000/static/index.xml"
           else:
             url = constants['url']
 
@@ -687,7 +687,7 @@ else:
                   aa = await file.text()
                   bb = json.loads(aa)
                   self.components[id]['data'] = bb 
-                  url = f'http://127.0.0.1:8000/application/view/component/{tag.replace("C_","")}.xml'
+                  url = f'http://0.0.0.0:8000/application/view/component/{tag.replace("C_","")}.xml'
                   
                   
                   test = await self.builder(url=url,data=bb,component=self.components[id],args=args)

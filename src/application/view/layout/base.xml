@@ -2,7 +2,7 @@
 <Container color="light" size="true" margin="-0" padding="-0" >
     <Nav color="dark">
         <Column size="2" padding="x-2">
-            <Img src="http://127.0.0.1:8000/static/logo.svg" height="50px" />
+            <Img src="static/logo.svg" height="50px" />
         </Column>
         <Row>
             <Column><Route data-bs-toggle="collapse" href="#company" ><Icon icon="bi-cloudy-fill"/><Text color="white" type="h5" >Company</Text></Route></Column>
@@ -77,7 +77,7 @@
         </Container>
     </Nav>
     <Nav color="body" type="" style=" d-flex flex-wrap shadow-sm">
-        <Route url="http://127.0.0.1:8000/static/test.xml"><Icon icon="bi-cloudy-fill"/><Text>Colosso</Text></Route>
+        <Route url="static/test.xml"><Icon icon="bi-cloudy-fill"/><Text>Colosso</Text></Route>
         <Route url=""><Icon icon="bi-basket3-fill"/><Text>Inventory</Text></Route>
         <Route url=""><Icon icon="bi-shield-fill"/><Text>Security</Text></Route>
         <Route url=""><Icon icon="bi-easel-fill"/><Text>Monitoring</Text></Route>

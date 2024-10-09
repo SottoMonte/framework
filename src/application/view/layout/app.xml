@@ -2,7 +2,7 @@
 <Container color="linear-gradient(#17082e 0%, #1a0933 7%, #1a0933 80%, #0c1f4c 100%)" size="expand" margin="m-0" padding="p-0" >
     <Nav color="#6f41c0" padding="px-2;py-0;" style="z-index:0;position:unset;">
         <Column>
-            <Img src="http://127.0.0.1:8000/static/logo.svg" height="30px" />
+            <Img src="/static/logo.svg" height="30px" />
         </Column>
         <Column>
             <Route url="application/view/page/orakom/test.xml"><Icon icon="bi-people-fill"/><Text>Colosso</Text></Route>
@@ -20,7 +20,7 @@
             <Button id="button3" data-bs-toggle="offcanvas" size="sm" data-bs-target="#profile" padding="p-0">
                 <Column alignment="center">
                     <Icon icon="bi-bell-fill" color="white"/>
-                    <Img src="http://127.0.0.1:8000/static/logo.svg" margin="mx-2" width="50px" height="50px" style="background-color:#787;" class="rounded-2" />
+                    <Img src="static/logo.svg" margin="mx-2" width="50px" height="50px" style="background-color:#787;" class="rounded-2" />
                     <Text color="white" >{{ user.username or 'None' }}</Text>
                 </Column>  
             </Button>
@@ -32,7 +32,7 @@
                     
                     <Button size="sm" data-bs-dismiss="offcanvas" >
                         <Column alignment="center">
-                        <Img src="http://127.0.0.1:8000/static/logo.svg" margin="mx-2" width="50px" height="50px" style="background-color:#787;" class="rounded-2" />
+                        <Img src="static/logo.svg" margin="mx-2" width="50px" height="50px" style="background-color:#787;" class="rounded-2" />
                         <Text color="black" >{{ user.username or 'None' }}</Text>
                         </Column>
                     </Button>

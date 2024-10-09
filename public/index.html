@@ -55,7 +55,7 @@
                     cwd = os.getcwd()
                     print(cwd)
                 `);
-                pyodide.runPython(await (await fetch("http://127.0.0.1:8000/static/app.py")).text());
+                pyodide.runPython(await (await fetch("http://0.0.0.0:8000/static/app.py")).text());
                 console.log(msg);
                 return pyodide;
             }
@@ -84,7 +84,7 @@
         <!--    Main Content-->
         <!-- ===============================================-->
         <div id="loading" class="d-flex justify-content-center align-items-center position-fixed w-100 h-100" style="background: #444;">
-            <img class="img" src="http://127.0.0.1:8000/static/logo.svg" style=" height:50px;">
+            <img class="img" src="static/logo.svg" style=" height:50px;">
             <div class="spinner-border text-success" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>
