@@ -1,6 +1,7 @@
 # Import
 import sys
 import asyncio
+import os
 
 if sys.platform == 'emscripten':
     import js
@@ -24,7 +25,10 @@ if sys.platform == 'emscripten':
             print(f"error load 'infrastructure.{service}.{adapter}'")
     run = loader_provider(service='service',adapter='run') 
 else:
-    sys.path.insert(1, '../framework/src')
+    cwd = os.getcwd()
+    sys.path.insert(1, cwd+'/src')
+    
+    print(cwd)
     import framework.service.run as run
 
 
