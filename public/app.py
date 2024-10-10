@@ -12,7 +12,7 @@ if sys.platform == 'emscripten':
         payload = constants['payload'] if 'payload' in constants else ''
             
         req = js.XMLHttpRequest.new()
-        req.open("GET", f"http://localhost:8000/framework/{service}/{adapter}.py", False)
+        req.open("GET", f"/framework/{service}/{adapter}.py", False)
         req.send()
         try:
             spec = importlib.util.spec_from_loader(adapter, loader=None)
