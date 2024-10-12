@@ -60,9 +60,9 @@ else:
 
         async def async_loader(self, *services, **constants):
           session = js.window.sessionStorage.getItem('session_state')
-          socket = js.WebSocket.new('ws://localhost:8000/ws')
-          def on_message(event):
-            print(f"Message received: {event.data}")
+          #socket = js.WebSocket.new('ws://localhost:8000/ws')
+          #def on_message(event):
+          #  print(f"Message received: {event.data}")
           #socket.onmessage = on_message
           #pyodide.create_proxy(self.route)
           #socket.addEventListener('message', pyodide.create_proxy(on_message))
