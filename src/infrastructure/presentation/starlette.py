@@ -206,7 +206,7 @@ class adapter(presentation.presentation):
             Mount('/framework', app=StaticFiles(directory=f'{cwd}/src/framework'), name="y"),
             Mount('/application', app=StaticFiles(directory=f'{cwd}/src/application'), name="z"),
             Mount('/infrastructure', app=StaticFiles(directory=f'{cwd}/src/infrastructure'), name="x"),
-            WebSocketRoute("/ws", self.websocket, name="ws"),
+            #WebSocketRoute("/ws", self.websocket, name="ws"),
         ]
 
         self.mount_route(routes,self.config['routes'])

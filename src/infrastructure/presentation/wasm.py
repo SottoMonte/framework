@@ -59,7 +59,7 @@ else:
           return current_data
 
         async def async_loader(self, *services, **constants):
-          session = js.window.sessionStorage.getItem('session_state')
+          #session = js.window.sessionStorage.getItem('session_state')
           #socket = js.WebSocket.new('ws://localhost:8000/ws')
           #def on_message(event):
           #  print(f"Message received: {event.data}")
@@ -67,8 +67,8 @@ else:
           #pyodide.create_proxy(self.route)
           #socket.addEventListener('message', pyodide.create_proxy(on_message))
           cookies = {cookie.split('=')[0].strip():cookie.split('=')[1] for cookie in js.document.cookie.split(';')}
-          print(js.document.cookie,"<-----",session,cookies)
-          
+          #print(js.document.cookie,"<-----",session,cookies)
+          print('OK')
           html = await self.builder(user=cookies)
           js.document.getElementById('loading').remove()
           js.document.body.prepend(html)
