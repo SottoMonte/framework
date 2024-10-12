@@ -8,17 +8,18 @@ if sys.platform != 'emscripten':
 
   class adapter(starlette.adapter):
       
-      def object(self,**constants):
+      def info(self,**constants):
           pass
 
-      @flow.async_function(ports=('storekeeper',))
+      '''@flow.async_function(ports=('storekeeper',))
       async def builder(self,storekeeper,**constants):
+          print(constants)
           cwd = os.getcwd()
           f = open(f"{cwd}/public/index.html", "r")
           stringa = f.read()
           template = self.env.from_string(stringa)
           rresult = template.render({'title':'Colosso','url':'asdasdasdasdasd'})
-          return rresult
+          return rresult'''
 else:
     import js
     from jinja2 import Environment, PackageLoader, select_autoescape
@@ -34,15 +35,18 @@ else:
           self.config = constants['config']
           self.env = Environment()
           self.document = js.document
+          #routes = []
+          #self.mount_route(routes,self.config['routes'])
 
         def loader(self, *services, **constants):
           code = asyncio.create_task(self.async_loader(),name="loader")
-          
           #js.document.body.prepend(mount_view(code))
+          pass
 
-        '''async def view(self,request):
+        async def view(self,request):
           a = await self.builder()
-          return HTMLResponse(a)'''
+          print("qui")
+          return HTMLResponse(a)
         
         def get_var(self,accessor_string,input_dict):
           """Gets data from a dictionary using a dotted accessor-string"""
@@ -55,19 +59,14 @@ else:
           return current_data
 
         async def async_loader(self, *services, **constants):
-          
+          session = js.window.sessionStorage.getItem('session_state')
           userf = [str(x.replace('user=','')) for x in js.document.cookie.split(';') if 'user=' in x]
-          print(js.document.cookie)
-          user = eval(userf[0]) if len(userf) != 0 else "dict({})"
+          print(js.document.cookie,"<-----",session)
+          #user = eval(userf[0]) if len(userf) != 0 else "dict({})"
           #print(user)
-          code = await self.builder(user=eval(user))
+          html = await self.builder()
           js.document.getElementById('loading').remove()
-          js.document.body.prepend(code)
-          
-        
-        def logout(self):
-          print(js.document.cookie)
-          #js.document.cookie = ""
+          js.document.body.prepend(html)
 
         def object(self,**constants):
             pass
@@ -76,7 +75,7 @@ else:
           return ('front-end')
         
         async def loader_module(self,act):
-          response = js.fetch(f'http://localhost:8000/application/action/{act}.py',{'method':'GET'})
+          response = js.fetch(f'application/action/{act}.py',{'method':'GET'})
           file = await response
           aa = await file.text()
           try:
@@ -654,7 +653,7 @@ else:
                   return div
                 case 'Storekeeper':
                   model = root._attributes['model'] if 'model' in root._attributes else 'client'
-                  url = f"http://localhost:8000/gather?model={model}"
+                  url = f"gather?model={model}"
                   if 'identifier' in root._attributes:
                     url += f"&identifier={root._attributes['identifier']}"
                   
@@ -682,7 +681,7 @@ else:
                   if id not in self.components:
                     self.components[id] = dict({'id':id,'model':model,'selected':[],'pageCurrent':1,'pageRow':10,'sortField':'CardName','sortAsc':True})
                   
-                  response = js.fetch(f"http://localhost:8000/gather?model={self.components[id]['model']}&row={self.components[id]['pageRow']}&page={self.components[id]['pageCurrent']}&order={self.components[id]['sortField']}",{'method':'GET'})
+                  response = js.fetch(f"gather?model={self.components[id]['model']}&row={self.components[id]['pageRow']}&page={self.components[id]['pageCurrent']}&order={self.components[id]['sortField']}",{'method':'GET'})
                   file = await response
                   aa = await file.text()
                   bb = json.loads(aa)

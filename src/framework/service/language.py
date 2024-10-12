@@ -4,6 +4,15 @@ from collections import OrderedDict
 import importlib
 from kink import di
 
+def get_var(accessor_string,input_dict):
+          """Gets data from a dictionary using a dotted accessor-string"""
+          current_data = input_dict
+          for chunk in accessor_string.split('.'):
+              if type([]) == type(current_data):
+                current_data = current_data[int(chunk)]
+              else:
+                current_data = current_data.get(chunk, {})
+          return current_data
 
 def get(domain,dictionary={}):
         output = None

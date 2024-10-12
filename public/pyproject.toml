@@ -7,11 +7,11 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "hub"
-identifier ="it.orakom.hub"
-key = "t0RZQLdUDpweGc7hvcDhMcoKuOaJBo+jgsjJ6huk2rQRLrpfPyFl/A=="
+identifier ="eu.colosso.hub"
+key = "{{ key }}"
 version = "0.0.1"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 
 dependencies = [
     "kink",
@@ -30,8 +30,23 @@ dependencies = [
 adapter = "wasm"
 url = "http://localhost:8000/infrastructure/"
 
+[apersistence.database]
+adapter = "mariadb"
+host = "0.0.0.0"
+username = "mario423434"
+password = "B6Ckb9FX1rVqoLZA"
+
+
 [presentation.app]
 adapter = "wasm"
 host = "0.0.0.0"
 port = "8000"
 view = "src/domain/view/layout/page.xml"
+routes = "src/application/route/app.xml"
+
+[presentation.sito]
+adapter = "starlette"
+host = "0.0.0.0"
+port = "8001"
+view = "src/domain/view/layout/page.xml"
+routes = "src/application/route/api.xml"

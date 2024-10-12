@@ -3,6 +3,7 @@ import importlib
 import tomli
 import js
 import sys
+import os
 # pass le configurazioni qui
 if sys.platform != 'emscripten':
     def loader_manager(**constants):
@@ -54,9 +55,10 @@ else:
     
 
 def bootstrap_adapter() -> None:
-    try:
+        env = dict(os.environ)
+        
         if sys.platform != 'emscripten':
-            with open('pyproject.toml', 'r') as f:
+            with open('public/pyproject.toml', 'r') as f:
                 config = tomli.loads(f.read())
         else:
             req = js.XMLHttpRequest.new()
@@ -76,20 +78,6 @@ def bootstrap_adapter() -> None:
                     adapter = setting['adapter']
                     loader_provider(service=module,adapter=adapter,payload=setting|{'profile':driver}|{'project':config['project']})
 
-    except Exception as e:
-        print("errore LOADER", repr(e))
-        e_type = type(e).__name__
-        e_file = e.__traceback__.tb_frame.f_code.co_filename
-        e_line = e.__traceback__.tb_lineno
-
-        e_message = str(e)
-
-        print(f'exception type: {e_type}')
-
-        print(f'exception filename: {e_file}')
-
-        print(f'exception line number: {e_line}')
-
-        print(f'exception message: {e_message}')
+    
     
     

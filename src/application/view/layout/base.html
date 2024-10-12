@@ -80,6 +80,11 @@
         <!--    Main Content-->
         <!-- ===============================================-->
         <main class="main" id="top">
+            <form id="form-login" action="/login" method="POST" padding="p-2">
+                <input name="username" padding="pb-2" />
+                <Input type="password" name="password" padding="pb-2" />
+                <button type="submit">Accedi</button>
+            </form>
             {{ main or '@MAIN' }}
             <script>
                 var navbarTopStyle = window.config.config.phoenixNavbarTopStyle;

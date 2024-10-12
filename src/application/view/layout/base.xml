@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Container color="light" size="true" margin="-0" padding="-0" >
+<Container color="light" size="true" margin="m-0" padding="p-0" >
     <Nav color="dark">
         <Column size="2" padding="x-2">
             <Img src="static/logo.svg" height="50px" />

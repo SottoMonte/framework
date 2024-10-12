@@ -1,12 +1,14 @@
 import framework.port.presentation as presentation
 import framework.service.flow as flow
+
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import JSONResponse,HTMLResponse,RedirectResponse
-from starlette.routing import Route
-from starlette.routing import Mount
+from starlette.routing import Route,Mount,WebSocketRoute
 from starlette.middleware import Middleware
-from starlette.middleware.cors import CORSMiddleware
+from starlette.websockets import WebSocket
+#from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from starlette.staticfiles import StaticFiles
 from jinja2 import Environment, PackageLoader, select_autoescape
 
@@ -20,6 +22,7 @@ from uvicorn import Config, Server
 # Auth 
 #from starlette.middleware.sessions import SessionMiddleware
 from datetime import timedelta
+import secrets
 #from starlette_login.middleware import AuthenticationMiddleware
 
 #
@@ -29,7 +32,7 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 from starlette.datastructures import MutableHeaders
 import http.cookies
 
-class AuthenticationMiddleware:
+'''class AuthenticationMiddleware:
     def __init__(
         self,
         app ,
@@ -68,10 +71,10 @@ class AuthenticationMiddleware:
         
         print(self.login_manager)
         
-        '''if not user or user.is_authenticated is False:
+        if not user or user.is_authenticated is False:
             conn.scope["user"] = self.login_manager.anonymous_user_cls()
         else:
-            conn.scope["user"] = user'''
+            conn.scope["user"] = user
 
         async def custom_send(message: Message):
             #print(message)
@@ -107,7 +110,7 @@ class AuthenticationMiddleware:
             await send(message)
 
         await self.app(scope, receive, custom_send)
-        return
+        return'''
     
 class AuthorizationMiddleware:
     def __init__(
@@ -195,6 +198,7 @@ class adapter(presentation.presentation):
     #@flow.function(ports=('defender',))
     def __init__(self,**constants):
         self.config = constants['config']
+        self.views = dict({})
         cwd = os.getcwd()
 
         routes=[
@@ -202,70 +206,76 @@ class adapter(presentation.presentation):
             Mount('/framework', app=StaticFiles(directory=f'{cwd}/src/framework'), name="y"),
             Mount('/application', app=StaticFiles(directory=f'{cwd}/src/application'), name="z"),
             Mount('/infrastructure', app=StaticFiles(directory=f'{cwd}/src/infrastructure'), name="x"),
+            WebSocketRoute("/ws", self.websocket, name="ws"),
         ]
 
-        self.mount_r(routes,self.config['routes'])
+        self.mount_route(routes,self.config['routes'])
 
         middleware = [
-            Middleware(CORSMiddleware, allow_origins=['*'],allow_methods=['*'],allow_headers=['*']),
-            #Middleware(SessionMiddleware, secret_key='secret'),
+            Middleware(SessionMiddleware, session_cookie="session_state",secret_key='pq2U5VtsFYemnfK6WYSYodQ7QUGJPEvw'),
+            #Middleware(CORSMiddleware, allow_origins=['*'],allow_methods=['*'],allow_headers=['*']),
+            #Middleware(DefenderMiddleware,backend=self,manager=defender),
             #Middleware(DefenderMiddleware,backend=self,manager=defender,allow_websocket=False,),
             #Middleware(AuthorizationMiddleware,)
         ]
 
         self.app = Starlette(debug=True,routes=routes,middleware=middleware)
 
-    async def builder(self,**constants):
+    def loader(self, *services, **constants):
         
-        return '''<html><body><form action="/create" method="post">
-            <input type="text" id="model" name="model" value="client"><br>
-            <label for="fname">First name:</label><br>
-            <input type="text" id="name" name="identifier" value="C00011631"><br>
-            <label for="lname">Last name:</label><br>
-            
-            <input type="text" id="lname" name="person.note" value="Rappresentante legale"><br><br>
-            <input type="text" id="lname" name="name" value="Doe"><br><br>
-            <input type="text" id="lname" name="person.first" value="Doe"><br><br>
-            <input type="submit" value="Submit">
-            </form> </body></html>'''
+        self.env = Environment()
+        loop=constants['loop']
+        config = Config(app=self.app, loop=loop,host=self.config['host'], port=int(self.config['port']),use_colors=True,reload=True)
+        server = Server(config)
+        loop.create_task(server.serve())
 
-    async def logout(self,request) -> None:
+    async def builder(self,**constants):
+        f = open(constants['file'], "r")
+        html = f.read()
+
+        '''template = self.env.from_string(aa)
+          
+        transformed = template.render(constants)
+
+        obj = untangle.parse(transformed)
+        
+        return await mount_view(obj.children[0],constants)'''
+        return html
+        
+    @flow.async_function(ports=('defender',))
+    async def logout(self,request,defender) -> None:
         assert request.scope.get("app") is not None, "Invalid Starlette app"
-        #login_manager = getattr(request.app.state, "login_manager", None)
-        #assert login_manager is not None, LOGIN_MANAGER_ERROR
-
-        '''config = login_manager.config
-        session_key = config.SESSION_NAME_KEY
-        session_fresh = config.SESSION_NAME_FRESH
-        session_id = config.SESSION_NAME_ID
-        remember_cookie = config.REMEMBER_COOKIE_NAME
-        remember_seconds = config.REMEMBER_SECONDS_NAME
-
-        if session_key in request.session:
-            request.session.pop(session_key)
-
-        if session_fresh in request.session:
-            request.session.pop(session_fresh)
-
-        if session_id in request.session:
-            request.session.pop(session_id)
-
-        if remember_cookie in request.session:
-            request.session[remember_cookie] = "clear"
-            if remember_seconds in request.session:
-                request.session.pop(remember_seconds)'''
-
-        self.clear_cookie(request.scope)
-
         request.session.clear()
+        response = RedirectResponse('/', status_code=303)
+        response.delete_cookie("session_token")
+        return response
 
-        #request.scope["user"] = None
+    @flow.async_function(ports=('defender',))
+    async def login(self,request: Request,defender) -> None:
+        credential = await request.form()
+        credential = dict(credential)
+        session_identifier = request.cookies.get('session_identifier', secrets.token_urlsafe(16))
+        #session_token = request.cookies.get('session_token', 'Cookie not found')
+        token,identity = await defender.authenticate(identifier=session_identifier,**credential)
+        if identity:
+            request.session.update(identity)
+        
+        #response = JSONResponse({'session': request.session})
+        response = RedirectResponse('/', status_code=303)
+        if 'session_identifier' not in request.cookies:
+            response.set_cookie(key='session_identifier', value=session_identifier, max_age=3600)
+        response.set_cookie(key='session_token', value=token, max_age=3600)
+        return response
 
-        return RedirectResponse('/', status_code=303)
-
-    async def login(self,request: Request) -> None:
-        request.session.update({"data": "session_data"})
-        return RedirectResponse('/', status_code=303)
+    async def websocket(self,websocket):
+        
+        await websocket.accept()
+        # Process incoming messages
+        while True:
+            mesg = await websocket.receive_text()
+            await websocket.send_text(mesg.replace("Client", "Server"))
+        await websocket.close()
+    
 
     @flow.async_function(ports=('storekeeper',))
     async def model(self,request,storekeeper,**constants):
@@ -298,66 +308,27 @@ class adapter(presentation.presentation):
                 request.scope["user"] = data
                 #await messenger.post(name=request.url.path[1:],value={'model':data['model'],'value':data})
                 return RedirectResponse('/', status_code=303)
-    
-    def get_cookie(self, cookie: str):
-        return decode_cookie(cookie, self.secret_key)
-    
-    def clear_cookie(self, message: Message) -> Message:
-        headers = MutableHeaders(scope=message)
-        cookie: "http.cookies.BaseCookie[str]" = http.cookies.SimpleCookie()
-        #message.setdefault("headers", [])
-        headers["set-cookie"] = cookie.output(header="").strip()
-    
-    def set_cookie(self, message, valor) -> Message:
-        COOKIE_NAME = 'user'
-        COOKIE_DOMAIN=None
-        COOKIE_PATH='/'
-        COOKIE_SECURE=False
-        COOKIE_HTTPONLY=True
-        COOKIE_SAMESITE=None
-        COOKIE_DURATION=timedelta(days=365)
-
-        key = COOKIE_NAME
-        value = valor
-        expires = int(COOKIE_DURATION.total_seconds())
-        path = COOKIE_PATH
-        domain = COOKIE_DOMAIN
-        secure = COOKIE_SECURE
-        httponly = COOKIE_HTTPONLY
-        samesite = COOKIE_SAMESITE
-
-        message.setdefault("headers", [])
-        headers = MutableHeaders(scope=message)
-        cookie: "http.cookies.BaseCookie[str]" = http.cookies.SimpleCookie()
-
-        cookie[key] = value
-        if expires is not None:
-            cookie[key]["expires"] = expires
-        if path is not None:
-            cookie[key]["path"] = path
-        if domain is not None:
-            cookie[key]["domain"] = domain
-        if secure:
-            cookie[key]["secure"] = True
-        if httponly:
-            cookie[key]["httponly"] = True
-        if samesite is not None:
-            assert samesite.lower() in [
-                "strict",
-                "lax",
-                "none",
-            ], "samesite must be either 'strict', 'lax' or 'none'"
-            cookie[key]["samesite"] = samesite
-
-        headers["set-cookie"] = cookie.output(header="").strip()
-        return message
 
     async def view(self,request):
-        
-        a = await self.builder()
-        return HTMLResponse(a)
+        html = await self.builder(file=self.views[request.url.path] )
+        return HTMLResponse(html)
     
-    def mount_r(self,routes,url):
+    async def mount_view(root,data=dict()): 
+        inner = []
+        tag = root._name
+        elements = root.get_elements()
+        if len(elements) > 0:
+            for element in elements:
+                mounted = await mount_view(element,data)
+                inner.append(mounted)
+                    
+        match tag:
+            case 'Button':
+                pass
+            case _:
+                pass
+                  
+    def mount_route(self,routes,url):
         
         gg = untangle.parse(url)
         zz = gg.get_elements()[0]
@@ -366,6 +337,7 @@ class adapter(presentation.presentation):
             path = setting.get_attribute('path')
             method = setting.get_attribute('method')
             typee = setting.get_attribute('type')
+            view = setting.get_attribute('view')
 
             if typee == 'model':
                 endpoint = self.model
@@ -379,19 +351,11 @@ class adapter(presentation.presentation):
             if typee == 'logout':
                 endpoint = self.logout
 
-            
+            if typee == 'login':
+                endpoint = self.login
+
+            self.views[path] = view
             r = Route(path,endpoint=endpoint, methods=[method])
             if setting == 'Mount':
                 r = Mount('/static', app=StaticFiles(directory='/home/salvatore-addivinola/Documenti/accent/public/'), name="static")
             routes.append(r)
-        
-    def loader(self, *services, **constants):
-        
-        self.env = Environment()
-        loop=constants['loop']
-        config = Config(app=self.app, loop=loop,host=self.config['host'], port=int(self.config['port']),use_colors=True,reload=True)
-        server = Server(config)
-        loop.create_task(server.serve())
-        
-        #loop.run_until_complete(server.serve())
-        #uvicorn.run(self.app, host=self.config['host'], port=int(self.config['port']),use_colors=True,loop=constants['loop'])
