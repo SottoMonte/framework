@@ -35,8 +35,6 @@ else:
           self.config = constants['config']
           self.env = Environment()
           self.document = js.document
-          #routes = []
-          #self.mount_route(routes,self.config['routes'])
 
         def loader(self, *services, **constants):
           code = asyncio.create_task(self.async_loader(),name="loader")
@@ -59,6 +57,7 @@ else:
           return current_data
 
         async def async_loader(self, *services, **constants):
+          print('OK load')
           #session = js.window.sessionStorage.getItem('session_state')
           #socket = js.WebSocket.new('ws://localhost:8000/ws')
           #def on_message(event):
