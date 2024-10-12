@@ -43,10 +43,10 @@ else:
           #js.document.body.prepend(mount_view(code))
           pass
 
-        async def view(self,request):
+        '''async def view(self,request):
           a = await self.builder()
           print("qui")
-          return HTMLResponse(a)
+          return HTMLResponse(a)'''
         
         def get_var(self,accessor_string,input_dict):
           """Gets data from a dictionary using a dotted accessor-string"""
@@ -60,11 +60,16 @@ else:
 
         async def async_loader(self, *services, **constants):
           session = js.window.sessionStorage.getItem('session_state')
-          userf = [str(x.replace('user=','')) for x in js.document.cookie.split(';') if 'user=' in x]
-          print(js.document.cookie,"<-----",session)
-          #user = eval(userf[0]) if len(userf) != 0 else "dict({})"
-          #print(user)
-          html = await self.builder()
+          socket = js.WebSocket.new('ws://localhost:8000/ws')
+          def on_message(event):
+            print(f"Message received: {event.data}")
+          #socket.onmessage = on_message
+          #pyodide.create_proxy(self.route)
+          #socket.addEventListener('message', pyodide.create_proxy(on_message))
+          cookies = {cookie.split('=')[0].strip():cookie.split('=')[1] for cookie in js.document.cookie.split(';')}
+          print(js.document.cookie,"<-----",session,cookies)
+          
+          html = await self.builder(user=cookies)
           js.document.getElementById('loading').remove()
           js.document.body.prepend(html)
 
@@ -245,12 +250,12 @@ else:
         
         async def rebuild(self,id,tag,**constants):
                   
-          response = js.fetch(f"http://0.0.0.0:8000/gather?model={self.components[id]['model']}&row={self.components[id]['pageRow']}&page={self.components[id]['pageCurrent']}&order={self.components[id]['sortField']}",{'method':'GET'})
+          response = js.fetch(f"gather?model={self.components[id]['model']}&row={self.components[id]['pageRow']}&page={self.components[id]['pageCurrent']}&order={self.components[id]['sortField']}",{'method':'GET'})
           file = await response
           aa = await file.text()
           bb = json.loads(aa)
 
-          url = f'http://0.0.0.0:8000/application/view/component/{tag.replace("C_","")}.xml'
+          url = f'application/view/component/{tag.replace("C_","")}.xml'
                   
                   
           test = await self.builder(url=url,data=bb,component=self.components[id])
@@ -262,7 +267,6 @@ else:
             cc.append(x)
           #cc.replaceChild(test,cc)
           #return test
-
 
         #@flow.async_function(ports=('storekeeper',))
         async def builder(self,**constants):
@@ -686,7 +690,7 @@ else:
                   aa = await file.text()
                   bb = json.loads(aa)
                   self.components[id]['data'] = bb 
-                  url = f'http://0.0.0.0:8000/application/view/component/{tag.replace("C_","")}.xml'
+                  url = f'application/view/component/{tag.replace("C_","")}.xml'
                   
                   
                   test = await self.builder(url=url,data=bb,component=self.components[id],args=args)
