@@ -65,7 +65,12 @@ else:
           #socket.onmessage = on_message
           #pyodide.create_proxy(self.route)
           #socket.addEventListener('message', pyodide.create_proxy(on_message))
-          cookies = {cookie.split('=')[0].strip():cookie.split('=')[1] for cookie in js.document.cookie.split(';')}
+          #cookies = {cookie.split('=')[0].strip():cookie.split('=')[1] for cookie in js.document.cookie.split(';')}
+          cookies = {}
+          for cookie in js.document.cookie.split(';'):
+              if '=' in cookie:
+                  key, value = cookie.split('=', 1)
+                  cookies[key.strip()] = value
           #print(js.document.cookie,"<-----",session,cookies)
           print('OK')
           html = await self.builder(user=cookies)

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-{% if user['session_token'] != '#' %}
+{% if user['session_token'] and user['session_token'] != '#' %}
 <View url="application/view/layout/app.xml" />
 {% else %}
 <View url="application/view/content/form/login.xml" />
