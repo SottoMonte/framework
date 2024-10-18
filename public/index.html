@@ -44,18 +44,9 @@
                 await micropip.install('jinja2');
                 await micropip.install('untangle');
                 
-                let msg = pyodide.runPython(`
-                    import sys
-                    import js
-                    import kink
-                    import os
-                    import tomli
-                    sys.version
-                    cwd = os.getcwd()
-                    print(cwd)
-                `);
+                pyodide.runPython(await (await fetch("framework/service/language.py")).text());
                 pyodide.runPython(await (await fetch("static/app.py")).text());
-                console.log(msg);
+                
                 return pyodide;
             }
 

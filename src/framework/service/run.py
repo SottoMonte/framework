@@ -1,32 +1,8 @@
 import asyncio
 import sys
 
-if sys.platform == 'emscripten':
-    import js
-    import importlib.util
-    def loader_provider(**constants):
-        adapter = constants['adapter'] if 'adapter' in constants else ''
-        service = constants['service'] if 'service' in constants else ''
-        payload = constants['payload'] if 'payload' in constants else ''
-            
-        req = js.XMLHttpRequest.new()
-        req.open("GET", f"framework/{service}/{adapter}.py", False)
-        req.send()
-        try:
-            spec = importlib.util.spec_from_loader(adapter, loader=None)
-            module = importlib.util.module_from_spec(spec)
-            exec(req.response, module.__dict__)
-            return module
-            #provider = getattr(module,'adapter')
-            
-        except Exception as e:
-            print(f"error load 'infrastructure.{service}.{adapter}'")
-    flow = loader_provider(service='service',adapter='flow')
-    loader = loader_provider(service='service',adapter='loader')
-    
-else:
-    import framework.service.flow as flow
-    import framework.service.loader as loader
+flow = language.load_module(area="framework",service='service',adapter='flow')
+loader = language.load_module(area="framework",service='service',adapter='loader')
 
 loader.bootstrap_adapter()
 

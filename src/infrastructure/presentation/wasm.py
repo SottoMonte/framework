@@ -82,19 +82,6 @@ else:
         
         def info(self):
           return ('front-end')
-        
-        async def loader_module(self,act):
-          response = js.fetch(f'application/action/{act}.py',{'method':'GET'})
-          file = await response
-          aa = await file.text()
-          try:
-              spec = importlib.util.spec_from_loader(act, loader=None)
-              module = importlib.util.module_from_spec(spec)
-              exec(aa, module.__dict__)
-              return module
-          except Exception as e:
-              
-              print(f"error load 'infrastructure module'")
 
         async def route(self,handle,**constants):
             # currentTarget
@@ -117,7 +104,7 @@ else:
               data = ss[1].replace(')','').split(',')
 
             
-            module = await self.loader_module(action)
+            module = await language.get_module(action)
             act = getattr(module,action)
             _ = await act(self,event,data=data)
             

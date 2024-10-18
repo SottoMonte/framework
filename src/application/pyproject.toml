@@ -20,25 +20,17 @@ dependencies = [
 
 [presentation.app]
 adapter = "wasm"
-host = "127.0.0.1"
+host = "0.0.0.0"
 port = "8000"
-routes = "/home/salvatore-addivinola/Documenti/accent/src/application/route/api.xml"
+view = "src/domain/view/layout/page.xml"
+routes = "src/application/route/app.xml"
 
-[apersistence.sap]
-adapter = "api"
-url = ""
-auth = "Login"
-name = ""
-username = ""
-password = ""
-
-[persistence.erp]
-adapter = "sql"
-host = ""
-port = "3306"
-name = ""
-username = ""
-password = ""
+[presentation.sito]
+adapter = "starlette"
+host = "0.0.0.0"
+port = "8001"
+view = "src/domain/view/layout/page.xml"
+routes = "src/application/route/api.xml"
 
 
 [apersistence.cache]
@@ -47,7 +39,7 @@ host = "127.0.0.1"
 port = "6379"
 expiry = "86400"
 
-[message.notice]
+[amessage.notice]
 adapter = "logging"
 host = "127.0.0.1"
 port = "2525"

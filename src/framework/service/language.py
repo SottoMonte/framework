@@ -1,8 +1,108 @@
 #import application.port.language as language
 from collections import OrderedDict
 
-import importlib
 from kink import di
+import importlib
+import tomli
+import js
+import sys
+import os
+import imp
+
+def ttt(**constants):
+    adapter = constants['adapter'] if 'adapter' in constants else ''
+    service = constants['service'] if 'service' in constants else ''
+    area = constants['area'] if 'area' in constants else ''
+    payload = constants['payload'] if 'payload' in constants else ''
+
+    spec=importlib.util.spec_from_file_location(adapter,f"src/{area}/{service}/{adapter}.py")
+ 
+    # creates a new module based on spec
+    foo = importlib.util.module_from_spec(spec)
+
+    setattr(foo,'language',imp.load_source('language', 'src/framework/service/language.py'))
+    
+    # executes the module in its own namespace
+    # when a module is imported or reloaded.
+    spec.loader.exec_module(foo)
+
+    return foo
+
+def loader_provider_test(**constants):
+        adapter = constants['adapter'] if 'adapter' in constants else ''
+        service = constants['service'] if 'service' in constants else ''
+        payload = constants['payload'] if 'payload' in constants else ''
+            
+        req = js.XMLHttpRequest.new()
+        req.open("GET", f"framework/{service}/{adapter}.py", False)
+        req.send()
+
+        req2 = js.XMLHttpRequest.new()
+        req2.open("GET", f"framework/service/language.py", False)
+        req2.send()
+
+        spec2 = importlib.util.spec_from_loader('language', loader=None)
+        module2 = importlib.util.module_from_spec(spec2)
+        exec(req2.response, module2.__dict__)
+        
+        spec = importlib.util.spec_from_loader(adapter, loader=None)
+        module = importlib.util.module_from_spec(spec)
+        module.language = module2
+        exec(req.response, module.__dict__)
+
+        
+
+        return module
+            #provider = getattr(module,'adapter')
+            
+def load_module(**c):
+    if sys.platform == 'emscripten':
+        return loader_provider_test(**c)
+    else:
+        return ttt(**c)
+
+async def get_module(path):
+    #response = js.fetch(f'application/action/{act}.py',{'method':'GET'})
+    response = js.fetch(path,{'method':'GET'})
+    file = await response
+    aa = await file.text()
+    try:
+        spec = importlib.util.spec_from_loader(act, loader=None)
+        module = importlib.util.module_from_spec(spec)
+        exec(aa, module.__dict__)
+        return module
+    except Exception as e:
+        print(f"error load 'infrastructure module'")
+
+async def loader_module(self,act):
+    response = js.fetch(f'application/action/{act}.py',{'method':'GET'})
+    file = await response
+    aa = await file.text()
+    try:
+        spec = importlib.util.spec_from_loader(act, loader=None)
+        module = importlib.util.module_from_spec(spec)
+        exec(aa, module.__dict__)
+        return module
+    except Exception as e:
+        print(f"error load 'infrastructure module'")
+
+def loader_provider(**constants):
+    adapter = constants['adapter'] if 'adapter' in constants else ''
+    service = constants['service'] if 'service' in constants else ''
+    payload = constants['payload'] if 'payload' in constants else ''
+    if service not in di:
+        di[service] = lambda di: list([])
+    req = js.XMLHttpRequest.new()
+    req.open("GET", f"infrastructure/{service}/{adapter}.py", False)
+    req.send()
+    try:
+        spec = importlib.util.spec_from_loader(adapter, loader=None)
+        module = importlib.util.module_from_spec(spec)
+        exec(req.response, module.__dict__)
+        provider = getattr(module,'adapter')
+        di[service].append(provider(config=payload))
+    except Exception as e:
+        print(f"error load 'infrastructure.{service}.{adapter}'")
 
 def get_var(accessor_string,input_dict):
           """Gets data from a dictionary using a dotted accessor-string"""
@@ -13,6 +113,67 @@ def get_var(accessor_string,input_dict):
               else:
                 current_data = current_data.get(chunk, {})
           return current_data
+
+
+if sys.platform != 'emscripten':
+    def loader_manager(**constants):
+        driver = importlib.import_module(constants['path'], package=None)
+        provider = getattr(driver,constants['name'])
+        ser = constants['provider'] 
+        if ser not in di:
+            di[ser] = lambda di: list([])
+        di[constants['name']] = lambda _di: provider(providers=di[ser])
+
+    def loader_driver(**constants):
+        driver = importlib.import_module(constants['path'], package=None)
+        provider = getattr(driver,constants['name'])
+        di[constants['name']] = lambda _di: provider()
+
+    def loader_provider(**constants):
+        adapter = constants['adapter'] if 'adapter' in constants else ''
+        service = constants['service'] if 'service' in constants else ''
+        payload = constants['payload'] if 'payload' in constants else ''
+
+        if service not in di:
+            di[service] = lambda di: list([])
+        driver = importlib.import_module(f"infrastructure.{service}.{adapter}", package=None)
+        provider = getattr(driver,'adapter')
+        di[service].append(provider(config=payload))
+else:
+    def loader_manager(**constants):
+        pass
+    
+
+    def loader_provider(**constants):
+        adapter = constants['adapter'] if 'adapter' in constants else ''
+        service = constants['service'] if 'service' in constants else ''
+        payload = constants['payload'] if 'payload' in constants else ''
+        if service not in di:
+            di[service] = lambda di: list([])
+        req = js.XMLHttpRequest.new()
+        req.open("GET", f"infrastructure/{service}/{adapter}.py", False)
+        req.send()
+        try:
+            spec = importlib.util.spec_from_loader(adapter, loader=None)
+            module = importlib.util.module_from_spec(spec)
+            exec(req.response, module.__dict__)
+            provider = getattr(module,'adapter')
+            di[service].append(provider(config=payload))
+        except Exception as e:
+            
+            print(f"error load 'infrastructure.{service}.{adapter}'")
+
+def get_confi(**constants):
+        if sys.platform != 'emscripten':
+            with open('src/application/pyproject.toml', 'r') as f:
+                config = tomli.loads(f.read())
+                return config
+        else:
+            req = js.XMLHttpRequest.new()
+            req.open("GET", "application/pyproject.toml", False)
+            req.send()
+            config = tomli.loads(str(req.response))
+            return config
 
 def get(domain,dictionary={}):
         output = None
