@@ -93,8 +93,7 @@ def async_function(**constants):
 
 #synchronous
 def function(**constants):
-    inject = dict()
-    test =[] 
+    inject = []
     cc = constants
     if 'ports' in constants:
         for port in  constants['ports']:
@@ -102,7 +101,7 @@ def function(**constants):
             #path = {'persistence':'infrastructure.persistence.redis','presentation':'presentation.gui.flutter','messenger':'infrastructure.persistence.redis'}
             #module_port = importlib.import_module(path[port], package=None)
             #print(port)
-            test.append(di[port])
+            inject.append(di[port])
     def decorator(function):
         def wrapper(*arg, **kwargs):
             '''if 'args' in cc:
@@ -116,7 +115,7 @@ def function(**constants):
             #di['messenger'].post(message=f"start::{function.__name__} , inject={inject},args={arg},kwargs={kwargs}")
             #await asyncio.sleep(2)
             try:
-                output = function(*test,*arg,**inject,**kwargs)
+                output = function(*arg,*inject,**kwargs)
             except Exception as e:
                 e_type = type(e).__name__
                 e_file = e.__traceback__.tb_frame.f_code.co_filename

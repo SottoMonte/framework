@@ -13,21 +13,29 @@ from secrets import token_urlsafe
 
 class defender():
 
-    provider = []
-    session = []
-    users = {'mario':'12345','luca':'pizza'}
-
     def __init__(self,**constants):
         self.sessions = dict()
         self.providers = constants['providers']
 
     async def authenticate(self,**constants):
-        if constants['username'] in self.users and constants['password'] == self.users[constants['username']]:
+        for backend in self.providers:
+            token = await backend.authenticate(**constants)
+            if token != None:
+                self.sessions[constants['identifier']] = token
+                return token
+        '''if constants['username'] in self.users and constants['password'] == self.users[constants['username']]:
             token = token_urlsafe(16)
             self.sessions[constants['identifier']] = token
-            return token,dict({'username':constants['username']})
+            return token
         else:
-            return '#',dict({'username':'sconosciuto'})
+            return '#' '''
+
+    async def authenticated(self,**constants):
+        #print(self.sessions,constants['session'])
+        if constants['session'] in self.sessions:
+            return True
+        else:
+            return False
 
     async def authorize(self,**constants):
         return True

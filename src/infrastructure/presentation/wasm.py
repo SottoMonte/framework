@@ -57,7 +57,6 @@ else:
           return current_data
 
         async def async_loader(self, *services, **constants):
-          print('OK load')
           #session = js.window.sessionStorage.getItem('session_state')
           #socket = js.WebSocket.new('ws://localhost:8000/ws')
           #def on_message(event):
@@ -66,14 +65,32 @@ else:
           #pyodide.create_proxy(self.route)
           #socket.addEventListener('message', pyodide.create_proxy(on_message))
           #cookies = {cookie.split('=')[0].strip():cookie.split('=')[1] for cookie in js.document.cookie.split(';')}
-          cookies = {}
+          self.cookies = {}
           for cookie in js.document.cookie.split(';'):
               if '=' in cookie:
                   key, value = cookie.split('=', 1)
-                  cookies[key.strip()] = value
+                  self.cookies[key.strip()] = value
           #print(js.document.cookie,"<-----",session,cookies)
-          print('OK')
-          html = await self.builder(user=cookies)
+
+          model = 'user'
+          token = self.cookies['session_token'] if 'session_token' in self.cookies else 'None'
+          
+          url = f"gather?model={model}&token={token}"
+                  
+          response = js.fetch(url,{'method':'GET'})
+          
+          file = await response
+          
+          if file.status == 200:
+            aa = await file.text()
+            transaction = json.loads(aa)
+            
+
+            user = transaction['result']
+          else:
+            user = dict()
+
+          html = await self.builder(user=user)
           js.document.getElementById('loading').remove()
           js.document.body.prepend(html)
 
@@ -512,7 +529,7 @@ else:
                     header.innerHTML += f'<h5 class="offcanvas-title" id="offcanvasScrollingLabel">{title}</h5>'
                     header.innerHTML += '<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>'
                     body = js.document.createElement("div")
-                    body.className = 'offcanvas-body'
+                    body.className = 'offcanvas-body p-0'
 
                     #div.append(header)
                     div.append(body)
@@ -649,8 +666,11 @@ else:
                 case 'Storekeeper':
                   model = root._attributes['model'] if 'model' in root._attributes else 'client'
                   url = f"gather?model={model}"
-                  if 'identifier' in root._attributes:
-                    url += f"&identifier={root._attributes['identifier']}"
+                  #if 'identifier' in root._attributes:
+                  #  url += f"&identifier={root._attributes['identifier']}"
+                  
+                  if 'token' in root._attributes:
+                    url += f"&token={self.cookies['session_token']}"
                   
                   
                   div = js.document.createElement("span")
@@ -660,11 +680,11 @@ else:
                   file = await response
                   aa = await file.text()
                   bb = json.loads(aa)
-
-                  #print(bb)
+                  #cccc = {'storekeeper':bb['result']}|data
+                  #print(cccc)
 
                   for y in root.get_elements():
-                    built = await mount_view(y,{'storekeeper':bb}|data)
+                    built = await mount_view(y,{'storekeeper':bb['result']}|data)
                     div.append(built)
 
                   return div

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Container color="linear-gradient(#17082e 0%, #1a0933 7%, #1a0933 80%, #0c1f4c 100%)" size="expand" margin="m-0" padding="p-0" >
-    <Nav color="#6f41c0" padding="px-2;py-0;" style="z-index:0;position:unset;">
+<Container color="#f8f8f8" size="expand" margin="m-0" padding="p-0" >
+    <Nav color="#fbfbfb" padding="px-5;py-1" margin="m-0" class="border-bottom" style="z-index:0;position:unset;">
         <Column>
             <Img src="/static/logo.svg" height="30px" />
         </Column>
@@ -16,12 +16,13 @@
             <Route url=""><Icon icon="bi-bag-fill"/><Text>Market</Text></Route>
             <Route url=""><Icon icon="bi-building-fill"/><Text>Data Center</Text></Route>
         </Column>
-        <Column size="auto" content="end" alignment="center" padding="px-3" >
+        <Column size="auto" content="end" alignment="center" >
             <Button id="button3" data-bs-toggle="offcanvas" size="sm" data-bs-target="#profile" padding="p-0">
                 <Column alignment="center">
-                    <Icon icon="bi-bell-fill" color="white"/>
-                    <Img src="static/logo.svg" margin="mx-2" width="50px" height="50px" style="background-color:#787;" class="rounded-2" />
-                    <Text color="white" >{{ user.username or 'None' }}</Text>
+                    <Icon icon="bi-inbox-fill" color="white"/>
+                    <Icon icon="bi-question-circle-fill" color="white"/>
+                    <Img src="{{ user.avatar or 'static/logo.svg' }}" margin="mx-2" width="40px" height="40px" class="rounded-2 border" />
+                    <Text >{{ user.username or 'NaM' }}</Text>
                 </Column>  
             </Button>
             <Window id="exampleModal" position="centered" size="sm" title="Logout" action="logout">
@@ -29,22 +30,24 @@
             </Window>
             <Window id="profile" type="canvas" title="Logout" >
                 <Column alignment="center">
-                    
                     <Button size="sm" data-bs-dismiss="offcanvas" >
                         <Column alignment="center">
-                        <Img src="static/logo.svg" margin="mx-2" width="50px" height="50px" style="background-color:#787;" class="rounded-2" />
-                        <Text color="black" >{{ user.username or 'None' }}</Text>
+                        <Img src="{{ user.avatar or 'static/logo.svg' }}" margin="mx-2" width="40px" height="40px" class="rounded-2 border" />
+                        <Text color="black" >{{ user.username or 'NaM' }}</Text>
                         </Column>
                     </Button>
-                    <Button id="button2" icon="REMOVE" size="sm" target="#exampleModal" class=" d-inline" >Sign Out</Button>
-                </Column>  
+                    <Button id="button2" icon="REMOVE" size="sm" target="#exampleModal" class=" d-inline" ><Icon icon="bi-box-arrow-right"/></Button>
+                </Column>
+                <Container class="border-top">
+
+                </Container>
             </Window>
         </Column>
     </Nav>
     <Container id="main" type="main" size="expand" margin="mb-auto" padding="p-0" class="overflow-auto" >
         
     </Container>
-    <Container type="footer" color="#170229" size="fluid">
+    <Container type="footer" color="#f1f1f1" class="border-top" size="fluid">
         <Container color="body">
             <Column content="center">
                 <Text>Colosso Copyright © 2023. All rights reserved. </Text>

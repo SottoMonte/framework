@@ -2,6 +2,7 @@
 <Routes path="/api" >
     <Route path="/login" type="login" method="POST" />
     <Route path="/logout" type="logout" method="GET" />
-    <Route path="/" type="view" view="src/application/view/layout/test.html" method="GET" />
+    <Route path="/" type="view" view="src/application/view/page/auth/login.html" method="GET" />
+    <Route path="/tic" type="view" view="public/index.html" method="GET" />
     <Route path="/gather" type="action" method="GET" policy="" />
 </Routes>

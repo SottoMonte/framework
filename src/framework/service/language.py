@@ -8,6 +8,7 @@ import js
 import sys
 import os
 import imp
+from jinja2 import Environment
 
 def ttt(**constants):
     adapter = constants['adapter'] if 'adapter' in constants else ''
@@ -164,16 +165,23 @@ else:
             print(f"error load 'infrastructure.{service}.{adapter}'")
 
 def get_confi(**constants):
-        if sys.platform != 'emscripten':
-            with open('src/application/pyproject.toml', 'r') as f:
-                config = tomli.loads(f.read())
-                return config
-        else:
-            req = js.XMLHttpRequest.new()
-            req.open("GET", "application/pyproject.toml", False)
-            req.send()
-            config = tomli.loads(str(req.response))
+    jinjaEnv = Environment()
+    if sys.platform != 'emscripten':
+        with open('src/application/pyproject.toml', 'r') as f:
+            text = f.read()
+            template = jinjaEnv.from_string(text)
+            content = template.render(constants)
+            config = tomli.loads(content)
             return config
+    else:
+        req = js.XMLHttpRequest.new()
+        req.open("GET", "application/pyproject.toml", False)
+        req.send()
+        text = str(req.response)
+        template = jinjaEnv.from_string(text)
+        content = template.render(constants)
+        config = tomli.loads(content)
+        return config
 
 def get(domain,dictionary={}):
         output = None

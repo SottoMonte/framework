@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Index{% endblock %}
+{% block head %}
+    {{ super() }}
+    <style type="text/css">
+        .important { color: #336699; }
+    </style>
+{% endblock %}
+{% block main %}
+<form id="form-login" action="/login" method="POST" padding="p-2">
+    <input name="username" padding="pb-2" />
+    <Input type="password" name="password" padding="pb-2" />
+    <button type="submit">Accedi</button>
+</form>
+<div class="container">
+    <div class="jumbotron text-center text-primary">
+        <h1><span class="fa fa-github"></span> Github OAuth</h1>
+        <p>Authorize your app with:</p>
+        <a href="https://github.com/login/oauth/authorize?client_id=Iv23li8IzmjxqtrCVomM" class="btn btn-danger"><span class="fa fa-github"></span> Github Login</a>
+    </div>
+</div>
+{% endblock %}

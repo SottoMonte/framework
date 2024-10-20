@@ -10,7 +10,7 @@ from starlette.websockets import WebSocket
 #from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.staticfiles import StaticFiles
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, PackageLoader, select_autoescape,FileSystemLoader
 
 import untangle
 
@@ -116,10 +116,11 @@ class AuthorizationMiddleware:
     def __init__(
         self,
         app ,
+        manager,
         allow_websocket: bool = True,
     ):
         self.app = app
-        #self.secret_key = login_manager.secret_key
+        self.manager = manager
         self.allow_websocket = allow_websocket
 
     async def __call__(
@@ -132,71 +133,29 @@ class AuthorizationMiddleware:
             await self.app(scope, receive, send)
             return
 
+        for prefix_dir in ['/github','/static','/login','/logout','/framework','/application','/infrastructure']:
+            if scope["path"].startswith(prefix_dir) or scope["path"] == '/':
+                await self.app(scope, receive, send)
+                return
+
         conn = HTTPConnection(scope=scope, receive=receive)
-        ssss = conn.cookies['user'] if 'user' in conn.cookies else None
-        #print(ssss)
-        SessionAuthBackend
-        if False:
+        ssss = conn.cookies['session_identifier'] if 'session_identifier' in conn.cookies else None
+        #print(ssss,conn.cookies)
+
+        check = await self.manager.authenticated(session=ssss)
+
+        if not check:
             response = RedirectResponse('/', status_code=301)
             await response(scope, receive, send)
             return
         else:
-
             await self.app(scope, receive, send)
             return
-
-class DefenderMiddleware:
-    def __init__(
-        self,
-        app ,
-        backend = None,
-        manager = None,
-        excluded_dirs = [],
-        allow_websocket: bool = True,
-    ):
-        self.app = app
-        self.backend = backend
-        self.excluded_dirs = excluded_dirs or []
-        self.manager = manager
-        #self.secret_key = login_manager.secret_key
-        self.allow_websocket = allow_websocket
-
-    async def __call__(
-        self, scope: Scope, receive: Receive, send: Send
-    ) -> None:
-        if self.allow_websocket is False and scope["type"] != "http":
-            await self.app(scope, receive, send)
-            return
-        elif scope["type"] not in ("http", "websocket"):
-            await self.app(scope, receive, send)
-            return
-
-
-        conn = HTTPConnection(scope=scope, receive=receive)
-        session = conn.session.get('user')
-        print(conn.cookies,session)
-        
-        
-
-        async def custom_send(message: Message):
-            #print(message)
-            '''user_ = conn.scope["user"] if 'user' in conn.scope else dict()
-            name = user_['username'] if user_ != None and 'username' in user_ else ''
-            passs = user_['password'] if user_ != None and 'password' in user_ else ''
-            #print(user_)
-            user = await self.manager.authenticate(username=name,password=passs)
-            if user:
-                self.backend.set_cookie(message,user)'''
-            
-            await send(message)
-
-        await self.app(scope, receive, custom_send)
-        return
 
 class adapter(presentation.presentation):
 
-    #@flow.function(ports=('defender',))
-    def __init__(self,**constants):
+    @flow.function(ports=('defender',))
+    def __init__(self,defender,**constants):
         self.config = constants['config']
         self.views = dict({})
         cwd = os.getcwd()
@@ -213,17 +172,17 @@ class adapter(presentation.presentation):
 
         middleware = [
             Middleware(SessionMiddleware, session_cookie="session_state",secret_key='pq2U5VtsFYemnfK6WYSYodQ7QUGJPEvw'),
+            #Middleware(AuthorizationMiddleware, manager=defender)
             #Middleware(CORSMiddleware, allow_origins=['*'],allow_methods=['*'],allow_headers=['*']),
             #Middleware(DefenderMiddleware,backend=self,manager=defender),
             #Middleware(DefenderMiddleware,backend=self,manager=defender,allow_websocket=False,),
-            #Middleware(AuthorizationMiddleware,)
         ]
 
         self.app = Starlette(debug=True,routes=routes,middleware=middleware)
 
     def loader(self, *services, **constants):
         
-        self.env = Environment()
+        self.env = Environment(loader=FileSystemLoader("src/application/view/layout/"))
         loop=constants['loop']
         config = Config(app=self.app, loop=loop,host=self.config['host'], port=int(self.config['port']),use_colors=True,reload=True)
         server = Server(config)
@@ -233,14 +192,14 @@ class adapter(presentation.presentation):
         f = open(constants['file'], "r")
         html = f.read()
 
-        '''template = self.env.from_string(aa)
+        template = self.env.from_string(html)
           
-        transformed = template.render(constants)
+        content = template.render(constants)
 
-        obj = untangle.parse(transformed)
+        #obj = untangle.parse(transformed)
         
-        return await mount_view(obj.children[0],constants)'''
-        return html
+        #return await mount_view(obj.children[0],constants)
+        return content
         
     @flow.async_function(ports=('defender',))
     async def logout(self,request,defender) -> None:
@@ -250,22 +209,42 @@ class adapter(presentation.presentation):
         response.delete_cookie("session_token")
         return response
 
-    @flow.async_function(ports=('defender',))
-    async def login(self,request: Request,defender) -> None:
-        credential = await request.form()
-        credential = dict(credential)
-        session_identifier = request.cookies.get('session_identifier', secrets.token_urlsafe(16))
-        #session_token = request.cookies.get('session_token', 'Cookie not found')
-        token,identity = await defender.authenticate(identifier=session_identifier,**credential)
-        if identity:
-            request.session.update(identity)
-        
-        #response = JSONResponse({'session': request.session})
-        response = RedirectResponse('/', status_code=303)
-        if 'session_identifier' not in request.cookies:
-            response.set_cookie(key='session_identifier', value=session_identifier, max_age=3600)
-        response.set_cookie(key='session_token', value=token, max_age=3600)
-        return response
+    @flow.async_function(ports=('storekeeper','defender',))
+    async def login(self,request: Request, storekeeper, defender) -> None:
+        match request.method:
+            case 'GET':
+                query = dict(request.query_params)
+                session_identifier = request.cookies.get('session_identifier', secrets.token_urlsafe(16))
+                #session_token = request.cookies.get('session_token', 'Cookie not found')
+                token = await defender.authenticate(identifier=session_identifier,**query)
+                
+                transaction = await storekeeper.get(model="user",token=token)
+                print(transaction)
+                if transaction['state']:
+                    request.session.update(transaction['result'])
+                
+                response = RedirectResponse('/', status_code=303)
+                if 'session_identifier' not in request.cookies:
+                    response.set_cookie(key='session_identifier', value=session_identifier, max_age=3600)
+                response.set_cookie(key='session_token', value=token, max_age=3600)
+                return response
+            case 'POST':
+                credential = await request.form()
+                credential = dict(credential)
+                session_identifier = request.cookies.get('session_identifier', secrets.token_urlsafe(16))
+                #session_token = request.cookies.get('session_token', 'Cookie not found')
+                token = await defender.authenticate(identifier=session_identifier,**credential)
+                
+                transaction = await storekeeper.get(model="user",token=token)
+                
+                if transaction['state']:
+                    request.session.update(transaction['result'])
+                
+                response = RedirectResponse('/', status_code=303)
+                if 'session_identifier' not in request.cookies:
+                    response.set_cookie(key='session_identifier', value=session_identifier, max_age=3600)
+                response.set_cookie(key='session_token', value=token, max_age=3600)
+                return response
 
     async def websocket(self,websocket):
         
@@ -292,8 +271,7 @@ class adapter(presentation.presentation):
         #print(request.cookies.get('user'))
         match request.method:
             case 'GET':
-                query = request.query_params
-                id = str(uuid.uuid4())
+                query = dict(request.query_params)
                 #await messenger.post(identifier=id,name=request.url.path[1:],value=dict(query))
                 #data = await messenger.get(identifier=id,name=request.url.path[1:],value=dict(query))
                 import application.action.gather as gather
@@ -357,5 +335,5 @@ class adapter(presentation.presentation):
             self.views[path] = view
             r = Route(path,endpoint=endpoint, methods=[method])
             if setting == 'Mount':
-                r = Mount('/static', app=StaticFiles(directory='/home/salvatore-addivinola/Documenti/accent/public/'), name="static")
+                r = Mount('/static', app=StaticFiles(directory='/public'), name="static")
             routes.append(r)

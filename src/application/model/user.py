@@ -1,6 +1,8 @@
 import application.model.password as password
 import application.model.name as name
 import application.model.string as string
+import application.model.identifier as identifier
+import application.model.url as url
 '''
 # User
 (code:natural)
@@ -17,7 +19,9 @@ import application.model.string as string
 )'''
 
 user = (
-    {'model':name.name},
+    {'model':identifier.identifier},
+    {'name':'username','model':name.name},
     {'model':password.password},
     {'name':'role','model':string.string},
+    {'avatar':'role','model':url.url},
 )

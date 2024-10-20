@@ -1,6 +1,6 @@
 [project]
 name = "hub"
-identifier ="it.orakom.hub"
+identifier ="eu.colosso.app"
 key = "t0RZQLdUDpweGc7hvcDhMcoKuOaJBo+jgsjJ6huk2rQRLrpfPyFl/A=="
 version = "0.0.1"
 readme = "README.md"
@@ -39,9 +39,24 @@ host = "127.0.0.1"
 port = "6379"
 expiry = "86400"
 
+[persistence.github]
+adapter = "api"
+url = "https://api.github.com"
+header_key = "Authorization"
+header_value = "token "
+autologin = "false"
+expiry = "86400"
+
 [amessage.notice]
 adapter = "logging"
 host = "127.0.0.1"
 port = "2525"
 persistence = "local"
+
+[authentication.github]
+adapter = "api"
+host = "127.0.0.1"
+port = "2525"
+id = "{{ GITHUB_APP_ID }}"
+secret = "{{ GITHUB_APP_SECRET }}"
 

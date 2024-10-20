@@ -1,29 +1,29 @@
 import framework.port.persistence as persistence
-import requests
 import aiohttp
 import framework.service.flow as flow
-import urllib3
+#import urllib3
 import json
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+#urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class adapter(persistence.port):
-    token = None
-    url = None
+    
     def __init__(self,**constants):
-        self.config = constants['config'] 
-        self.token = self.login()
+        self.config = constants['config']
+        self.ssl = bool(self.config['ssl']) if 'ssl' in self.config else True
+        self.url = self.config['url']
+        if 'autologin' in self.config and self.config['autologin'] == 'true':
+            self.token = self.login()
 
     def login(self):
         url = f"{self.config['url']}/Login"
-        ddd = { "UserName":"manager", "Password":"Orakom2024", "CompanyDB":"SBO_ORAKOM99",}
+        ddd = { "UserName":"manager", "Password":"s", "CompanyDB":"s",}
         response = requests.post(url, json = ddd,verify=False)
         
         if response.status_code == 200:
             return response.json()['SessionId']
         else:
             return ''
-            
-    
+             
     def logout(self):
         url = f"{self.config['url']}/Login"
         head = {'Cookie':'B1SESSION='+self.token}
@@ -36,42 +36,40 @@ class adapter(persistence.port):
 
     async def query(self, *services, **constants):
 
-        url = f"{self.config['url']}/{constants['path']}"
+        url = f"{self.url}/{constants['path']}"
 
-        if 'identifier' in constants:
+        '''if 'identifier' in constants:
             url += f"('{constants['identifier']}')"
         else:
             row = constants['row'] if 'row' in constants else '10'
             page = str((int(constants['page'])-1)*int(row)) if 'page' in constants else str((int('1')-1)*int(row)) 
             url += f"?$top={row}&$skip={page}&$filter=CardType eq 'cCustomer'"
         
-        '''if 'partition' or 'order' or 'filter' in constants:
-            url += f"?"'''
+        if 'partition' or 'order' or 'filter' in constants:
+            url += f"?"
 
         if 'order' in constants:
             url += "&$orderby=CardCode desc"
             
 
         if 'filter' in constants:
-            url += f"$filter={constants['filter']['field']} eq '{constants['filter']['value']}'"
-        print(url)
+            url += f"$filter={constants['filter']['field']} eq '{constants['filter']['value']}'"'''
+
         return url
 
     @flow.async_function(ports=('storekeeper',))
     async def read(self, storekeeper, **constants):
         # passare tramite constant valore status code
-        head = {'Cookie':'B1SESSION='+self.token}
+        headers = {self.config['header_key']:self.config['header_value']+constants['token']}
         url = await self.query(**constants)
-        #response = requests.get(url, headers=head,verify=False)
         
         async with aiohttp.ClientSession() as session:
 
-            async with session.get(url, headers=head,ssl=False) as response:
+            async with session.get(url, headers=headers,ssl=self.ssl) as response:
                 if response.status != 200:
                     return storekeeper.builder('transaction',{'state': False,'action':'read','remark':'not found data'})
                 else:
                     r = await response.json()
-                    #print(r)
                     return storekeeper.builder('transaction',{'state': True,'action':'read','result':r})
 
         

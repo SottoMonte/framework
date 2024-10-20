@@ -18,10 +18,13 @@ values2 = {
 }
 
 values = {
-    'identifier':[
-        {'MODEL':lambda n: f"C{int(n):08d}" if type(n) == type('') else [f"C{int(item):08d}" for item in n],
-         'ERP': lambda s: int(''.join(filter(str.isdigit, s))) if type(s) == type('') else [int(''.join(filter(str.isdigit, item))) for item in s], 
-         'SAP': lambda n: f"C{int(n):08d}" if type(n) == type('') else [f"C{int(item):08d}" for item in n]},
+    ''''identifier':[
+        {
+            'MODEL':lambda n: f"C{int(n):08d}" if type(n) == type('') else [f"C{int(item):08d}" for item in str(n)],
+            'ERP': lambda s: int(''.join(filter(str.isdigit, s))) if type(s) == type('') else [int(''.join(filter(str.isdigit, item))) for item in s],
+            'GITHUB': lambda s: int(''.join(filter(str.isdigit, s))) if type(s) == type('') else [int(''.join(filter(str.isdigit, item))) for item in s],
+            'SAP': lambda n: f"C{int(n):08d}" if type(n) == type('') else [f"C{int(item):08d}" for item in n]
+        },
     ],
     'person.gender':[
         {'MODEL':'male','ERP': 'm', 'SAP': 'gt_Male'},
@@ -35,17 +38,18 @@ values = {
         {'MODEL':'DIR','ERP': 'DIR', 'SAP': 'BOCLI'},
         {'MODEL':'client','ERP': 'Contacts::Customer', 'SAP': 'cCustomer'},
         {'MODEL':'agent','ERP': 'Contacts::Agent', 'SAP': 'cAgent'},
-    ],
+    ],'''
 }
 
 #converti = lambda s: ''.join(filter(str.isdigit, s))
 #lambda n: f"C{n:08d}"
 lambda n: f"C{int(n):08d}" if type(n) == type('') else [f"C{int(item):08d}" for item in n]
 #Table/Path
-location = {'ERP': 'SCRM_Customers', 'SAP': 'BusinessPartners','CACHE':'cache'}
+#location = {'ERP': 'SCRM_Customers', 'SAP': 'BusinessPartners','CACHE':'cache','GITHUB':'user'}
+location = {'GITHUB':'user'}
 
 keys_test = (
-    {'MODEL':'identifier','ERP': 'id', 'SAP': ['CardCode','value.*.CardCode']},
+    {'MODEL':'identifier','ERP': 'id', 'SAP': ['CardCode','value.*.CardCode'],'GITHUB':'id'},
     #{'MODEL':'type','ERP': 'name', 'SAP': 'CardType'},
     {'MODEL':'name','ERP': 'name', 'SAP': ['CardName','value.*.CardName']},
     {'MODEL':'person.first','ERP': 'first_name', 'SAP': ['ContactEmployees.0.FirstName','value.*.ContactEmployees.0.FirstName']},
@@ -56,7 +60,7 @@ keys_test = (
     {'MODEL':'person.city','ERP': 'birth_town', 'SAP': ['ContactEmployees.0.CityOfBirth','value.*.ContactEmployees.0.CityOfBirth']},
     {'MODEL':'person.date','ERP': 'birth_date', 'SAP': ['ContactEmployees.0.DateOfBirth','value.*.ContactEmployees.0.DateOfBirth']},
     {'MODEL':'person.province','ERP': 'birth_province', 'SAP': ['ContactEmployees.0.PlaceOfBirth','value.*.ContactEmployees.0.PlaceOfBirth']},
-    {'MODEL':'person.contact.email','ERP': 'email', 'SAP': ['EmailAddress','value.*.EmailAddress']},
+    {'MODEL':'person.contact.email','ERP': 'email', 'SAP': ['EmailAddress','value.*.EmailAddress'],'GITHUB':'name'},
     {'MODEL':'person.contact.website','ERP': '', 'SAP': ['ContactEmployees.0.Website','value.*.ContactEmployees.0.Website']},
     {'MODEL':'person.contact.phone','ERP': 'phone', 'SAP': ['ContactEmployees.0.Phone1','value.*.ContactEmployees.0.Phone1']},
     {'MODEL':'person.contact.cellular','ERP': 'phone', 'SAP': ['ContactEmployees.0.MobilePhone','value.*.ContactEmployees.0.MobilePhone']},

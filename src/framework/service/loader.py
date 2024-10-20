@@ -8,9 +8,9 @@ def bootstrap_adapter() -> None:
         language.loader_manager(provider="message",name='messenger',path='framework.manager.messenger')
         language.loader_manager(provider="persistence",name='storekeeper',path='framework.manager.storekeeper')
         language.loader_manager(provider="presentation",name='presenter',path='framework.manager.presenter')
-        language.loader_manager(provider="storekeeper",name='defender',path='framework.manager.defender')
+        language.loader_manager(provider="authentication",name='defender',path='framework.manager.defender')
         
-        for module in ['presentation','persistence','message']:
+        for module in ['presentation','persistence','message','authentication']:
             if module in config:
                 for driver in config[module]:
                     setting = config[module][driver]

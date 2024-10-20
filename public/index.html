@@ -17,6 +17,7 @@
         <!-- ===============================================-->
         <meta name="theme-color" content="#ffffff">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
   
         <!-- ===============================================-->
         <!--    Stylesheets-->
@@ -25,7 +26,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-        <link href="https://bootswatch.com/5/vapor/bootstrap.min.css" rel="stylesheet" >
+        
         
         <!-- ===============================================-->
         <!--    Javascript-->
@@ -71,6 +72,7 @@
 
         <script type = "text/javascript">
             function runWebsockets() {
+                // <a href="javascript:runWebsockets()">Say Hello From Client</a>
                 if ("WebSocket" in window) {
                     var ws = new WebSocket("ws://localhost:8000/ws");
                     ws.onopen = function() {
@@ -90,10 +92,11 @@
         </script>
     </head>
     <body id="body" class="d-flex h-100 flex-column">
-        <a href="javascript:runWebsockets()">Say Hello From Client</a>
         <!-- ===============================================-->
         <!--    Main Content-->
         <!-- ===============================================-->
+        {% block main %}
+        {% endblock %}
         <div id="loading" class="d-flex justify-content-center align-items-center position-fixed w-100 h-100" style="background: #444;">
             <img class="img" src="static/logo.svg" style=" height:50px;">
             <div class="spinner-border text-success" role="status">
@@ -103,6 +106,8 @@
         <!-- ===============================================-->
         <!--    JavaScripts-->
         <!-- ===============================================-->
+        {% block script %}
+        {% endblock %}
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     </body>
 </html>
