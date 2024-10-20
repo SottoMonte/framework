@@ -5,9 +5,9 @@
             <Img src="/static/logo.svg" height="30px" />
         </Column>
         <Column>
-            <Route url="application/view/page/orakom/test.xml"><Icon icon="bi-people-fill"/><Text>Colosso</Text></Route>
-            <Route url="application/view/component/editor.xml"><Icon icon="bi-basket3-fill"/><Text>Inventory</Text></Route>
-            <Route url=""><Icon icon="bi-shield-fill"/><Text>Security</Text></Route>
+            <Route url="application/view/page/colosso/test.xml"><Icon icon="bi-people-fill"/><Text>Colosso</Text></Route>
+            <Route url="application/view/page/auth/dashboard.xml"><Icon icon="bi-basket3-fill"/><Text>Inventory</Text></Route>
+            <Route url="application/view/layout/main.xml"><Icon icon="bi-shield-fill"/><Text>Security</Text></Route>
             <Route url=""><Icon icon="bi-easel-fill"/><Text>Monitoring</Text></Route>
             <Route url=""><Icon icon="bi-mortarboard-fill"/><Text>Academy</Text></Route>
             <Route url=""><Icon icon="bi-chat-dots-fill"/><Text>Social</Text></Route>
@@ -38,8 +38,35 @@
                     </Button>
                     <Button id="button2" icon="REMOVE" size="sm" target="#exampleModal" class=" d-inline" ><Icon icon="bi-box-arrow-right"/></Button>
                 </Column>
-                <Container class="border-top">
-
+                <Container class="border-top" padding="p-0">
+                    <!-- TabNav -->
+                    <Nav margin="m-0" padding="p-0" class="border-bottom">
+                        <Route href="#contracts" data-bs-toggle="tab"><Icon icon="bi-person-fill-gear"/><Text class="text-uppercase">Profile</Text></Route>
+                        <Route href="#credit-notes" data-bs-toggle="tab"><Icon icon="bi-wallet-fill"/><Text class="text-uppercase">Wallet</Text></Route>
+                        <Route href="#invoices" data-bs-toggle="tab"><Icon icon="bi-key-fill"/><Text class="text-uppercase">API</Text></Route>
+                        <Route href="#calls" data-bs-toggle="tab"><Icon icon="bi-inbox-fill"/><Text class="text-uppercase">Box</Text></Route>
+                    </Nav>
+                    <!-- Tab -->
+                    <Tab>
+                        <Container id="contracts">
+                            <Text>1</Text>
+                        </Container>
+                        <Container id="invoices">
+                            <Text>2</Text>
+                        </Container>
+                        <Container id="credit-notes">
+                            <Text>3</Text>
+                        </Container>
+                        <Container id="calls">
+                            <Text>4</Text>
+                        </Container>
+                        <Container id="tickets">
+                            <Text>5</Text>
+                        </Container>
+                        <Container id="historical">
+                            <Text>6</Text>
+                        </Container>
+                    </Tab>
                 </Container>
             </Window>
         </Column>

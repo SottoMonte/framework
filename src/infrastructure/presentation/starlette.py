@@ -10,7 +10,7 @@ from starlette.websockets import WebSocket
 #from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.staticfiles import StaticFiles
-from jinja2 import Environment, PackageLoader, select_autoescape,FileSystemLoader
+from jinja2 import Environment, select_autoescape,FileSystemLoader,BaseLoader,ChoiceLoader,Template
 
 import untangle
 
@@ -181,8 +181,10 @@ class adapter(presentation.presentation):
         self.app = Starlette(debug=True,routes=routes,middleware=middleware)
 
     def loader(self, *services, **constants):
-        
-        self.env = Environment(loader=FileSystemLoader("src/application/view/layout/"))
+        fs_loader = FileSystemLoader("src/application/view/layout/")
+        #http_loader = MyLoader()
+        #choice_loader = ChoiceLoader([fs_loader, http_loader])
+        self.env = Environment(loader=fs_loader,autoescape=select_autoescape(["html", "xml"]))
         loop=constants['loop']
         config = Config(app=self.app, loop=loop,host=self.config['host'], port=int(self.config['port']),use_colors=True,reload=True)
         server = Server(config)

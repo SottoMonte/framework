@@ -22,18 +22,27 @@ if sys.platform != 'emscripten':
           return rresult'''
 else:
     import js
-    from jinja2 import Environment, PackageLoader, select_autoescape
+    from jinja2 import Environment, select_autoescape,FileSystemLoader,BaseLoader,ChoiceLoader,Template
     import untangle
     import asyncio
     import pyodide
     import json
     import importlib
+
+    class MyLoader(BaseLoader):
+      def get_source(self, environment, template):
+          req = js.XMLHttpRequest.new()
+          req.open("GET", f"application/view/layout/{template}", False)
+          req.send()
+          return req.response, None, None
+          # return TEMPLATE, fname, False
     
     class adapter():
         def __init__(self,**constants):
           self.components = dict()
           self.config = constants['config']
-          self.env = Environment()
+          http_loader = MyLoader()
+          self.env = Environment(loader=http_loader,autoescape=select_autoescape(["html", "xml"]))
           self.document = js.document
 
         def loader(self, *services, **constants):
@@ -93,22 +102,16 @@ else:
           html = await self.builder(user=user)
           js.document.getElementById('loading').remove()
           js.document.body.prepend(html)
-
-        def object(self,**constants):
-            pass
         
         def info(self):
           return ('front-end')
 
         async def route(self,handle,**constants):
             # currentTarget
-            user = [x.replace('user=','') for x in js.document.cookie.split(';') if 'user=' in x]
-            print(js.document.cookie.split(';'))
-            user = user[0] if len(user) != 0 else '#'
             url = handle.target.getAttribute('url')
             href = handle.target.getAttribute('href')
             #print(url)
-            code = await self.builder(user=user,url=url,href=href)
+            code = await self.builder(url=url,href=href)
             js.document.getElementById('main').innerHTML = ''
             js.document.getElementById('main').prepend(code)
 
@@ -143,7 +146,8 @@ else:
               case 'identifier':
                 element.setAttribute('name',value)
               case 'url':
-                element.setAttribute('url','http://0.0.0.0:8000/'+value)
+                #'http://0.0.0.0:8000/'
+                element.setAttribute('url',value)
                 element.addEventListener('click',pyodide.create_proxy(self.route))
               case 'click':
                 element.setAttribute(key,value)
@@ -258,15 +262,15 @@ else:
         
         async def rebuild(self,id,tag,**constants):
                   
-          response = js.fetch(f"gather?model={self.components[id]['model']}&row={self.components[id]['pageRow']}&page={self.components[id]['pageCurrent']}&order={self.components[id]['sortField']}",{'method':'GET'})
-          file = await response
-          aa = await file.text()
-          bb = json.loads(aa)
+          #response = js.fetch(f"gather?model={self.components[id]['model']}&row={self.components[id]['pageRow']}&page={self.components[id]['pageCurrent']}&order={self.components[id]['sortField']}",{'method':'GET'})
+          #file = await response
+          #aa = await file.text()
+          #bb = json.loads(aa)
 
           url = f'application/view/component/{tag.replace("C_","")}.xml'
                   
                   
-          test = await self.builder(url=url,data=bb,component=self.components[id])
+          test = await self.builder(url=url,component=self.components[id])
 
           cc = self.document.getElementById(id)
           cc.innerHTML = ""
@@ -291,26 +295,9 @@ else:
           else:
             aa = constants['view']
 
-          
-          
           template = self.env.from_string(aa)
-          
           transformed = template.render(constants)
-
           obj = untangle.parse(transformed)
-          '''try:
-            obj = untangle.parse(transformed)
-          except Exception as e:
-            print(transformed)'''
-          
-          
-
-          '''div = js.document.createElement("div")
-          div.innerHTML = ""
-          #main = js.document.getElementById('main')
-          #main.append(div)
-          #main.prepend(div)
-          js.document.body.prepend(div)'''
 
           async def mount_view(root,data=dict()):
             
@@ -696,15 +683,15 @@ else:
                   if id not in self.components:
                     self.components[id] = dict({'id':id,'model':model,'selected':[],'pageCurrent':1,'pageRow':10,'sortField':'CardName','sortAsc':True})
                   
-                  response = js.fetch(f"gather?model={self.components[id]['model']}&row={self.components[id]['pageRow']}&page={self.components[id]['pageCurrent']}&order={self.components[id]['sortField']}",{'method':'GET'})
-                  file = await response
-                  aa = await file.text()
-                  bb = json.loads(aa)
-                  self.components[id]['data'] = bb 
+                  #response = js.fetch(f"gather?model={self.components[id]['model']}&row={self.components[id]['pageRow']}&page={self.components[id]['pageCurrent']}&order={self.components[id]['sortField']}",{'method':'GET'})
+                  #file = await response
+                  #aa = await file.text()
+                  #bb = json.loads(aa)
+                  #self.components[id]['data'] = bb 
                   url = f'application/view/component/{tag.replace("C_","")}.xml'
                   
                   
-                  test = await self.builder(url=url,data=bb,component=self.components[id],args=args)
+                  test = await self.builder(url=url,component=self.components[id],args=args)
                   
                   return test
                   
