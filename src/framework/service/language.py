@@ -7,7 +7,6 @@ import tomli
 import js
 import sys
 import os
-import imp
 from jinja2 import Environment
 
 def ttt(**constants):
@@ -21,7 +20,10 @@ def ttt(**constants):
     # creates a new module based on spec
     foo = importlib.util.module_from_spec(spec)
 
-    setattr(foo,'language',imp.load_source('language', 'src/framework/service/language.py'))
+    spec_lang=importlib.util.spec_from_file_location('language','src/framework/service/language.py')
+    foo_lang = importlib.util.module_from_spec(spec_lang)
+    spec_lang.loader.exec_module(foo_lang)
+    setattr(foo,'language',foo_lang)
     
     # executes the module in its own namespace
     # when a module is imported or reloaded.
