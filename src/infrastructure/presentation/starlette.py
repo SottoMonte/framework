@@ -157,6 +157,7 @@ class adapter(presentation.presentation):
     @flow.function(ports=('defender',))
     def __init__(self,defender,**constants):
         self.config = constants['config']
+        print(self.config)
         self.views = dict({})
         cwd = os.getcwd()
 
@@ -171,7 +172,7 @@ class adapter(presentation.presentation):
         self.mount_route(routes,self.config['routes'])
 
         middleware = [
-            Middleware(SessionMiddleware, session_cookie="session_state",secret_key='pq2U5VtsFYemnfK6WYSYodQ7QUGJPEvw'),
+            Middleware(SessionMiddleware, session_cookie="session_state",secret_key=self.config['project']['key']),
             Middleware(AuthorizationMiddleware, manager=defender)
             #Middleware(CORSMiddleware, allow_origins=['*'],allow_methods=['*'],allow_headers=['*']),
             #Middleware(DefenderMiddleware,backend=self,manager=defender),
@@ -319,9 +320,9 @@ class adapter(presentation.presentation):
                 self.att(div,root._attributes)
                 for x in inn:
                     if 'url' in root._attributes:
-                    x.setAttribute('url',root._attributes['url'])
+                        x.setAttribute('url',root._attributes['url'])
                     if 'href' in root._attributes:
-                    x.setAttribute('href',root._attributes['href'])
+                        x.setAttribute('href',root._attributes['href'])
                     div.append(x)
                 return div
             case 'Action':

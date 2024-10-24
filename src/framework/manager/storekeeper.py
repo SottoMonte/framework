@@ -10,7 +10,6 @@ if sys.platform == 'emscripten':
     #port = language.load_module(area="application",service='port',adapter='storekeeper')
 else:
     import framework.service.flow as flow
-    import application.port.storekeeper as port
     import framework.service.language as language
 
 #port.storekeeper
