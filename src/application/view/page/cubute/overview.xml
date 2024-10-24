@@ -1,0 +1,104 @@
+{% extends "cardinal.xml" %}
+{% block west %}
+<Select>
+    <Text>View</Text>
+    <Text>Model</Text>
+    <Text>Action</Text>
+    <Text>Policy</Text>
+    <Text>Route</Text>
+</Select>
+{% endblock %}
+{% block north %}
+<Column>
+<Text>View</Text>
+<Text>Notice</Text>
+<Text>Input</Text>
+<Text>Action</Text>
+<Text>Window</Text>
+<Text>Panel</Text>
+<Text>Text</Text>
+<Text>Container</Text>
+<Text>Row</Text>
+<Text>Column</Text>
+<Text>Graph</Text>
+</Column>
+{% endblock %}
+{% block center %}
+<Nav class="nav-tabs" margin="m-0" padding="p-0" color="#ededed">
+    <Route href="#application" data-bs-toggle="tab"><Icon icon="bi-pass"/><Text>Application</Text></Route>
+    <Route href="#framework" data-bs-toggle="tab"><Icon icon="bi-receipt"/><Text>Framework</Text></Route>
+    <Route href="#infrastructure" data-bs-toggle="tab"><Icon icon="bi-journal-bookmark"/><Text>Infrastructure</Text></Route>
+</Nav>
+<Tab>
+    <Container size="fluid" id="application">
+        <Column size="fluid">
+            <Container size="fluid" color="#ededed">
+                <Breadcrumb padding="p-1">
+                    <Select>
+                        <Text>View</Text>
+                        <Text>Model</Text>
+                        <Text>Action</Text>
+                        <Text>Policy</Text>
+                        <Text>Route</Text>
+                    </Select>
+                    <Select class="d-inline">
+                        <Text>layout</Text>
+                        <Text>page</Text>
+                        <Text>content</Text>
+                        <Text>componenet</Text>
+                    </Select>
+                    <Select class="d-inline">
+                        <Text>app.xml</Text>
+                        <Text>stack.xml</Text>
+                        <Text>cardinal.xml</Text>
+                    </Select>
+                </Breadcrumb>
+            </Container>
+            <Container size="fluid" color="#000">   
+                <Text>2</Text>
+            </Container>
+        </Column>
+    </Container>
+    <Container id="framework">
+        <Text>2</Text>
+    </Container>
+    <Container id="infrastructure">
+        <Text>3</Text>
+    </Container>
+</Tab>
+{% endblock %}
+{% block south %}
+<!-- TabNav -->
+<Nav class="nav-tabs" margin="m-0" padding="p-0" color="#ededed">
+    <Route href="#test" data-bs-toggle="tab"><Icon icon="bi-pass"/><Text>Contracts</Text></Route>
+    <Route href="#invoices" data-bs-toggle="tab"><Icon icon="bi-receipt"/><Text>Invoices</Text></Route>
+    <Route href="#credit-notes" data-bs-toggle="tab"><Icon icon="bi-journal-bookmark"/><Text>Credit Notes</Text></Route>
+    <Route href="#calls" data-bs-toggle="tab"><Icon icon="bi-telephone"/><Text>Calls</Text></Route>
+    <Route href="#tickets" data-bs-toggle="tab"><Icon icon="bi-ticket-perforated"/><Text>Tickets</Text></Route>
+    <Route href="#historical" data-bs-toggle="tab"><Icon icon="bi-clock-history"/><Text>Historical</Text></Route>
+</Nav>
+<!-- Tab -->
+<Tab>
+    <Container id="test">
+        <Text>1</Text>
+    </Container>
+    <Container id="invoices">
+        <Text>2</Text>
+    </Container>
+    <Container id="credit-notes">
+        <Text>3</Text>
+    </Container>
+    <Container id="calls">
+        <Text>4</Text>
+    </Container>
+    <Container id="tickets">
+        <Text>5</Text>
+    </Container>
+    <Container id="historical">
+        <Text>6</Text>
+    </Container>
+</Tab>
+{% endblock %}
+{% block east %}
+<Text>East</Text>
+{% endblock %}

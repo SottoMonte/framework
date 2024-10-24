@@ -26,8 +26,8 @@ else:
     import untangle
     import asyncio
     import pyodide
-    import json
     import importlib
+    flow = language.load_module(area="framework",service='service',adapter='flow')
 
     class MyLoader(BaseLoader):
       def get_source(self, environment, template):
@@ -65,7 +65,8 @@ else:
                 current_data = current_data.get(chunk, {})
           return current_data
 
-        async def async_loader(self, *services, **constants):
+        @flow.async_function(ports=('storekeeper',))
+        async def async_loader(self, storekeeper, **constants):
           #session = js.window.sessionStorage.getItem('session_state')
           #socket = js.WebSocket.new('ws://localhost:8000/ws')
           #def on_message(event):
@@ -84,17 +85,9 @@ else:
           model = 'user'
           token = self.cookies['session_token'] if 'session_token' in self.cookies else 'None'
           
-          url = f"gather?model={model}&token={token}"
-                  
-          response = js.fetch(url,{'method':'GET'})
-          
-          file = await response
-          
-          if file.status == 200:
-            aa = await file.text()
-            transaction = json.loads(aa)
-            
+          transaction = await storekeeper.get(model="user",token=token)
 
+          if transaction['state']:
             user = transaction['result']
           else:
             user = dict()
@@ -398,7 +391,7 @@ else:
                   return div
                 case 'Nav':
                   nav = js.document.createElement("nav")
-                  nav.className = "navbar"
+                  nav.className = "container-fluid"
                   classe = "navbar"
 
                   self.att(nav,root._attributes)
@@ -407,6 +400,22 @@ else:
                   for x in inn:
                      li = js.document.createElement("li")
                      li.className = "nav-item"
+                     li.append(x)
+                     ul.append(li)
+                     
+                  nav.append(ul)
+                  return nav
+                case 'Breadcrumb':
+                  nav = js.document.createElement("nav")
+                  nav.className = ""
+                  
+
+                  self.att(nav,root._attributes)
+                  ul = js.document.createElement("ol")
+                  ul.className = "breadcrumb p-0 m-0"
+                  for x in inn:
+                     li = js.document.createElement("li")
+                     li.className = "breadcrumb-item"
                      li.append(x)
                      ul.append(li)
                      
@@ -549,6 +558,7 @@ else:
                     self.att(dialog,root._attributes)
 
                   div.className = classe
+                  div.setAttribute('data-bs-backdrop','false')
                   self.att(div,root._attributes)
                   
                   

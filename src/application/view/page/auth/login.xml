@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window>
+    <Column>
+        <Messenger type="error" />
+        <Action type="form" act="/login">
+            <Input model="user.name" />
+            <Input model="user.password" />
+            <Action act="submit"/>
+            <Action url="https://github.com/login/oauth/authorize?client_id=Iv23li8IzmjxqtrCVomM">
+                <Text>GitHub Login</Text>
+            </Action>
+        </Action>
+        <Graph type="img" url="static/home.png" ></Graph>
+    </Column>
+</Window>

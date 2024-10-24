@@ -3,5 +3,5 @@
     <Input identifier="username" padding="pb-2" />
     <Input type="password" identifier="password" padding="pb-2" />
     <Button type="submit">Accedi</Button>
-    <Route url="https://github.com/login/oauth/authorize?client_id=Iv23li8IzmjxqtrCVomM"><Icon icon="bi-bag-fill"/><Text>Market</Text></Route>
+    <Route href="https://github.com/login/oauth/authorize?client_id=Iv23li8IzmjxqtrCVomM"><Icon icon="bi-github"/><Text>Github Login</Text></Route>
 </Form>

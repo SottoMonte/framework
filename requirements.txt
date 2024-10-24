@@ -1,6 +1,6 @@
 kink>=0.8.0
 tomli>=2.0.2
-js==1.0
+pyodide-py>=0.25.1
 starlette>=0.39.2
 python-multipart>=0.0.12
 itsdangerous==2.2.0 

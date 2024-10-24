@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Column size="full">
+    <Row color="#fcfcfc" width="300px" size="expand" class="border-end">
+        <Container position="fixed" padding="p-0" margin="m-0" start="0" width="230px">
+            {% block west %}
+            {% endblock %}
+        </Container>
+    </Row>
+    <Container size="fluid" padding="p-0" margin="m-0" class="d-flex flex-column container-fluid">
+        <Container size="fluid" color="#fcfcfc" class="border-bottom">
+            {% block north %}
+            {% endblock %}
+        </Container>
+        <Container>
+            {% block center %}
+            {% endblock %}
+        </Container>
+        <Container size="fluid" color="#fcfcfc" margin="mt-auto" class="border-top">
+            {% block south %}
+            {% endblock %}
+        </Container>
+    </Container>
+    <Row color="#fcfcfc" width="253px" size="expand" class="border-start">
+        <Container position="fixed" padding="p-0" margin="m-0" start="0" width="230px">
+            {% block east %}
+            {% endblock %}
+        </Container>
+    </Row>
+</Column>

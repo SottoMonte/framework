@@ -56,7 +56,6 @@ def loader_provider_test(**constants):
         
 
         return module
-            #provider = getattr(module,'adapter')
             
 def load_module(**c):
     if sys.platform == 'emscripten':
@@ -144,27 +143,70 @@ if sys.platform != 'emscripten':
         di[service].append(provider(config=payload))
 else:
     def loader_manager(**constants):
-        pass
+        area,service,adapter = constants['path'].split('.')
+
+        if service not in di:
+            di[service] = lambda di: list([])
+        try:
+            req = js.XMLHttpRequest.new()
+            req.open("GET", f"{area}/{service}/{adapter}.py", False)
+            req.send()
+
+            req2 = js.XMLHttpRequest.new()
+            req2.open("GET", f"framework/service/language.py", False)
+            req2.send()
+
+            spec2 = importlib.util.spec_from_loader('language', loader=None)
+            module2 = importlib.util.module_from_spec(spec2)
+            exec(req2.response, module2.__dict__)
+            
+            spec = importlib.util.spec_from_loader(adapter, loader=None)
+            module = importlib.util.module_from_spec(spec)
+            module.language = module2
+            exec(req.response, module.__dict__)
+
+            provider = getattr(module,adapter)
+            ser = constants['provider'] 
+            if ser not in di:
+                di[ser] = lambda di: list([])
+            
+            
+            di[constants['name']] = lambda _di: provider(providers=di[ser])
+        except Exception as e:
+            print(constants)
+            print(f"error load 'infrastructure.{service}.{adapter}' {repr(e)}")
     
 
     def loader_provider(**constants):
         adapter = constants['adapter'] if 'adapter' in constants else ''
         service = constants['service'] if 'service' in constants else ''
         payload = constants['payload'] if 'payload' in constants else ''
+        area = constants['area'] if 'area' in constants else ''
         if service not in di:
             di[service] = lambda di: list([])
-        req = js.XMLHttpRequest.new()
-        req.open("GET", f"infrastructure/{service}/{adapter}.py", False)
-        req.send()
         try:
+            req = js.XMLHttpRequest.new()
+            req.open("GET", f"{area}/{service}/{adapter}.py", False)
+            req.send()
+
+            req2 = js.XMLHttpRequest.new()
+            req2.open("GET", f"framework/service/language.py", False)
+            req2.send()
+
+            spec2 = importlib.util.spec_from_loader('language', loader=None)
+            module2 = importlib.util.module_from_spec(spec2)
+            exec(req2.response, module2.__dict__)
+            
             spec = importlib.util.spec_from_loader(adapter, loader=None)
             module = importlib.util.module_from_spec(spec)
+            module.language = module2
             exec(req.response, module.__dict__)
+
             provider = getattr(module,'adapter')
             di[service].append(provider(config=payload))
         except Exception as e:
             
-            print(f"error load 'infrastructure.{service}.{adapter}'")
+            print(f"error load 'infrastructure.{service}.{adapter}' {repr(e)}")
 
 def get_confi(**constants):
     jinjaEnv = Environment()

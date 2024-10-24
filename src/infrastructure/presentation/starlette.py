@@ -172,7 +172,7 @@ class adapter(presentation.presentation):
 
         middleware = [
             Middleware(SessionMiddleware, session_cookie="session_state",secret_key='pq2U5VtsFYemnfK6WYSYodQ7QUGJPEvw'),
-            #Middleware(AuthorizationMiddleware, manager=defender)
+            Middleware(AuthorizationMiddleware, manager=defender)
             #Middleware(CORSMiddleware, allow_origins=['*'],allow_methods=['*'],allow_headers=['*']),
             #Middleware(DefenderMiddleware,backend=self,manager=defender),
             #Middleware(DefenderMiddleware,backend=self,manager=defender,allow_websocket=False,),
@@ -221,7 +221,6 @@ class adapter(presentation.presentation):
                 token = await defender.authenticate(identifier=session_identifier,**query)
                 
                 transaction = await storekeeper.get(model="user",token=token)
-                print(transaction)
                 if transaction['state']:
                     request.session.update(transaction['result'])
                 
@@ -303,7 +302,42 @@ class adapter(presentation.presentation):
                 inner.append(mounted)
                     
         match tag:
-            case 'Button':
+            case 'Messenger':
+                pass
+            case 'Storekeeper':
+                pass
+            case 'Graph':
+                pass
+            case 'View':
+                pass
+            case 'Notice':
+                pass
+            case 'Input':
+                div = js.document.createElement("a")
+                div.className = "nav-link p-1 d-flex flex-row"
+                classe = 'nav-link'
+                self.att(div,root._attributes)
+                for x in inn:
+                    if 'url' in root._attributes:
+                    x.setAttribute('url',root._attributes['url'])
+                    if 'href' in root._attributes:
+                    x.setAttribute('href',root._attributes['href'])
+                    div.append(x)
+                return div
+            case 'Action':
+                # url,
+                pass
+            case 'Window':
+                pass
+            case 'Panel':
+                pass
+            case 'Text':
+                pass
+            case 'Row':
+                pass
+            case 'Column':
+                pass
+            case 'Container':
                 pass
             case _:
                 pass

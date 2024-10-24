@@ -1,11 +1,20 @@
 import asyncio
 import importlib
-import framework.service.flow as flow
 import re
-import application.port.storekeeper as port
-import framework.service.language as language
 
-class storekeeper(port.storekeeper):
+
+import sys
+if sys.platform == 'emscripten':
+    #language = language.load_module(area="framework",service='service',adapter='language')
+    flow = language.load_module(area="framework",service='service',adapter='flow')
+    #port = language.load_module(area="application",service='port',adapter='storekeeper')
+else:
+    import framework.service.flow as flow
+    import application.port.storekeeper as port
+    import framework.service.language as language
+
+#port.storekeeper
+class storekeeper():
 
     def __init__(self,**constants):
         self.providers = constants['providers']
@@ -146,11 +155,11 @@ class storekeeper(port.storekeeper):
     # get/read/get
     @flow.async_function(args=('model','identifier'),ports=('messenger',))
     async def get(self, messenger, **constants):
-
+        
         operations = [] 
-        repository = importlib.import_module(f"framework.repository.{constants['model']}", package=None)
+        repository = language.load_module(area="framework",service='repository',adapter=constants['model'])
         mappa = dict()
-        miss = [] 
+        miss = []
         
         for provider in self.providers:
             profile = provider.config['profile'].upper()
@@ -185,15 +194,14 @@ class storekeeper(port.storekeeper):
                     
                     #if unfinished:
                     #    await asyncio.wait(unfinished)
-
                     #await messenger.post(name="log",value=f"success get miss {miss}")
                     
-                    return self.builder('transaction',{'state': True,'action':'get','result':translated})
+                    return {'state': True,'action':'get','result':translated}
                 else:
                     miss.append(mappa[operation])
                     if len(operations) == 1:
                         #await messenger.post(name="log",value=f"failed get  miss {miss}")
-                        return self.builder('transaction',{'state': False,'action':'get','parameter':constants,'remark':'not found data'})
+                        return {'state': False,'action':'get','parameter':constants,'remark':'not found data'}
 
             operations = unfinished
         

@@ -15,7 +15,7 @@ def bootstrap_adapter() -> None:
                 for driver in config[module]:
                     setting = config[module][driver]
                     adapter = setting['adapter']
-                    language.loader_provider(service=module,adapter=adapter,payload=setting|{'profile':driver}|{'project':config['project']})
+                    language.loader_provider(area='infrastructure',service=module,adapter=adapter,payload=setting|{'profile':driver}|{'project':config['project']})
 
     
     

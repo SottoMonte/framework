@@ -20,7 +20,12 @@ Implementazione di un sistema di chat:
 Se stai sviluppando un�applicazione che richiede una chat o una messaggistica, una classe Messenger pu� gestire l�invio e la ricezione di messaggi tra utenti.
 '''
 import asyncio
-import framework.service.flow as flow
+
+import sys
+if sys.platform == 'emscripten':
+    flow = language.load_module(area="framework",service='service',adapter='flow')
+else:
+    import framework.service.flow as flow
 
 class messenger():
 
