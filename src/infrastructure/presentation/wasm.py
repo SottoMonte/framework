@@ -273,54 +273,32 @@ else:
           #cc.replaceChild(test,cc)
           #return test
 
-        #@flow.async_function(ports=('storekeeper',))
-        async def builder(self,**constants):
-          
-          if 'url' not in constants:
-            url="static/index.xml"
-          else:
-            url = constants['url']
-
-          if 'view' not in constants: 
-            response = js.fetch(url,{'method':'GET'})
-            file = await response
-            aa = await file.text()
-          else:
-            aa = constants['view']
-
-          template = self.env.from_string(aa)
-          transformed = template.render(constants)
-          obj = untangle.parse(transformed)
-
-          async def mount_view(root,data=dict()):
+        def code(self,tag,attr,inner=None):
+          tag = js.document.createElement(tag)
+          for key in attr:
+            tag.setAttribute(key,attr[key])
+          for x in inner:
+            tag.append(x)
+          return tag
+        
+        async def mount_vieww(self,root,data=dict()):
             
-            inn = []
-            tag = root._name
-            ele = root.get_elements()
-            if len(ele) > 0:
-                for x in ele:
-                    #print(root,type(data),data)
-                    ffff = await mount_view(x,data)
-                    inn.append(ffff)
+          inner = []
+          tag = root._name
+          att = root._attributes
+          text = root.cdata
+          elements = root.get_elements()
+          if len(elements) > 0:
+            for x in elements:
+              #print(root,type(data),data)
+              ffff = await self.mount_view(x,data)
+              inn.append(ffff)
                     
-            match tag:
+          match tag:
                 case 'Button':
-                  #print(dir(root))
-                  button = js.document.createElement("button")
-                  button.setAttribute('type','button')
-                  button.className = "btn "
-                  self.att(button,root._attributes)
-
-                  if 'color' in root._attributes:
-                    button.className += f" btn-{root._attributes['color']}"
-                  else:
-                    #button.className += " btn-primary"
-                    pass
-
-                  for x in inn:
-                     button.append(x)
-                  button.innerHTML += root.cdata
-                  return button
+                  item = self.code('button',{'class':'btn'},inn)
+                  self.att(item,att)
+                  return item
                 case 'Route':
                   div = js.document.createElement("a")
                   div.className = "nav-link p-1 d-flex flex-row"
@@ -356,13 +334,9 @@ else:
                   
                   return div
                 case 'Row':
-                  div = js.document.createElement("div")
-                  #div.className = "row m-0"
-                  #classe = 'row'
-                  self.att(div,root._attributes)
-                  for x in inn:
-                     div.append(x)
-                  return div
+                  item = self.code('div',{'class':'row'},inn)
+                  self.att(item,att)
+                  return item
                 case 'Column':
                   #div = js.document.createElement("div")
                   cell = js.document.createElement("div")
@@ -531,6 +505,11 @@ else:
                     div.append(body)
                     div.setAttribute('data-bs-backdrop','false')
                     classe = 'offcanvas offcanvas-end'
+                  elif typee == 'main':
+                    div.className = "d-flex h-100"
+                    for x in inn:
+                     div.append(x)
+                    return div
                   else:
                     dialog = js.document.createElement("div")
                     dialog.className = 'modal-dialog modal-dialog-scrollable'
@@ -704,14 +683,27 @@ else:
                   test = await self.builder(url=url,component=self.components[id],args=args)
                   
                   return test
-                  
-          ## END
-          '''if 'url' not in constants:
-            js.document.body.prepend(mount_view(obj.children[0]))
+                
+        
+        #@flow.async_function(ports=('storekeeper',))
+        async def builder(self,**constants):
+          
+          if 'url' not in constants:
+            url="application/view/layout/app.xml"
           else:
-            js.document.getElementById('main').innerHTML = ''
-            js.document.getElementById('main').prepend(mount_view(obj.children[0]))'''
+            url = constants['url']
+          
+          if 'view' not in constants: 
+            response = js.fetch(url,{'method':'GET'})
+            file = await response
+            aa = await file.text()
+          else:
+            aa = constants['view']
+
+          template = self.env.from_string(aa)
+          transformed = template.render(constants)
+          obj = untangle.parse(transformed)
           
           
-          return await mount_view(obj.children[0],constants)
+          return await self.mount_view(obj.children[0],constants)
           

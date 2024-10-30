@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Routes path="/api" >
+<Routes prefix="/api" path="/api" >
+    <Policies>
+        <Policy name="Bandwidth">
+            <Setting name="MaxBandwidth" value="100Mbps"/>
+        </Policy>
+        <Policy name="BillingMethod">
+            <Setting name="Method" value="Prepaid"/>
+        </Policy>
+        <Policy name="Encryption">
+            <Setting name="Type" value="AES256"/>
+        </Policy>
+    </Policies>
     <Route path="/login" type="login" method="POST" />
     <Route path="/logout" type="logout" method="POST" />
-    <Route path="/" type="view" view="src/application/view/page/auth/login.html" method="GET" />
+    <Route path="/" type="view" view="src/application/view/page/auth/login.xml" method="GET" />
     <Route path="/tic" type="view" view="public/index.html" method="GET" />
     <Route path="/gather" type="action" method="GET" policy="" />
 </Routes>

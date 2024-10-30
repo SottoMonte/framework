@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block main %}
+<div id="loading" class="d-flex justify-content-center align-items-center position-fixed w-100 h-100" style="background: #444;">
+    <img class="img" src="static/logo.svg" style=" height:50px;">
+    <div class="spinner-border text-success" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+{% endblock %}
+{% block head_script %}
+<script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
+<script>
+            // init pyodide and show sys.version when it's loaded successfully
+            async function main() {
+                let pyodide = await loadPyodide({
+                    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/",
+                });
+                await pyodide.loadPackage("micropip");
+                const micropip = pyodide.pyimport("micropip");
+                await micropip.install('kink');
+                await micropip.install('tomli');
+                await micropip.install('jinja2');
+                await micropip.install('untangle');
+                
+                pyodide.runPython(await (await fetch("framework/service/language.py")).text());
+                pyodide.runPython(await (await fetch("static/app.py")).text());
+                
+                return pyodide;
+            }
+
+            // run the main function
+            let pyodideReadyPromise = main();
+
+            async function evaluatePython(test) {
+                let pyodide = await pyodideReadyPromise;
+                try {
+                    pyodide.runPython(`
+                        import io
+                        sys.stdout = io.StringIO()
+                    `);
+                    let result = pyodide.runPython(test);
+                    let stdout = pyodide.runPython("sys.stdout.getvalue()");
+                    //console.log(stdout);
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+</script>
+{% endblock %}

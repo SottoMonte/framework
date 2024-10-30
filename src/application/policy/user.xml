@@ -1,13 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<User>
-    <Resources>
-        <Model name="client" access="self" />
-    </Resources>
-    <Routes band="standard" requests_time="10s">
-        <Route path="/logout" type="action" method="POST" BANDWIDTH="1000mbit/s" />
-        <Route path="/" type="view" method="GET" />
-        <Route path="/gather" type="action" method="GET" policy="default" />
-        <Route path="/register" type="action" method="POST" />
-        <Route path="/login" type="action" method="POST" />
-    </Routes>
-</User>
+<Configuration>
+    <Groups>
+        <Group name="user">
+            <Resources>
+                <Models>
+                    <Policies>
+                        <Policy name="Access">
+                            <Setting name="tenure" value="self"/>
+                        </Policy>
+                    </Policies>
+                    <Model name="inventory" />
+                    <Model name="client" />
+                </Models>
+                <Routes>
+                    <Policies>
+                        <Policy name="Limit">
+                            <Setting name="Request" value="50.000" unit="month"/>
+                            <Setting name="Request" value="100" unit="second"/>
+                        </Policy>
+                    </Policies>
+                    <Route name="api/gather">
+                        <Setting name="Method" value="GET"/>
+                    </Route>
+                </Routes>
+                <Routes>
+                    <Route name="/">
+                        <Setting name="Method" value="GET"/>
+                    </Route>
+                    <Route name="/login">
+                        <Setting name="Method" value="POST"/>
+                    </Route>
+                    <Route name="/logout">
+                        <Setting name="Method" value="POST"/>
+                    </Route>
+                    <Route name="/register">
+                        <Setting name="Method" value="POST"/>
+                    </Route>
+                    <Route name="/gather">
+                        <Setting name="Method" value="GET"/>
+                    </Route>
+                </Routes>
+            </Resources>
+        </Group>
+    </Groups>
+</Configuration>

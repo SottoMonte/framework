@@ -133,7 +133,7 @@ class AuthorizationMiddleware:
             await self.app(scope, receive, send)
             return
 
-        for prefix_dir in ['/github','/static','/login','/logout','/framework','/application','/infrastructure']:
+        for prefix_dir in ['/favicon.ico','/github','/static','/login','/logout','/framework','/application','/infrastructure']:
             if scope["path"].startswith(prefix_dir) or scope["path"] == '/':
                 await self.app(scope, receive, send)
                 return
@@ -157,7 +157,6 @@ class adapter(presentation.presentation):
     @flow.function(ports=('defender',))
     def __init__(self,defender,**constants):
         self.config = constants['config']
-        print(self.config)
         self.views = dict({})
         cwd = os.getcwd()
 
@@ -192,17 +191,17 @@ class adapter(presentation.presentation):
         loop.create_task(server.serve())
 
     async def builder(self,**constants):
-        f = open(constants['file'], "r")
-        html = f.read()
+        f = open('src/'+constants['file'], "r")
+        text = f.read()
 
-        template = self.env.from_string(html)
+        template = self.env.from_string(text)
           
         content = template.render(constants)
 
-        #obj = untangle.parse(transformed)
+        xml = untangle.parse(content)
         
-        #return await mount_view(obj.children[0],constants)
-        return content
+        return await self.mount_view(xml.children[0],constants)
+        #return content
         
     @flow.async_function(ports=('defender',))
     async def logout(self,request,defender) -> None:
@@ -293,55 +292,120 @@ class adapter(presentation.presentation):
         html = await self.builder(file=self.views[request.url.path] )
         return HTMLResponse(html)
     
-    async def mount_view(root,data=dict()): 
+    def code(self,tag,attr,inner=None):
+        att = ''
+        html = inner
+        for key in attr:
+            att += f' {key}="{attr[key]}"'
+        for item in inner:
+            html += item
+        if inner:
+            return f'<{tag} {att} >{inner}</{tag}>'
+        else:
+            return f'<{tag} {att} />'
+    
+    async def mount_view(self,root,data=dict()): 
         inner = []
         tag = root._name
+        att = root._attributes
+        text = root.cdata
         elements = root.get_elements()
         if len(elements) > 0:
             for element in elements:
-                mounted = await mount_view(element,data)
+                mounted = await self.mount_view(element,data)
                 inner.append(mounted)
                     
         match tag:
             case 'Messenger':
-                pass
+                html = ''
+                for item in inner:
+                    html += item
+                return html
             case 'Storekeeper':
-                pass
+                html = ''
+                for item in inner:
+                    html += item
+                return html
             case 'Graph':
-                pass
+                html = ''
+                for item in inner:
+                    html += item
+                return html
             case 'View':
-                pass
-            case 'Notice':
-                pass
+                url = att['url'] if 'url' in att else ''
+                test = await self.builder(**data.copy())
+                return self.code('div',{'class':'toast-body'},test)
+            case 'Message':
+                model = att['type'] if 'type' in att else 'flesh'
+                title = att['title'] if 'title' in att else ''
+                html = ''
+                for item in inner:
+                    html += item
+                
+                if model == 'system':
+                    return self.code('div',
+                        {'class':'toast','role':'alert','aria-live':'assertive','aria-atomic':'true'},
+                        self.code('div',{'class':'toast-header'}, self.code('strong',{'class':'me-auto'},title))+
+                        self.code('div',{'class':'toast-body'},html)
+                    )
+                elif model == 'flesh':
+                    return self.code('div',{'class':'alert alert-primary','role':'alert'},html)
             case 'Input':
-                div = js.document.createElement("a")
-                div.className = "nav-link p-1 d-flex flex-row"
-                classe = 'nav-link'
-                self.att(div,root._attributes)
-                for x in inn:
-                    if 'url' in root._attributes:
-                        x.setAttribute('url',root._attributes['url'])
-                    if 'href' in root._attributes:
-                        x.setAttribute('href',root._attributes['href'])
-                    div.append(x)
-                return div
+                html = ''
+                for item in inner:
+                    html += item
+                return self.code('input',{'class':'form-control'},html)
             case 'Action':
-                # url,
-                pass
+                model = att['type'] if 'type' in att else 'button'
+                url = att['url'] if 'url' in att else '#'
+                html = ''
+                for item in inner:
+                    html += item
+                
+                if model == 'form':
+                    return self.code('form',{'action':'/action_page.php','method':'POST'},html)
+                elif model == 'button':
+                    return self.code('a',{'class':'btn','href':url},html)
             case 'Window':
-                pass
+                layout = att['layout'] if 'layout' in att else 'src/application/view/layout/base.html'
+                f = open(layout, "r")
+                file = f.read()
+                template = self.env.from_string(file)
+                body = ''
+                for item in inner:
+                    body += item
+                content = template.render(body=body)
+                content = content.replace('<!-- Body -->',body)
+                return content
             case 'Panel':
-                pass
+                html = ''
+                for item in inner:
+                    html += item
+                return html
             case 'Text':
-                pass
+                html = ''
+                for item in inner:
+                    html += item
+                return self.code('p',{'class':'fw-lighter'},text)
             case 'Row':
-                pass
+                html = ''
+                for item in inner:
+                    html += item
+                return self.code('div',{'class':'row'},html)
             case 'Column':
-                pass
+                html = ''
+                
+                return self.code('div',{'class':'col'},html)
             case 'Container':
-                pass
+                html = ''
+                for item in inner:
+                    html += item
+                return self.code('div',{'class':'container'},html)
             case _:
-                pass
+                html = ''
+                for item in inner:
+                    html += item
+                return html
                   
     def mount_route(self,routes,url):
         
