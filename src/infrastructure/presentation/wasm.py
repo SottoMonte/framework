@@ -1,69 +1,47 @@
 import sys  
-
 if sys.platform != 'emscripten':
   import infrastructure.presentation.starlette as starlette
   import framework.service.flow as flow
   import os
-
-
-  class adapter(starlette.adapter):
-      
-      def info(self,**constants):
-          pass
-
-      '''@flow.async_function(ports=('storekeeper',))
-      async def builder(self,storekeeper,**constants):
-          print(constants)
-          cwd = os.getcwd()
-          f = open(f"{cwd}/public/index.html", "r")
-          stringa = f.read()
-          template = self.env.from_string(stringa)
-          rresult = template.render({'title':'Colosso','url':'asdasdasdasdasd'})
-          return rresult'''
+  from starlette.responses import JSONResponse,HTMLResponse,RedirectResponse
 else:
-    import js
-    from jinja2 import Environment, select_autoescape,FileSystemLoader,BaseLoader,ChoiceLoader,Template
-    import untangle
-    import asyncio
-    import pyodide
-    import importlib
-    flow = language.load_module(area="framework",service='service',adapter='flow')
+  import js
+  from jinja2 import Environment, select_autoescape,FileSystemLoader,BaseLoader,ChoiceLoader,Template
+  import untangle
+  import asyncio
+  import pyodide
+  import importlib
+    
+  flow = language.load_module(area="framework",service='service',adapter='flow')
+  starlette = language.load_module(area="infrastructure",service='presentation',adapter='starlette')
 
-    class MyLoader(BaseLoader):
+  class MyLoader(BaseLoader):
       def get_source(self, environment, template):
           req = js.XMLHttpRequest.new()
           req.open("GET", f"application/view/layout/{template}", False)
           req.send()
           return req.response, None, None
-          # return TEMPLATE, fname, False
-    
-    class adapter():
+
+
+class adapter(starlette.adapter):
+  if sys.platform != 'emscripten':
+    async def view(self,request):
+        #html = await self.builder(file=self.views[request.url.path])
+        text = await self.host({'url':'application/view/layout/wasm.html'})
+        template = self.env.from_string(text)
+        html = template.render()
+        return HTMLResponse(html)
+  else:
         def __init__(self,**constants):
           self.components = dict()
           self.config = constants['config']
           http_loader = MyLoader()
           self.env = Environment(loader=http_loader,autoescape=select_autoescape(["html", "xml"]))
-          self.document = js.document
+          self.document = js.document         
 
         def loader(self, *services, **constants):
           code = asyncio.create_task(self.async_loader(),name="loader")
           #js.document.body.prepend(mount_view(code))
-          pass
-
-        '''async def view(self,request):
-          a = await self.builder()
-          print("qui")
-          return HTMLResponse(a)'''
-        
-        def get_var(self,accessor_string,input_dict):
-          """Gets data from a dictionary using a dotted accessor-string"""
-          current_data = input_dict
-          for chunk in accessor_string.split('.'):
-              if type([]) == type(current_data):
-                current_data = current_data[int(chunk)]
-              else:
-                current_data = current_data.get(chunk, {})
-          return current_data
 
         @flow.async_function(ports=('storekeeper',))
         async def async_loader(self, storekeeper, **constants):
@@ -91,8 +69,11 @@ else:
             user = transaction['result']
           else:
             user = dict()
-
-          html = await self.builder(user=user)
+          try:
+            html = await self.builder(user=user)
+          except Exception as e:
+            print("errore generico",e)
+          print(html)
           js.document.getElementById('loading').remove()
           js.document.body.prepend(html)
         
@@ -152,10 +133,12 @@ else:
               case 'width':
                 style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
                 style += f" width:{value};"
+                element.className += ' col-auto'
                 element.setAttribute('style',style)
               case 'height':
                 style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
                 style += f" height:{value};"
+                element.className += ' col-auto'
                 element.setAttribute('style',style)
               case 'src':
                 element.setAttribute(key,value)
@@ -273,437 +256,27 @@ else:
           #cc.replaceChild(test,cc)
           #return test
 
-        def code(self,tag,attr,inner=None):
+        def code(self,tag,attr,inner=[]):
           tag = js.document.createElement(tag)
           for key in attr:
             tag.setAttribute(key,attr[key])
-          for x in inner:
-            tag.append(x)
+
+          if type(inner) == type([]):
+            for item in inner:
+              tag.append(item)
+          elif type(inner) == type(''):
+            tag.innerHTML += inner
+          else:
+            pass
           return tag
         
-        async def mount_vieww(self,root,data=dict()):
-            
-          inner = []
-          tag = root._name
-          att = root._attributes
-          text = root.cdata
-          elements = root.get_elements()
-          if len(elements) > 0:
-            for x in elements:
-              #print(root,type(data),data)
-              ffff = await self.mount_view(x,data)
-              inn.append(ffff)
-                    
-          match tag:
-                case 'Button':
-                  item = self.code('button',{'class':'btn'},inn)
-                  self.att(item,att)
-                  return item
-                case 'Route':
-                  div = js.document.createElement("a")
-                  div.className = "nav-link p-1 d-flex flex-row"
-                  classe = 'nav-link'
-                  self.att(div,root._attributes)
-                  for x in inn:
-                      if 'url' in root._attributes:
-                        x.setAttribute('url',root._attributes['url'])
-                      if 'href' in root._attributes:
-                        x.setAttribute('href',root._attributes['href'])
-                      div.append(x)
-                  return div
-                case 'Tab':
-                  div = js.document.createElement("div")
-                  div.className = "tab-content"
-                  classe = 'nav-link'
-                  self.att(div,root._attributes)
-                  #print(root,data)
-                  fiest = True
-                  for x in inn:
-                      tab = js.document.createElement("div")
-                      tab.className = "tab-pane fade"
-                      if fiest:
-                        tab.className += " active show"
-                        fiest = False
-
-                      tab.setAttribute('role','tabpanel')
-                      tab.setAttribute('id',x.getAttribute('id'))
-                      x.removeAttribute('id')
-                      tab.prepend(x)
-                      div.prepend(tab)
-                    
-                  
-                  return div
-                case 'Row':
-                  item = self.code('div',{'class':'row'},inn)
-                  self.att(item,att)
-                  return item
-                case 'Column':
-                  #div = js.document.createElement("div")
-                  cell = js.document.createElement("div")
-                  #div.className = "col p-0 "
-                  cell.className = "d-flex flex-row"
-                  #classe = 'col'
-                  #self.att(div,root._attributes)
-                  self.att(cell,root._attributes)
-                  #div.append(cell)
-                  for x in inn:
-                     #col += f'<div class="col">{x}</div>'
-                     cell.append(x)
-                  return cell
-                case 'Text':
-                  div = js.document.createElement("p")
-                  div.className = "fw-lighter p-0 m-1"
-                  for x in inn:
-                    div.append(x)
-                  div.innerHTML += root.cdata
-                  if 'var' in root._attributes:
-                    gg = self.get_var(root._attributes['var'],data)
-                    div.innerHTML += str(gg)
-                  
-                  #print(root.cdata)
-                  self.att(div,root._attributes)
-                  return div
-                case 'Nav':
-                  nav = js.document.createElement("nav")
-                  nav.className = "container-fluid"
-                  classe = "navbar"
-
-                  self.att(nav,root._attributes)
-                  ul = js.document.createElement("ul")
-                  ul.className = "nav container-fluid"
-                  for x in inn:
-                     li = js.document.createElement("li")
-                     li.className = "nav-item"
-                     li.append(x)
-                     ul.append(li)
-                     
-                  nav.append(ul)
-                  return nav
-                case 'Breadcrumb':
-                  nav = js.document.createElement("nav")
-                  nav.className = ""
-                  
-
-                  self.att(nav,root._attributes)
-                  ul = js.document.createElement("ol")
-                  ul.className = "breadcrumb p-0 m-0"
-                  for x in inn:
-                     li = js.document.createElement("li")
-                     li.className = "breadcrumb-item"
-                     li.append(x)
-                     ul.append(li)
-                     
-                  nav.append(ul)
-                  return nav
-                case 'Container':
-                  if 'type' in root._attributes:
-                    div = js.document.createElement(root._attributes['type'])
-                  else:
-                    div = js.document.createElement("div")
-                  classe = "container"
-                  
-                  if 'size' not in root._attributes:
-                    div.className = classe
-                  
-                  self.att(div,root._attributes)
-
-                  for x in inn:
-                     div.append(x)
-                  return div
-                case 'Input':
-                  
-                  lType = {'':'form-control','range':'form-range','checkbox':'form-check-input','password':'form-control'}
-                  
-                  if 'type' in root._attributes:
-                    key = root._attributes['type']
-                    kk = key if key in lType else ''
-                    classe = lType[kk]
-                    if key not in lType:
-                      div = js.document.createElement(key)
-                      div.setAttribute('contenteditable','true')
-                      div.innerHTML += root.cdata
-                    else:
-                      div = js.document.createElement('input')
-                    
-                    
-                  else:
-                    classe = lType['']
-                    div = js.document.createElement("input")
-                    div.setAttribute('value',root.cdata)
-                  
-                  div.className = classe
-                  
-                  
-                  
-                  self.att(div,root._attributes)
-                  for x in inn:
-                    div.append(x)
-
-                  if 'var' in root._attributes:
-                    gg = self.get_var(root._attributes['var'],data)
-                    #print(gg,data)
-                    #div.innerHTML += str(gg)
-                    div.setAttribute('value',gg)
-
-                  return div
-                case 'Select':
-                  div = js.document.createElement("select")
-                  div.className = "form-select"
-                  self.att(div,root._attributes)
-                  for x in inn:
-                    option = js.document.createElement("option")
-                    option.append(x)
-                    div.append(option)
-                  return div
-                case 'Icon':
-                  div = js.document.createElement("i")
-                  div.className = "bi p-1"
-                  self.att(div,root._attributes)
-                  return div
-                case 'Alert':
-                  div = js.document.createElement("div")
-                  classe = 'alert'
-                  alertType = root._attributes['type'] if 'type' in root._attributes else ''
-                  div.setAttribute('role','alert')
-                  div.className = classe + ' alert-dismissible d-flex align-items-center'
-                  self.att(div,root._attributes)
-                  if 'info' == alertType:
-                    div.innerHTML += '<i class="bi bi-info-circle-fill px-3"></i>'
-                  elif 'success' == alertType:
-                    div.innerHTML += '<i class="bi bi-check-circle-fill px-3"></i>'
-                  elif 'danger' == alertType:
-                    div.innerHTML += '<i class="bi bi-exclamation-triangle-fill px-3"></i>'
-                  elif 'warning' == alertType:
-                    div.innerHTML += '<i class="bi bi-exclamation-octagon-fill px-3"></i>'
-                  div.innerHTML += root.cdata
-                  div.innerHTML += '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'
-                  return div
-                case 'Badge':
-                  div = js.document.createElement("span")
-                  classe = 'badge'
-                  div.className = classe
-                  self.att(div,root._attributes)
-                  div.innerHTML += root.cdata
-                  return div
-                case 'Window':
-                  title = root._attributes['title'] if 'title' in root._attributes else ''
-                  typee = root._attributes['type'] if 'type' in root._attributes else ''
-                  idd = root._attributes['id'] if 'id' in root._attributes else ''
-                  action = root._attributes['action'] if 'action' in root._attributes else ''
-                  
-                  div = js.document.createElement("div")
-                  if typee == 'canvas':
-
-                    header = js.document.createElement("div")
-                    header.className = 'offcanvas-header'
-                    header.innerHTML += f'<h5 class="offcanvas-title" id="offcanvasScrollingLabel">{title}</h5>'
-                    header.innerHTML += '<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>'
-                    body = js.document.createElement("div")
-                    body.className = 'offcanvas-body p-0'
-
-                    #div.append(header)
-                    div.append(body)
-                    div.setAttribute('data-bs-backdrop','false')
-                    classe = 'offcanvas offcanvas-end'
-                  elif typee == 'main':
-                    div.className = "d-flex h-100"
-                    for x in inn:
-                     div.append(x)
-                    return div
-                  else:
-                    dialog = js.document.createElement("div")
-                    dialog.className = 'modal-dialog modal-dialog-scrollable'
-                    content = js.document.createElement("div")
-                    content.className = 'modal-content'
-
-                    header = js.document.createElement("div")
-                    header.className = 'modal-header'
-                    header.innerHTML += f'<h5 class="modal-title">{title}</h5>'
-                    #header.innerHTML += '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'
-                    body = js.document.createElement("div")
-                    body.className = 'modal-body p-0'
-                    footer = js.document.createElement("div")
-                    footer.className = 'modal-footer'
-                    footer.innerHTML = f'<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> <button type="button" onclick="document.getElementById(\'form-{action}\').submit();" class="btn btn-success">{action.capitalize()}</button>'
-
-
-                    classe = 'modal'
-
-                    div.append(dialog)
-                    dialog.append(content)
-                    content.append(header)
-                    content.append(body)
-                    content.append(footer)
-                    self.att(dialog,root._attributes)
-
-                  div.className = classe
-                  div.setAttribute('data-bs-backdrop','false')
-                  self.att(div,root._attributes)
-                  
-                  
-
-                  for x in inn:
-                     body.append(x)
-                  return div
-                case 'Carousel':
-                  classe = 'modal'
-                  div = js.document.createElement("div")
-                  div.className = classe
-                  inner = js.document.createElement("div")
-                  inner.className = 'carousel-inner'
-
-                  for x in inn:
-                     body.append(x)
-
-                  return div
-                case 'Img':
-                  classe = 'img'
-                  div = js.document.createElement("img")
-                  div.className = classe
-                  
-                  self.att(div,root._attributes)
-
-                  return div
-                case 'Collapse':
-                  classe = 'img'
-                  div = js.document.createElement("div")
-                  div.className = "collapse"
-                  self.att(div,root._attributes)
-                  
-                  for x in inn:
-                     div.append(x)
-
-                  return div
-                case 'Form':         
-                  div = js.document.createElement("form")
-                  self.att(div,root._attributes)
-                  
-                  for x in inn:
-                     div.append(x)
-
-                  return div
-                case 'View':         
-                  div = js.document.createElement("form")
-                  #self.att(div,root._attributes)
-                  url = root._attributes['url'] if 'url' in root._attributes else ''
-                  cc = data.copy()
-                  cc['url'] = url
-                  test = await self.builder(**cc)
-
-                  return test
-                case 'Divider':         
-                  div = js.document.createElement("div")
-                  div.className = "vr"
-                  self.att(div,root._attributes)
-                  return div
-                case 'Table':
-                  tt = root._attributes['head'].split(';') if 'head' in root._attributes else []
-                  
-                  #table.className += "table"
-                  table = js.document.createElement("table")
-                  head = js.document.createElement("thead")
-                  hrow = js.document.createElement("tr")
-                  
-                  for y in root.get_elements()[:1]:
-                      brow = js.document.createElement("tr")
-                      for z in y.children:
-                        bcol = js.document.createElement("th")
-                        ttt = await mount_view(z,data)
-                        bcol.append(ttt)
-                        brow.append(bcol)
-                      head.append(brow)
-                  
-                  body = js.document.createElement("tbody")
-
-                  # non è ottimizzato qui
-                  for y in root.get_elements()[1:]:
-                      brow = js.document.createElement("tr")
-                      for z in y.children:
-                        bcol = js.document.createElement("td")
-                        ttt = await mount_view(z,data)
-                        bcol.append(ttt)
-                        brow.append(bcol)
-                      body.append(brow)
-
-                  head.append(hrow)
-                  table.append(head)
-                  table.append(body)
-                  table.className += "table table-striped"
-                  self.att(table,root._attributes)
-
-                  return table
-                case 'Mark':         
-                  div = js.document.createElement("span")
-                  self.att(div,root._attributes)
-                  for x in inn:
-                    div.append(x)
-                  div.innerHTML += root.cdata
-                  return div
-                case 'Storekeeper':
-                  model = root._attributes['model'] if 'model' in root._attributes else 'client'
-                  url = f"gather?model={model}"
-                  #if 'identifier' in root._attributes:
-                  #  url += f"&identifier={root._attributes['identifier']}"
-                  
-                  if 'token' in root._attributes:
-                    url += f"&token={self.cookies['session_token']}"
-                  
-                  
-                  div = js.document.createElement("span")
-                  self.att(div,root._attributes)
-                  
-                  response = js.fetch(url,{'method':'GET'})
-                  file = await response
-                  aa = await file.text()
-                  bb = json.loads(aa)
-                  #cccc = {'storekeeper':bb['result']}|data
-                  #print(cccc)
-
-                  for y in root.get_elements():
-                    built = await mount_view(y,{'storekeeper':bb['result']}|data)
-                    div.append(built)
-
-                  return div
-                case _:
-                  id = root._attributes['id'] if 'id' in root._attributes else 'ttttt'
-                  model = root._attributes['model'] if 'model' in root._attributes else 'client'
-                  args = root._attributes['args'] if 'args' in root._attributes else None
-
-                  if id not in self.components:
-                    self.components[id] = dict({'id':id,'model':model,'selected':[],'pageCurrent':1,'pageRow':10,'sortField':'CardName','sortAsc':True})
-                  
-                  #response = js.fetch(f"gather?model={self.components[id]['model']}&row={self.components[id]['pageRow']}&page={self.components[id]['pageCurrent']}&order={self.components[id]['sortField']}",{'method':'GET'})
-                  #file = await response
-                  #aa = await file.text()
-                  #bb = json.loads(aa)
-                  #self.components[id]['data'] = bb 
-                  url = f'application/view/component/{tag.replace("C_","")}.xml'
-                  
-                  
-                  test = await self.builder(url=url,component=self.components[id],args=args)
-                  
-                  return test
-                
-        
-        #@flow.async_function(ports=('storekeeper',))
-        async def builder(self,**constants):
+        async def host(self,constants):
           
           if 'url' not in constants:
             url="application/view/layout/app.xml"
           else:
             url = constants['url']
-          
-          if 'view' not in constants: 
-            response = js.fetch(url,{'method':'GET'})
-            file = await response
-            aa = await file.text()
-          else:
-            aa = constants['view']
-
-          template = self.env.from_string(aa)
-          transformed = template.render(constants)
-          obj = untangle.parse(transformed)
-          
-          
-          return await self.mount_view(obj.children[0],constants)
-          
+          response = js.fetch(url,{'method':'GET'})
+          file = await response
+          aa = await file.text()
+          return aa

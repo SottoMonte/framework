@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window type="layout" >
-    <Column>
-        <Row>
-            <Text>GitHub Login</Text>
-            <Graph type="img" url="static/home.png" ></Graph>
-        </Row>
-        <Row>
-            <Messenger type="error" />
-            <Message title="Failed build" type="system"><Text>Login: disponibile</Text></Message>
-            <Message title="Failed build"><Text>Login: disponibile</Text></Message>
-            <Action type="form" act="/login">
-                <Input model="user.name" />
-                <Input model="user.password" />
-                <Action act="submit"/>
-                <Action url="https://github.com/login/oauth/authorize?client_id=Iv23li8IzmjxqtrCVomM">
-                    <Text>GitHub Login</Text>
-                </Action>
+<Column>
+    <Row>
+        <Text>GitHub Login</Text>
+    </Row>
+    <Row>
+        <Message title="Failed build" type="system"><Text>Login: disponibile</Text></Message>
+        <Message title="Failed build"><Text>Login: disponibile</Text></Message>
+        <Action type="form" act="/login">
+            <Input model="user.name" />
+            <Input model="user.password" />
+            <Action act="submit"/>
+            <Action url="https://github.com/login/oauth/authorize?client_id=Iv23li8IzmjxqtrCVomM">
+                <Text>GitHub Login</Text>
             </Action>
-        </Row>
-    </Column>
-</Window>
+        </Action>
+    </Row>
+</Column>

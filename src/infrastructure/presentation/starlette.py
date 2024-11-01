@@ -1,158 +1,47 @@
-import framework.port.presentation as presentation
-import framework.service.flow as flow
 
-from starlette.applications import Starlette
-from starlette.requests import Request
-from starlette.responses import JSONResponse,HTMLResponse,RedirectResponse
-from starlette.routing import Route,Mount,WebSocketRoute
-from starlette.middleware import Middleware
-from starlette.websockets import WebSocket
-#from starlette.middleware.cors import CORSMiddleware
-from starlette.middleware.sessions import SessionMiddleware
-from starlette.staticfiles import StaticFiles
-from jinja2 import Environment, select_autoescape,FileSystemLoader,BaseLoader,ChoiceLoader,Template
 
-import untangle
+try:
+    #import framework.port.presentation as presentation
+    import framework.service.flow as flow
 
-import os
-import uuid
-#import uvicorn
-from uvicorn import Config, Server
+    from starlette.applications import Starlette
+    from starlette.requests import Request
+    from starlette.responses import JSONResponse,HTMLResponse,RedirectResponse
+    from starlette.routing import Route,Mount,WebSocketRoute
+    from starlette.middleware import Middleware
+    from starlette.websockets import WebSocket
+    #from starlette.middleware.cors import CORSMiddleware
+    from starlette.middleware.sessions import SessionMiddleware
+    from starlette.staticfiles import StaticFiles
+    from jinja2 import Environment, select_autoescape,FileSystemLoader,BaseLoader,ChoiceLoader,Template
 
-# Auth 
-#from starlette.middleware.sessions import SessionMiddleware
-from datetime import timedelta
-import secrets
-#from starlette_login.middleware import AuthenticationMiddleware
+    import untangle
 
-#
-from starlette.requests import HTTPConnection
-from starlette.types import ASGIApp, Message, Receive, Scope, Send
+    import os
+    import uuid
+    #import uvicorn
+    from uvicorn import Config, Server
 
-from starlette.datastructures import MutableHeaders
-import http.cookies
+    # Auth 
+    #from starlette.middleware.sessions import SessionMiddleware
+    from datetime import timedelta
+    import secrets
+    #from starlette_login.middleware import AuthenticationMiddleware
 
-'''class AuthenticationMiddleware:
-    def __init__(
-        self,
-        app ,
-        backend,
-        login_manager = None,
-        excluded_dirs = [],
-        allow_websocket: bool = True,
-    ):
-        self.app = app
-        self.backend = backend
-        self.excluded_dirs = excluded_dirs or []
-        self.login_manager = login_manager
-        #self.secret_key = login_manager.secret_key
-        self.allow_websocket = allow_websocket
+    #
+    from starlette.requests import HTTPConnection
+    from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
-    async def __call__(
-        self, scope: Scope, receive: Receive, send: Send
-    ) -> None:
-        if self.allow_websocket is False and scope["type"] != "http":
-            await self.app(scope, receive, send)
-            return
-        elif scope["type"] not in ("http", "websocket"):
-            await self.app(scope, receive, send)
-            return
+    from starlette.datastructures import MutableHeaders
+    import http.cookies
+except Exception as e:
+    flow = language.load_module(area="framework",service='service',adapter='flow')
+    starlette = None
+    import untangle
+    print("errore generico",e)
 
-        conn = HTTPConnection(scope=scope, receive=receive)
-        #print(dir(conn))
-        #print(conn.session.items())
-        print(conn.cookies)
-        #print(conn.scope)
-        #print('/logout' == conn['path'],conn['path'])
-        if '/logout' == conn['path']:
-            self.login_manager.logout()
-            conn.cookies = dict()
-            print('LOGOUT')
-        
-        print(self.login_manager)
-        
-        if not user or user.is_authenticated is False:
-            conn.scope["user"] = self.login_manager.anonymous_user_cls()
-        else:
-            conn.scope["user"] = user
-
-        async def custom_send(message: Message):
-            #print(message)
-            user_ = conn.scope["user"] if 'user' in conn.scope else None
-            name = user_['username'] if user_ != None and 'username' in user_ else ''
-            passs = user_['password'] if user_ != None and 'password' in user_ else ''
-            
-            ccc = await self.login_manager.authenticate(username=name,password=passs)
-
-            if ccc:
-                #print(user_)
-                message.setdefault("headers", [])
-                headers = MutableHeaders(scope=message)
-                cookie: "http.cookies.BaseCookie[str]" = http.cookies.SimpleCookie()
-                key = 'user'
-                if 'password' in user_:
-                    del user_['password']
-                cookie[key] = user_
-                
-                if 'expires' not in cookie[key]:
-                    cookie[key]["expires"] = 36000
-                if 'path' not in cookie[key]:
-                    cookie[key]["path"] = '/'
-                if 'domain' not in cookie[key]:
-                    cookie[key]["domain"] = '/'
-                if 'secure' not in cookie[key]:
-                    cookie[key]["secure"] = True
-
-                headers["set-cookie"] = cookie.output(header="").strip()
-
-                #print(headers)
-                #message[headers]
-            await send(message)
-
-        await self.app(scope, receive, custom_send)
-        return'''
-    
-class AuthorizationMiddleware:
-    def __init__(
-        self,
-        app ,
-        manager,
-        allow_websocket: bool = True,
-    ):
-        self.app = app
-        self.manager = manager
-        self.allow_websocket = allow_websocket
-
-    async def __call__(
-        self, scope: Scope, receive: Receive, send: Send
-    ) -> None:
-        if self.allow_websocket is False and scope["type"] != "http":
-            await self.app(scope, receive, send)
-            return
-        elif scope["type"] not in ("http", "websocket"):
-            await self.app(scope, receive, send)
-            return
-
-        for prefix_dir in ['/favicon.ico','/github','/static','/login','/logout','/framework','/application','/infrastructure']:
-            if scope["path"].startswith(prefix_dir) or scope["path"] == '/':
-                await self.app(scope, receive, send)
-                return
-
-        conn = HTTPConnection(scope=scope, receive=receive)
-        ssss = conn.cookies['session_identifier'] if 'session_identifier' in conn.cookies else None
-        #print(ssss,conn.cookies)
-
-        check = await self.manager.authenticated(session=ssss)
-
-        if not check:
-            response = RedirectResponse('/', status_code=301)
-            await response(scope, receive, send)
-            return
-        else:
-            await self.app(scope, receive, send)
-            return
-
-class adapter(presentation.presentation):
+#presentation.presentation
+class adapter():
 
     @flow.function(ports=('defender',))
     def __init__(self,defender,**constants):
@@ -172,36 +61,36 @@ class adapter(presentation.presentation):
 
         middleware = [
             Middleware(SessionMiddleware, session_cookie="session_state",secret_key=self.config['project']['key']),
-            Middleware(AuthorizationMiddleware, manager=defender)
-            #Middleware(CORSMiddleware, allow_origins=['*'],allow_methods=['*'],allow_headers=['*']),
-            #Middleware(DefenderMiddleware,backend=self,manager=defender),
-            #Middleware(DefenderMiddleware,backend=self,manager=defender,allow_websocket=False,),
+            #Middleware(AuthorizationMiddleware, manager=defender)
         ]
 
         self.app = Starlette(debug=True,routes=routes,middleware=middleware)
 
     def loader(self, *services, **constants):
-        fs_loader = FileSystemLoader("src/application/view/layout/")
-        #http_loader = MyLoader()
-        #choice_loader = ChoiceLoader([fs_loader, http_loader])
-        self.env = Environment(loader=fs_loader,autoescape=select_autoescape(["html", "xml"]))
-        loop=constants['loop']
-        config = Config(app=self.app, loop=loop,host=self.config['host'], port=int(self.config['port']),use_colors=True,reload=True)
-        server = Server(config)
-        loop.create_task(server.serve())
+        try:
+            fs_loader = FileSystemLoader("src/application/view/layout/")
+            #http_loader = MyLoader()
+            #choice_loader = ChoiceLoader([fs_loader, http_loader])
+            self.env = Environment(loader=fs_loader,autoescape=select_autoescape(["html", "xml"]))
+            loop=constants['loop']
+            config = Config(app=self.app, loop=loop,host=self.config['host'], port=int(self.config['port']),use_colors=True,reload=True)
+            server = Server(config)
+            loop.create_task(server.serve())
+        except Exception as e:
+            print("errore generico",e)
+
+    async def host(self,constants):
+        f = open('src/'+constants['url'], "r")
+        text = f.read()
+        return text
 
     async def builder(self,**constants):
-        f = open('src/'+constants['file'], "r")
-        text = f.read()
-
+        text = await self.host(constants)
         template = self.env.from_string(text)
-          
         content = template.render(constants)
-
         xml = untangle.parse(content)
-        
-        return await self.mount_view(xml.children[0],constants)
-        #return content
+        out = await self.mount_view(xml.children[0],constants)
+        return out
         
     @flow.async_function(ports=('defender',))
     async def logout(self,request,defender) -> None:
@@ -212,7 +101,7 @@ class adapter(presentation.presentation):
         return response
 
     @flow.async_function(ports=('storekeeper','defender',))
-    async def login(self,request: Request, storekeeper, defender) -> None:
+    async def login(self,request, storekeeper, defender) -> None:
         match request.method:
             case 'GET':
                 query = dict(request.query_params)
@@ -289,22 +178,33 @@ class adapter(presentation.presentation):
                 return RedirectResponse('/', status_code=303)
 
     async def view(self,request):
-        html = await self.builder(file=self.views[request.url.path] )
-        return HTMLResponse(html)
+        html = await self.builder(url=self.views[request.url.path])
+        layout = 'application/view/layout/base.html'
+        file = await self.host({'url':layout})
+        template = self.env.from_string(file)
+        content = template.render()
+        content = content.replace('<!-- Body -->',html)
+        return HTMLResponse(content)
     
-    def code(self,tag,attr,inner=None):
+    def code(self,tag,attr,inner=[]):
         att = ''
-        html = inner
+        html = ''
         for key in attr:
             att += f' {key}="{attr[key]}"'
-        for item in inner:
-            html += item
-        if inner:
+        if type(inner) == type([]):
+            for item in inner:
+                html += item
+            return f'<{tag} {att} >{html}</{tag}>'
+        elif  type(inner) == type(''):
             return f'<{tag} {att} >{inner}</{tag}>'
         else:
             return f'<{tag} {att} />'
+
+    def att(self,element,attributes):
+        pass
     
-    async def mount_view(self,root,data=dict()): 
+    async def mount_view(self,root,data=dict()):
+        tags = ['Messenger','Storekeeper']
         inner = []
         tag = root._name
         att = root._attributes
@@ -327,85 +227,91 @@ class adapter(presentation.presentation):
                     html += item
                 return html
             case 'Graph':
-                html = ''
-                for item in inner:
-                    html += item
-                return html
+                icon = att['icon'] if 'icon' in att else 'bi-image-alt'
+                if 'icon' in att:
+                    return self.code('i',{'class':f'bi {icon}'})
+                elif 'src' in att:
+                    src = att['src'] if 'src' in att else 'bi-image-alt'
+                    img = self.code('img',{'src':src})
+                    self.att(img,att)
+                    return img
+                else:
+                    return self.code('i',{'class':f'bi {icon}'})
             case 'View':
-                url = att['url'] if 'url' in att else ''
-                test = await self.builder(**data.copy())
-                return self.code('div',{'class':'toast-body'},test)
+                copy = data.copy()
+                test = await self.builder(**copy|att)
+                return self.code('div',{'class':'container-fluid d-flex flex-row col p-0 m-0'},[test])
             case 'Message':
                 model = att['type'] if 'type' in att else 'flesh'
                 title = att['title'] if 'title' in att else ''
-                html = ''
-                for item in inner:
-                    html += item
-                
+
                 if model == 'system':
                     return self.code('div',
-                        {'class':'toast','role':'alert','aria-live':'assertive','aria-atomic':'true'},
-                        self.code('div',{'class':'toast-header'}, self.code('strong',{'class':'me-auto'},title))+
-                        self.code('div',{'class':'toast-body'},html)
-                    )
+                        {'class':'toast','role':'alert','aria-live':'assertive','aria-atomic':'true'},[
+                            self.code('div',{'class':'toast-header'}, self.code('strong',{'class':'me-auto'},title)),
+                            self.code('div',{'class':'toast-body'},inner)
+                        ])
                 elif model == 'flesh':
-                    return self.code('div',{'class':'alert alert-primary','role':'alert'},html)
+                    return self.code('div',{'class':'alert alert-primary','role':'alert'},inner)
             case 'Input':
-                html = ''
-                for item in inner:
-                    html += item
-                return self.code('input',{'class':'form-control'},html)
+                return self.code('input',{'class':'form-control'})
             case 'Action':
                 model = att['type'] if 'type' in att else 'button'
                 url = att['url'] if 'url' in att else '#'
-                html = ''
-                for item in inner:
-                    html += item
                 
                 if model == 'form':
-                    return self.code('form',{'action':'/action_page.php','method':'POST'},html)
+                    act = att['act'] if 'act' in att else '#'
+                    form = self.code('form',{'action':act,'method':'POST'},inner)
+                    self.att(form,att)
+                    return form
                 elif model == 'button':
-                    return self.code('a',{'class':'btn','href':url},html)
+                    button = self.code('a',{'class':'btn','href':url},inner)
+                    self.att(button,att)
+                    return button
             case 'Window':
-                layout = att['layout'] if 'layout' in att else 'src/application/view/layout/base.html'
-                f = open(layout, "r")
-                file = f.read()
-                template = self.env.from_string(file)
-                body = ''
-                for item in inner:
-                    body += item
-                content = template.render(body=body)
-                content = content.replace('<!-- Body -->',body)
-                return content
+                tipo = att['type'] if 'type' in att else 'None'
+                id = att['id'] if 'id' in att else 'None'
+                action = att['action'] if 'action' in att else 'action'
+                match tipo:
+                    case 'canvas':
+                        return self.code('div',{'data-bs-backdrop':'false','id':id,'class':'offcanvas offcanvas-end'},[
+                            self.code('div',{'class':'offcanvas-body p-0 m-0'},inner),
+                        ])
+                    case 'modal':
+                        return self.code('div',{'id':id,'class':'modal','data-bs-backdrop':'false'},[
+                            self.code('div',{'class':'modal-dialog modal-dialog-centered modal-dialog-scrollable'},[
+                                self.code('div',{'class':'modal-content'},[
+                                    self.code('div',{'class':'modal-header'}),
+                                    self.code('div',{'class':'modal-body'},inner),
+                                    self.code('div',{'class':'modal-footer'},f'<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> <button type="button" onclick="document.getElementById(\'form-{action}\').submit();" class="btn btn-success">{action.capitalize()}</button>')
+                                ]),
+                            ]),
+                        ])
+                    case _:
+                        return self.code('div',{'class':'container-fluid d-flex h-100 p-0 m-0'},inner)
             case 'Panel':
                 html = ''
                 for item in inner:
                     html += item
                 return html
             case 'Text':
-                html = ''
-                for item in inner:
-                    html += item
                 return self.code('p',{'class':'fw-lighter'},text)
+            case 'Group':
+                return self.code('div',{'class':'container-fluid p-0 m-0'},inner)
             case 'Row':
-                html = ''
-                for item in inner:
-                    html += item
-                return self.code('div',{'class':'row'},html)
+                tt = self.code('div',{'class':'d-flex flex-column row p-0 m-0'},inner)
+                self.att(tt,att)
+                return tt
             case 'Column':
-                html = ''
-                
-                return self.code('div',{'class':'col'},html)
+                tt = self.code('div',{'class':'d-flex flex-row col p-0 m-0'},inner)
+                self.att(tt,att)
+                return tt
             case 'Container':
-                html = ''
-                for item in inner:
-                    html += item
-                return self.code('div',{'class':'container'},html)
+                tt = self.code('div',{'class':'container-fluid p-0 m-0'},inner)
+                self.att(tt,att)
+                return tt
             case _:
-                html = ''
-                for item in inner:
-                    html += item
-                return html
+                pass
                   
     def mount_route(self,routes,url):
         

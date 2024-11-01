@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window type="main" layout="src/application/view/layout/wasm.html" >
-{% if user and user['username'] %}
-<View url="application/view/layout/appley.xml" />
-{% else %}
-<View url="application/view/content/form/login.xml" />
-{% endif %}
+<Window type="main" layout="application/view/layout/base.html" >
+    {% if user %}
+    <View url="application/view/layout/appley.xml" />
+    {% else %}
+    <View url="application/view/page/auth/login.xml" />
+    {% endif %}
 </Window>

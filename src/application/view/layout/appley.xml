@@ -1,49 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Container color="#f8f8f8"  margin="m-0" padding="p-0" >
-    <Nav color="#fbfbfb" padding="px-3;py-1" margin="m-0" class="border-bottom" style="z-index:0;position:unset;">
+<Row color="#f8f8f8" class="w-100"  margin="m-0" padding="p-0" >
+    <Column color="#fbfbfb" height="auto" padding="px-3;py-1" margin="m-0" class="border-bottom" style="z-index:0;position:unset;">
         <Column>
-            <Img src="/static/logo.svg" height="30px" />
+            <Graph src="static/logo.svg" />
         </Column>
         <Column>
-            <Route url="application/view/page/company/overview.xml"><Icon icon="bi-people-fill"/><Text>Colosso</Text></Route>
-            <Route url="application/view/page/inventory/overview.xml"><Icon icon="bi-basket3-fill"/><Text>Inventory</Text></Route>
-            <Route url="application/view/layout/main.xml"><Icon icon="bi-shield-fill"/><Text>Security</Text></Route>
-            <Route url=""><Icon icon="bi-easel-fill"/><Text>Monitoring</Text></Route>
-            <Route url="application/view/page/cubute/overview.xml"><Icon icon="bi-box2-fill"/><Text>Cubute</Text></Route>
-            <Route url=""><Icon icon="bi-mortarboard-fill"/><Text>Academy</Text></Route>
-            <Route url=""><Icon icon="bi-rocket-takeoff-fill"/><Text>Partnership</Text></Route>
-            <Route url="application/view/page/forum/overview.xml"><Icon icon="bi-bank2"/><Text>Forum</Text></Route>
-            <Route url=""><Icon icon="bi-building-fill"/><Text>Facility</Text></Route>
+            <Action url="application/view/page/company/overview.xml"><Graph icon="bi-people-fill"/><Text>Colosso</Text></Action>
+            <Action url="application/view/page/inventory/overview.xml"><Graph icon="bi-basket3-fill"/><Text>Inventory</Text></Action>
+            <Action url="application/view/layout/main.xml"><Graph icon="bi-shield-fill"/><Text>Security</Text></Action>
+            <Action url=""><Graph icon="bi-easel-fill"/><Text>Monitoring</Text></Action>
+            <Action url="application/view/page/cubute/overview.xml"><Graph icon="bi-box2-fill"/><Text>Cubute</Text></Action>
+            <Action url=""><Graph icon="bi-mortarboard-fill"/><Text>Academy</Text></Action>
+            <Action url=""><Graph icon="bi-rocket-takeoff-fill"/><Text>Partnership</Text></Action>
+            <Action url="application/view/page/forum/overview.xml"><Graph icon="bi-bank2"/><Text>Forum</Text></Action>
+            <Action url=""><Graph icon="bi-building-fill"/><Text>Facility</Text></Action>
         </Column>
         <Column size="auto" content="end" alignment="center" >
-            <Button id="button3" data-bs-toggle="offcanvas" size="sm" data-bs-target="#profile" padding="p-0">
+            <Action id="button3" data-bs-toggle="offcanvas" size="sm" data-bs-target="#profile" padding="p-0">
                 <Column alignment="center">
-                    <Icon icon="bi-inbox-fill" color="white"/>
-                    <Icon icon="bi-question-circle-fill" color="white"/>
-                    <Img src="{{ user.avatar or 'static/logo.svg' }}" margin="mx-2" width="40px" height="40px" class="rounded-2 border" />
-                    <Text >{{ user.username or 'NaM' }}</Text>
+                    <Graph icon="bi-inbox-fill" color="white"/>
+                    <Graph icon="bi-question-circle-fill" color="white"/>
+                    <Graph src="{{ user.avatar or 'static/logo.svg' }}" margin="mx-2" width="40px" height="40px" class="rounded-2 border" />
+                    <Text>{{ user.username or 'NaM' }}</Text>
                 </Column>  
-            </Button>
+            </Action>
             <Window id="profile" type="canvas" title="Logout" >
                 <Column alignment="center">
-                    <Button size="sm" data-bs-dismiss="offcanvas" >
+                    <Action size="sm" data-bs-dismiss="offcanvas" >
                         <Column alignment="center">
-                        <Img src="{{ user.avatar or 'static/logo.svg' }}" margin="mx-2" width="40px" height="40px" class="rounded-2 border" />
-                        <Text color="black" >{{ user.username or 'NaM' }}</Text>
+                            <Graph src="{{ user.avatar or 'static/logo.svg' }}" margin="mx-2" width="40px" height="40px" class="rounded-2 border" />
+                            <Text color="black" >{{ user.username or 'NaM' }}</Text>
                         </Column>
-                    </Button>
-                    <Button id="button2" icon="REMOVE" size="sm" target="#exampleModal" class=" d-inline" ><Icon icon="bi-box-arrow-right"/></Button>
+                    </Action>
+                    <Action id="button2" icon="REMOVE" size="sm" target="#exampleModal" class=" d-inline" ><Graph icon="bi-box-arrow-right"/></Action>
                 </Column>
                 <Container class="border-top" padding="p-0">
                     <!-- TabNav -->
-                    <Nav margin="m-0" padding="p-0" class="border-bottom">
-                        <Route href="#contracts" data-bs-toggle="tab"><Icon icon="bi-person-fill-gear"/><Text class="text-uppercase">Profile</Text></Route>
-                        <Route href="#credit-notes" data-bs-toggle="tab"><Icon icon="bi-wallet-fill"/><Text class="text-uppercase">Wallet</Text></Route>
-                        <Route href="#invoices" data-bs-toggle="tab"><Icon icon="bi-key-fill"/><Text class="text-uppercase">API</Text></Route>
-                        <Route href="#calls" data-bs-toggle="tab"><Icon icon="bi-inbox-fill"/><Text class="text-uppercase">Box</Text></Route>
-                    </Nav>
+                    <Column margin="m-0" padding="p-0" class="border-bottom">
+                        <Action href="#contracts" data-bs-toggle="tab"><Graph icon="bi-person-fill-gear"/><Text class="text-uppercase">Profile</Text></Action>
+                        <Action href="#credit-notes" data-bs-toggle="tab"><Graph icon="bi-wallet-fill"/><Text class="text-uppercase">Wallet</Text></Action>
+                        <Action href="#invoices" data-bs-toggle="tab"><Graph icon="bi-key-fill"/><Text class="text-uppercase">API</Text></Action>
+                        <Action href="#calls" data-bs-toggle="tab"><Graph icon="bi-inbox-fill"/><Text class="text-uppercase">Box</Text></Action>
+                    </Column>
                     <!-- Tab -->
-                    <Tab>
+                    <Group>
                         <Container id="contracts">
                             <Text>1</Text>
                         </Container>
@@ -62,17 +62,17 @@
                         <Container id="historical">
                             <Text>6</Text>
                         </Container>
-                    </Tab>
+                    </Group>
                 </Container>
             </Window>
-            <Window id="exampleModal" position="centered" size="sm" title="Logout" action="logout">
+            <Window id="exampleModal" type="modal" position="centered" size="sm" title="Logout" action="logout">
                 <View url="application/view/content/form/logout.xml" />
             </Window>
         </Column>
-    </Nav>
-    <Container id="main" type="main" size="expand" margin="mb-auto" padding="p-0" class="overflow-auto" >
+    </Column>
+    <Column id="main" type="main" margin="mb-auto" padding="p-0" class="overflow-auto" >
         
-    </Container>
+    </Column>
     <Container type="footer" color="#f1f1f1" class="border-top" size="fluid">
         <Container color="body">
             <Column content="center">
@@ -82,4 +82,4 @@
             </Column>
         </Container>
     </Container>
-</Container>
+</Row>

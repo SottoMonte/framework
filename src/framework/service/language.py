@@ -35,9 +35,10 @@ def loader_provider_test(**constants):
         adapter = constants['adapter'] if 'adapter' in constants else ''
         service = constants['service'] if 'service' in constants else ''
         payload = constants['payload'] if 'payload' in constants else ''
+        area = constants['area'] if 'area' in constants else 'framework'
             
         req = js.XMLHttpRequest.new()
-        req.open("GET", f"framework/{service}/{adapter}.py", False)
+        req.open("GET", f"{area}/{service}/{adapter}.py", False)
         req.send()
 
         req2 = js.XMLHttpRequest.new()

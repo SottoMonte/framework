@@ -7,21 +7,16 @@
         </Container>
     </Row>
     <Row size="fluid">
-        <Breadcrumb padding="p-1">
-            <Text class="d-inline">Colosso</Text>
-            <Text class="d-inline">Clients</Text>
-            <Text class="d-inline">#445</Text>
-        </Breadcrumb>
         <Column margin="m-5">
-            <Row size="full">
+            <Row>
                 <Text type="h1">{% block title %}{% endblock %}</Text>
                 <Text>{% block subtitle %}{% endblock %}</Text>
             </Row>
             <Container>{% block action %}{% endblock %}</Container>
         </Column>
-        <Row id="alert-container" type="container-fluid">
-            <Alert type="danger">Errore</Alert>
-        </Row>
+        <Container id="alert-container">
+            <Message title="Failed build"><Text>Login: disponibile</Text></Message>
+        </Container>
         {% block content %}
         {% endblock %}
     </Row>
