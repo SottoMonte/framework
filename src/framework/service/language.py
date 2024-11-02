@@ -392,6 +392,45 @@ def builder(schema,value=None,spread={}):
             return output[next(iter(output))]
         else: return output
 
+def translation(constants,values,keys,input='MODEL',output='MODEL'):
+        
+        out = dict()
+        zwork = dict()
+
+        for x in constants:
+            #print(x,constants)
+            zwork |= put(x,constants[x],zwork)
+        #print(input,output,constants)
+        for row in keys:
+            if not input in row: dd = row['MODEL']
+            else:dd = row[input]
+            if not output in row: name = row['MODEL']
+            else:name = row[output]
+
+            trat = row['MODEL'] if dd not in row else dd
+
+            if type(dd) == type([]):
+                for x in dd:
+                   valor = get(x,zwork)
+                   #valor = [1,2,3] 
+                   if valor != None:break
+            else:valor = get(dd,zwork)
+            #print(name,dd,valor,'<====')
+            if valor != None:
+                #print(input,output,row,dd,trat)
+                if trat in values:
+                    for x in values[trat]:
+                        #print(x)
+                        if type(x[output]) == type(""):
+                            pass
+                        else:
+                            valor = x[output](valor)
+                    #print(valor)
+                out |= put(name,valor,out)
+            #print(dd,valor)'''
+        
+        return out
+
 def filter(self):
         pass
 

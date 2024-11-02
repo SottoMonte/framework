@@ -9,6 +9,7 @@ else:
     import json
     import framework.port.persistence as persistence
     import framework.service.flow as flow
+    import framework.service.language as language
 
 
 class adapter(persistence.port):
@@ -83,10 +84,10 @@ class adapter(persistence.port):
 
                 async with session.get(url, headers=headers,ssl=self.ssl) as response:
                     if response.status != 200:
-                        return storekeeper.builder('transaction',{'state': False,'action':'read','remark':'not found data'})
+                        return language.builder('transaction',{'state': False,'action':'read','remark':'not found data'})
                     else:
-                        r = await response.json()
-                        return storekeeper.builder('transaction',{'state': True,'action':'read','result':r})
+                        result = await response.json()
+                        return language.builder('transaction',{'state': True,'action':'read','result':result})
 
         @flow.async_function(ports=('storekeeper',))
         async def create(self, storekeeper, **constants):
@@ -99,8 +100,7 @@ class adapter(persistence.port):
                 async with session.post(url, headers=head,data=json.dumps(constants['value']),ssl=False) as response:
                     if response.status == 201:
                         result = await response.json()
-                        return storekeeper.builder('transaction',{'state': True,'action':'create','result':result})
-                        
+                        return storekeeper.builder('transaction',{'state': True,'action':'create','result':result})         
                     else:
                         info = await response.json()
                         pp = {'url':url}

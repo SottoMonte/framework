@@ -65,6 +65,8 @@ class adapter(starlette.adapter):
           
           transaction = await storekeeper.get(model="user",token=token)
 
+          print(transaction)
+
           if transaction['state']:
             user = transaction['result']
           else:
