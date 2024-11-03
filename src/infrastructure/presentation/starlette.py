@@ -265,7 +265,7 @@ class adapter():
                     self.att(form,att)
                     return form
                 elif model == 'button':
-                    button = self.code('a',{'class':'btn','href':url},inner)
+                    button = self.code('a',{'class':'btn'},inner)
                     self.att(button,att)
                     return button
             case 'Window':
@@ -295,7 +295,9 @@ class adapter():
                     html += item
                 return html
             case 'Text':
-                return self.code('p',{'class':'fw-lighter'},text)
+                text = self.code('p',{'class':'text-truncate fw-lighter p-0 m-0'},text)
+                self.att(text,att)
+                return text
             case 'Group':
                 return self.code('div',{'class':'container-fluid p-0 m-0'},inner)
             case 'Row':
@@ -307,7 +309,8 @@ class adapter():
                 self.att(tt,att)
                 return tt
             case 'Container':
-                tt = self.code('div',{'class':'container-fluid p-0 m-0'},inner)
+                #container-fluid p-0 m-0
+                tt = self.code('div',{'class':''},inner)
                 self.att(tt,att)
                 return tt
             case _:

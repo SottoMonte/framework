@@ -121,14 +121,15 @@ class adapter(starlette.adapter):
                 element.setAttribute('method',value)
               case 'identifier':
                 element.setAttribute('name',value)
-              case 'url':
-                #'http://0.0.0.0:8000/'
+              case 'route':
+                for child in element.childNodes:
+                  child.setAttribute('url',value)
                 element.setAttribute('url',value)
                 element.addEventListener('click',pyodide.create_proxy(self.route))
               case 'click':
                 element.setAttribute(key,value)
                 element.addEventListener('click',pyodide.create_proxy(self.event))
-              case 'href':
+              case 'link':
                 element.setAttribute('href',value)
               case 'icon':
                 element.className += ' '+value
@@ -192,7 +193,9 @@ class adapter(starlette.adapter):
                 elif value == 'fluid': element.className += " container-fluid p-0 m-0"
                 elif 'modal-dialog' in element.className: element.className += f" modal-{value} "
                 elif element.tagName == 'BUTTON': element.className += f" btn-{value} "
-                else: element.className += f" col-{value} "
+                elif value == 'auto': element.className += " col-auto"
+                elif value == 'expanded': element.className += " col"
+                else: element.className += " col"
                   
               case 'color':
                 if element.tagName in ['DIV','NAV','FOOTER']:
@@ -273,7 +276,6 @@ class adapter(starlette.adapter):
           return tag
         
         async def host(self,constants):
-          
           if 'url' not in constants:
             url="application/view/layout/app.xml"
           else:

@@ -2,30 +2,38 @@
 {% block title %}Overview{% endblock %}
 {% block subtitle %}Keep track of your inventory{% endblock %}
 {% block bar %}
-<Route url="application/view/page/orakom/dashboard.xml">
-    <Text><Icon icon="bi-view-list" color="white" />Overview</Text>
-</Route>
-<Route url="application/view/page/orakom/clients.xml">
-    <Text><Icon icon="bi-pc-horizontal" color="white" />Virtual machines</Text>
-</Route>
-<Route url="application/view/page/orakom/contracts.xml">
-    <Text><Icon icon="bi-box-seam" color="white" />Containers</Text>
-</Route>
-<Route url="application/view/page/orakom/invoices.xml">
-    <Text><Icon icon="bi-boxes" color="white" />Services</Text>
-</Route>
-<Route url="application/view/page/orakom/invoices.xml">
-    <Text><Icon icon="bi-globe" color="white" />Domains</Text>
-</Route>
-<Route url="application/view/page/orakom/invoices.xml">
-    <Text><Icon icon="bi-database" color="white" />Volumes</Text>
-</Route>
-<Route url="application/view/page/orakom/invoices.xml">
-    <Text><Icon icon="bi-braces-asterisk" color="white" />Software</Text>
-</Route>
-<Route url="application/view/page/orakom/invoices.xml">
-    <Text><Icon icon="bi-file-ruled" color="white" />Politics</Text>
-</Route>
+<Action route="application/view/page/orakom/dashboard.xml">
+    <Graph icon="bi-view-list" />
+    <Text>Overview</Text>
+</Action>
+<Action route="application/view/page/orakom/clients.xml">
+    <Graph icon="bi-pc-horizontal" />
+    <Text>Virtual machines</Text>
+</Action>
+<Action route="application/view/page/orakom/contracts.xml">
+    <Graph icon="bi-box-seam" />
+    <Text>Containers</Text>
+</Action>
+<Action route="application/view/page/orakom/invoices.xml">
+    <Graph icon="bi-boxes" />
+    <Text>Services</Text>
+</Action>
+<Action route="application/view/page/orakom/invoices.xml">
+    <Graph icon="bi-globe" />
+    <Text>Domains</Text>
+</Action>
+<Action route="application/view/page/orakom/invoices.xml">
+    <Graph icon="bi-database" />
+    <Text>Volumes</Text>
+</Action>
+<Action route="application/view/page/orakom/invoices.xml">
+    <Graph icon="bi-braces-asterisk" />
+    <Text>Software</Text>
+</Action>
+<Action route="application/view/page/orakom/invoices.xml">
+    <Graph icon="bi-file-ruled" />
+    <Text>Politics</Text>
+</Action>
 {% endblock %}
 {% block content %}
 <Container color="#fafafa" size="fluid" padding="p-4" expand="True" class="border-top border-bottom">

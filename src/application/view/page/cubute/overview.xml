@@ -24,6 +24,24 @@
 </Column>
 {% endblock %}
 {% block center %}
+<Container class="nested">
+    <Container class="item">
+        <Action><Graph icon="bi-arrows-move" /></Action>
+        <Container class="nested">
+            <Container class="item">
+                <Action><Graph icon="bi-arrows-move" /></Action>
+                <Container class="nested">
+                    <Container class="item">
+                        <Action><Graph icon="bi-arrows-move" /></Action>
+                        <Container class="nested">
+
+                        </Container>
+                    </Container>
+                </Container>
+            </Container>
+        </Container>
+    </Container>
+</Container>
 <Nav class="nav-tabs" margin="m-0" padding="p-0" color="#ededed">
     <Route href="#application" data-bs-toggle="tab"><Icon icon="bi-pass"/><Text>Application</Text></Route>
     <Route href="#framework" data-bs-toggle="tab"><Icon icon="bi-receipt"/><Text>Framework</Text></Route>

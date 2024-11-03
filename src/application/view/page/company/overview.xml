@@ -2,18 +2,22 @@
 {% block title %}Overview{% endblock %}
 {% block subtitle %}Keep track of your company{% endblock %}
 {% block bar %}
-<Route url="application/view/page/orakom/dashboard.xml">
-    <Text><Icon icon="bi-view-list" color="white" />Overview</Text>
-</Route>
-<Route url="application/view/page/orakom/clients.xml">
-    <Text><Icon icon="bi-people" color="white" />Clients</Text>
-</Route>
-<Route url="application/view/page/orakom/contracts.xml">
-    <Text><Icon icon="bi-pass" color="white" />Contracts</Text>
-</Route>
-<Route url="application/view/page/orakom/invoices.xml">
-    <Text><Icon icon="bi-receipt" color="white" />Invoices</Text>
-</Route>
+<Action route="application/view/page/company/dashboard.xml">
+    <Graph icon="bi-view-list" />
+    <Text>Overview</Text>
+</Action>
+<Action route="application/view/page/company/clients.xml">
+    <Graph icon="bi-people" />
+    <Text>Clients</Text>
+</Action>
+<Action route="application/view/page/company/contracts.xml">
+    <Graph icon="bi-pass" />
+    <Text>Contracts</Text>
+</Action>
+<Action route="application/view/page/company/invoices.xml">
+    <Graph icon="bi-receipt" />
+    <Text>Invoices</Text>
+</Action>
 {% endblock %}
 {% block content %}
 <Container color="#fafafa" size="fluid" padding="p-4" expand="True" class="border-top border-bottom">

@@ -7,6 +7,34 @@
     </div>
 </div>
 {% endblock %}
+{% block style %}
+<style>
+    .container {
+        width: 400px;
+        margin: 0 auto;
+    }
+
+    .nested {
+        padding: 4px 0;
+        border: 1px groove #bbb;
+    }
+
+    .item {
+        padding: 8px;
+    }
+</style>
+{% endblock %}
+{% block body_script %}
+<script>
+    //var element = document.getElementById('body');
+
+    //element.addEventListener('DOMSubtreeModified', myFunction);
+
+    function myFunction(e) {
+        dragula([].slice.apply(document.querySelectorAll('.nested')));
+    }
+</script>
+{% endblock %}
 {% block head_script %}
 <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
 <script>

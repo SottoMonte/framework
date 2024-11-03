@@ -10,7 +10,7 @@
             <Input model="user.name" />
             <Input model="user.password" />
             <Action act="submit"/>
-            <Action url="https://github.com/login/oauth/authorize?client_id=Iv23li8IzmjxqtrCVomM">
+            <Action link="https://github.com/login/oauth/authorize?client_id=Iv23li8IzmjxqtrCVomM">
                 <Text>GitHub Login</Text>
             </Action>
         </Action>
