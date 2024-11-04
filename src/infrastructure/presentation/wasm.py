@@ -91,9 +91,42 @@ class adapter(starlette.adapter):
             js.document.getElementById('main').innerHTML = ''
             js.document.getElementById('main').prepend(code)
 
+        async def on_drag_start(self,event,**constants):
+          print('on_drag_start')
+          self.gg = event.target.id
+          
+          for x in self.document.querySelectorAll(".nested"):
+            x.className += " ui-droppable-active active"
+        
+
+        async def on_drop(self,event,**constants):
+          print('on_drop')
+          for x in self.document.querySelectorAll(".nested"):
+            x.className = x.className.replace('ui-droppable-active','')
+            x.className = x.className.replace('active','')
+          event.preventDefault()
+          if 'nested' in event.target.className:
+            draggable_element = js.document.getElementById(self.gg)
+            event.target.appendChild(draggable_element)
+          else:
+            draggable_element = js.document.getElementById(self.gg)
+            a = event.target.querySelectorAll(".nested")
+            if len(a) == 0 :
+              #print(event.target.parentElement.tagName,event.target.parentElement.className)
+              b = event.target.parentElement.querySelectorAll(".nested")
+              b[0].appendChild(draggable_element)
+            else:
+              a[0].appendChild(draggable_element)
+          #event.target.innerHTML += '<div class=" item"><p class="text-truncate fw-lighter p-0 m-0" style=" background-color:#ccc;">3</p><div class="nested ui-droppable ui-sortable"></div></div>'
+        
+        async def on_drag_over(self,event,**constants): 
+          print('on_drag_over')
+          #event.preventDefault()
+        
         async def event(self,event,**constants):
             action = event.target.getAttribute('click')
-            data = []
+            print(event)
+            '''data = []
             if '(' in action:
               ss = action.split('(')
               action = ss[0]
@@ -105,7 +138,7 @@ class adapter(starlette.adapter):
             _ = await act(self,event,data=data)
             
             
-            #print(dir(event.target),event.target.checked,self.components[target])
+            #print(dir(event.target),event.target.checked,self.components[target])'''
 
         def att(self,element,attributes):
           for key in attributes:
@@ -129,6 +162,17 @@ class adapter(starlette.adapter):
               case 'click':
                 element.setAttribute(key,value)
                 element.addEventListener('click',pyodide.create_proxy(self.event))
+              case 'droppable':
+                element.setAttribute('ondragover','allowDrop(event)')
+                element.addEventListener('drop',pyodide.create_proxy(self.on_drop))
+                element.addEventListener('dragover',pyodide.create_proxy(self.on_drag_over))
+              case 'draggable':
+                if value not in ['false','true']:
+                  element.setAttribute(key,value)
+                else:
+                  element.setAttribute(key,'true')
+                element.setAttribute('ondragstart','drag(event)')
+                element.addEventListener('dragstart',pyodide.create_proxy(self.on_drag_start))
               case 'link':
                 element.setAttribute('href',value)
               case 'icon':

@@ -1,12 +1,36 @@
 {% extends "cardinal.xml" %}
 {% block west %}
-<Select>
+<Column id="box" class="flex-wrap" style="font-size: 40px;" >
+    <Action id="img" draggable="true" width="50px" height="50px" >
+        <Graph icon="bi-link" />
+    </Action>
+    <Action class="drag" >
+        <Graph icon="bi-send" />
+    </Action>
+    <Action class="drag" >
+        <Graph icon="bi-image" />
+    </Action>
+    <Action class="drag" >
+        <Graph icon="bi-window" />
+    </Action>
+    <Action class="drag" >
+        <Graph icon="bi-layout-three-columns" />
+    </Action>
+    <Action class="drag" >
+        <Graph icon="bi-textarea" />
+    </Action>
+    <Action class="drag" >
+        <Graph icon="bi-textarea-resize" />
+    </Action>
+</Column>
+
+<Action>
     <Text>View</Text>
     <Text>Model</Text>
     <Text>Action</Text>
     <Text>Policy</Text>
     <Text>Route</Text>
-</Select>
+</Action>
 {% endblock %}
 {% block north %}
 <Column>
@@ -24,22 +48,18 @@
 </Column>
 {% endblock %}
 {% block center %}
-<Container class="nested">
+<Container id="tags" droppable="true" class="nested">
     <Container class="item">
-        <Action><Graph icon="bi-arrows-move" /></Action>
-        <Container class="nested">
-            <Container class="item">
-                <Action><Graph icon="bi-arrows-move" /></Action>
-                <Container class="nested">
-                    <Container class="item">
-                        <Action><Graph icon="bi-arrows-move" /></Action>
-                        <Container class="nested">
-
-                        </Container>
-                    </Container>
-                </Container>
-            </Container>
-        </Container>
+        <Text style="background-color:#ccc;">View</Text>
+        <Container class="nested ui-droppable ui-sortable"></Container>
+    </Container>
+    <Container class="item">
+        <Text style="background-color:#ccc;">2</Text>
+        <Container class="nested ui-droppable ui-sortable"></Container>
+    </Container>
+    <Container class="item">
+        <Text style="background-color:#ccc;">3</Text>
+        <Container class="nested ui-droppable ui-sortable"></Container>
     </Container>
 </Container>
 <Nav class="nav-tabs" margin="m-0" padding="p-0" color="#ededed">

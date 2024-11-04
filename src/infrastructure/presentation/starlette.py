@@ -229,14 +229,18 @@ class adapter():
             case 'Graph':
                 icon = att['icon'] if 'icon' in att else 'bi-image-alt'
                 if 'icon' in att:
-                    return self.code('i',{'class':f'bi {icon}'})
+                    out = self.code('i',{'class':f'bi {icon}'})
+                    self.att(out,att)
+                    return out
                 elif 'src' in att:
                     src = att['src'] if 'src' in att else 'bi-image-alt'
                     img = self.code('img',{'src':src})
                     self.att(img,att)
                     return img
                 else:
-                    return self.code('i',{'class':f'bi {icon}'})
+                    out = self.code('i',{'class':f'bi {icon}'})
+                    self.att(out,att)
+                    return out
             case 'View':
                 copy = data.copy()
                 test = await self.builder(**copy|att)
