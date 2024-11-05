@@ -21,9 +21,7 @@
         </Container>
     </Container>
     <Row color="#fcfcfc" width="253px" size="expand" class="border-start">
-        <Container position="fixed" padding="p-0" margin="m-0" start="0" width="230px">
-            {% block east %}
-            {% endblock %}
-        </Container>
+        {% block east %}
+        {% endblock %}
     </Row>
 </Column>

@@ -269,7 +269,7 @@ class adapter():
                     self.att(form,att)
                     return form
                 elif model == 'button':
-                    button = self.code('a',{'class':'btn'},inner)
+                    button = self.code('a',{'class':'btn rounded-0'},inner)
                     self.att(button,att)
                     return button
             case 'Window':
@@ -303,7 +303,25 @@ class adapter():
                 self.att(text,att)
                 return text
             case 'Group':
-                return self.code('div',{'class':'container-fluid p-0 m-0'},inner)
+                tipo = att['type'] if 'type' in att else 'None'
+                match tipo:
+                    case 'tab':
+                        #self.att(inner[0],{'class':'active show'})
+                        for item in inner:
+                            self.att(item,{'class':'tab-pane fade','role':'tabpanel'})
+                        tab = self.code('div',{'class':'tab-content'},inner)
+                        self.att(tab,att)
+                        return tab
+                    case 'nav':
+                        new = [] 
+                        for item in inner:
+                            li = self.code('li',{'class':'nav-item'},[item])
+                            new.append(li)
+                        tab = self.code('ul',{'class':'nav nav-tabs'},new)
+                        self.att(tab,att)
+                        return tab
+                    case _:
+                        return self.code('div',{'class':'container-fluid p-0 m-0'},inner)
             case 'Row':
                 tt = self.code('div',{'class':'d-flex flex-column row p-0 m-0'},inner)
                 self.att(tt,att)
@@ -313,8 +331,7 @@ class adapter():
                 self.att(tt,att)
                 return tt
             case 'Container':
-                #container-fluid p-0 m-0
-                tt = self.code('div',{'class':''},inner)
+                tt = self.code('div',{'class':'container-fluid'},inner)
                 self.att(tt,att)
                 return tt
             case _:

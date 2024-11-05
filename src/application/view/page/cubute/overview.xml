@@ -1,25 +1,25 @@
 {% extends "cardinal.xml" %}
 {% block west %}
 <Column id="box" class="flex-wrap" style="font-size: 40px;" >
-    <Action id="img" draggable="true" width="50px" height="50px" >
+    <Action id="img" draggable="true" >
         <Graph icon="bi-link" />
     </Action>
-    <Action class="drag" >
+    <Action id="img4" draggable="true" >
         <Graph icon="bi-send" />
     </Action>
-    <Action class="drag" >
+    <Action id="img34" draggable="true"  >
         <Graph icon="bi-image" />
     </Action>
-    <Action class="drag" >
+    <Action id="img4" draggable="true" >
         <Graph icon="bi-window" />
     </Action>
-    <Action class="drag" >
+    <Action id="img44" draggable="true" >
         <Graph icon="bi-layout-three-columns" />
     </Action>
-    <Action class="drag" >
+    <Action id="img33" draggable="true" >
         <Graph icon="bi-textarea" />
     </Action>
-    <Action class="drag" >
+    <Action id="img3" draggable="true" >
         <Graph icon="bi-textarea-resize" />
     </Action>
 </Column>
@@ -33,110 +33,91 @@
 </Action>
 {% endblock %}
 {% block north %}
-<Column>
-<Text>View</Text>
-<Text>Notice</Text>
-<Text>Input</Text>
-<Text>Action</Text>
-<Text>Window</Text>
-<Text>Panel</Text>
-<Text>Text</Text>
-<Text>Container</Text>
-<Text>Row</Text>
-<Text>Column</Text>
-<Text>Graph</Text>
-</Column>
 {% endblock %}
 {% block center %}
-<Container id="tags" droppable="true" class="nested">
-    <Container class="item">
-        <Text style="background-color:#ccc;">View</Text>
-        <Container class="nested ui-droppable ui-sortable"></Container>
-    </Container>
-    <Container class="item">
-        <Text style="background-color:#ccc;">2</Text>
-        <Container class="nested ui-droppable ui-sortable"></Container>
-    </Container>
-    <Container class="item">
-        <Text style="background-color:#ccc;">3</Text>
-        <Container class="nested ui-droppable ui-sortable"></Container>
-    </Container>
-</Container>
-<Nav class="nav-tabs" margin="m-0" padding="p-0" color="#ededed">
-    <Route href="#application" data-bs-toggle="tab"><Icon icon="bi-pass"/><Text>Application</Text></Route>
-    <Route href="#framework" data-bs-toggle="tab"><Icon icon="bi-receipt"/><Text>Framework</Text></Route>
-    <Route href="#infrastructure" data-bs-toggle="tab"><Icon icon="bi-journal-bookmark"/><Text>Infrastructure</Text></Route>
-</Nav>
-<Tab>
-    <Container size="fluid" id="application">
-        <Column size="fluid">
-            <Container size="fluid" color="#ededed">
-                <Breadcrumb padding="p-1">
-                    <Select>
-                        <Text>View</Text>
-                        <Text>Model</Text>
-                        <Text>Action</Text>
-                        <Text>Policy</Text>
-                        <Text>Route</Text>
-                    </Select>
-                    <Select class="d-inline">
-                        <Text>layout</Text>
-                        <Text>page</Text>
-                        <Text>content</Text>
-                        <Text>componenet</Text>
-                    </Select>
-                    <Select class="d-inline">
-                        <Text>app.xml</Text>
-                        <Text>stack.xml</Text>
-                        <Text>cardinal.xml</Text>
-                    </Select>
-                </Breadcrumb>
+<Group type="nav" margin="m-0" padding="p-0" color="#ededed">
+    <Action link="#framework" data-bs-toggle="tab"><Graph icon="bi-pass"/><Text>framework</Text></Action>
+    <Action link="#infrastructure" data-bs-toggle="tab"><Graph icon="bi-receipt"/><Text>infrastructure</Text></Action>
+</Group>
+<Group type="tab">
+    <Row id="framework">
+        <Column padding="p-1">
+            <Container droppable="true" class="nested">
+                <Container class="item">
+                    <Text style="background-color:#ccc;">View</Text>
+                    <Container class="nested ui-droppable ui-sortable" padding="p-2"></Container>
+                </Container>
+                <Container class="item">
+                    <Text style="background-color:#ccc;">2</Text>
+                    <Container class="nested ui-droppable ui-sortable" padding="p-2"></Container>
+                </Container>
+                <Container class="item">
+                    <Text style="background-color:#ccc;">3</Text>
+                    <Container class="nested ui-droppable ui-sortable" padding="p-2"></Container>
+                </Container>
             </Container>
-            <Container size="fluid" color="#000">   
-                <Text>2</Text>
+            <Container droppable="true" class="nested">
+                <Container class="item">
+                    <Column style="background-color:#ccc;">
+                        <Text>src/application/view/page/cubute/overview.xml</Text>
+                        <Group type="nav">
+                            <Action link="#framework"><Graph icon="bi-floppy2-fill"/></Action>
+                            <Action link="#framework"><Graph icon="bi-layer-forward"/></Action>
+                            <Action link="#framework"><Graph icon="bi-layer-backward"/></Action>
+                        </Group>
+                    </Column>
+                    
+                    <Container class="nested ui-droppable ui-sortable" padding="p-2"></Container>
+                </Container>
             </Container>
         </Column>
-    </Container>
-    <Container id="framework">
-        <Text>2</Text>
-    </Container>
+    </Row>
     <Container id="infrastructure">
         <Text>3</Text>
     </Container>
-</Tab>
+</Group>
 {% endblock %}
 {% block south %}
 <!-- TabNav -->
-<Nav class="nav-tabs" margin="m-0" padding="p-0" color="#ededed">
-    <Route href="#test" data-bs-toggle="tab"><Icon icon="bi-pass"/><Text>Contracts</Text></Route>
-    <Route href="#invoices" data-bs-toggle="tab"><Icon icon="bi-receipt"/><Text>Invoices</Text></Route>
-    <Route href="#credit-notes" data-bs-toggle="tab"><Icon icon="bi-journal-bookmark"/><Text>Credit Notes</Text></Route>
-    <Route href="#calls" data-bs-toggle="tab"><Icon icon="bi-telephone"/><Text>Calls</Text></Route>
-    <Route href="#tickets" data-bs-toggle="tab"><Icon icon="bi-ticket-perforated"/><Text>Tickets</Text></Route>
-    <Route href="#historical" data-bs-toggle="tab"><Icon icon="bi-clock-history"/><Text>Historical</Text></Route>
-</Nav>
+<Group type="nav" margin="m-0" padding="p-0" color="#ededed">
+    <Action link="#tab-code" data-bs-toggle="tab"><Graph icon="bi-code-slash"/><Text>Code</Text></Action>
+    <Action link="#tab-build" data-bs-toggle="tab"><Graph icon="bi-tools"/><Text>Build</Text></Action>
+    <Action link="#tab-test" data-bs-toggle="tab"><Graph icon="bi-play-fill"/><Text>Test</Text></Action>
+    <Action link="#tab-release" data-bs-toggle="tab"><Graph icon="bi-rocket-fill"/><Text>Release</Text></Action>
+</Group>
 <!-- Tab -->
-<Tab>
-    <Container id="test">
+<Group type="tab">
+    <Container id="tab-code">
         <Text>1</Text>
     </Container>
-    <Container id="invoices">
+    <Container id="tab-build">
         <Text>2</Text>
     </Container>
-    <Container id="credit-notes">
+    <Container id="tab-test">
         <Text>3</Text>
     </Container>
-    <Container id="calls">
+    <Container id="tab-release">
         <Text>4</Text>
     </Container>
-    <Container id="tickets">
-        <Text>5</Text>
-    </Container>
-    <Container id="historical">
-        <Text>6</Text>
-    </Container>
-</Tab>
+</Group>
 {% endblock %}
 {% block east %}
-<Text>East</Text>
+<!-- TabNav -->
+<Group type="nav" margin="m-0" padding="p-0" color="#ededed">
+    <Action link="#tab-property" data-bs-toggle="tab"><Graph icon="bi-sliders2"/><Text>Property</Text></Action>
+    <Action link="#tab-style" data-bs-toggle="tab"><Graph icon="bi-rulers"/><Text>Style</Text></Action>
+    <Action link="#tab-event" data-bs-toggle="tab"><Graph icon="bi-lightning-fill"/><Text>Event</Text></Action>
+</Group>
+<!-- Tab -->
+<Group type="tab">
+    <Container id="tab-property">
+        <Text>1</Text>
+    </Container>
+    <Container id="tab-style">
+        <Text>2</Text>
+    </Container>
+    <Container id="tab-event">
+        <Text>3</Text>
+    </Container>
+</Group>
 {% endblock %}

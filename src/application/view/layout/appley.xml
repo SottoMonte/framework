@@ -36,14 +36,14 @@
                 </Column>
                 <Container class="border-top" padding="p-0">
                     <!-- TabNav -->
-                    <Column margin="m-0" padding="p-0" class="border-bottom">
-                        <Column content="center"><Action href="#contracts" data-bs-toggle="tab"><Graph icon="bi-person-fill-gear"/><Text class="text-uppercase">Profile</Text></Action></Column>
-                        <Column content="center"><Action href="#credit-notes" data-bs-toggle="tab"><Graph icon="bi-wallet-fill"/><Text class="text-uppercase">Wallet</Text></Action></Column>
-                        <Column content="center"><Action href="#invoices" data-bs-toggle="tab"><Graph icon="bi-key-fill"/><Text class="text-uppercase">API</Text></Action></Column>
-                        <Column content="center"><Action href="#calls" data-bs-toggle="tab"><Graph icon="bi-inbox-fill"/><Text class="text-uppercase">Box</Text></Action></Column>
-                    </Column>
+                    <Group type="nav" margin="m-0" padding="p-0" class="border-bottom">
+                        <Column content="center"><Action link="#contracts" data-bs-toggle="tab"><Graph icon="bi-person-fill-gear"/><Text class="text-uppercase">Profile</Text></Action></Column>
+                        <Column content="center"><Action link="#credit-notes" data-bs-toggle="tab"><Graph icon="bi-wallet-fill"/><Text class="text-uppercase">Wallet</Text></Action></Column>
+                        <Column content="center"><Action link="#invoices" data-bs-toggle="tab"><Graph icon="bi-key-fill"/><Text class="text-uppercase">API</Text></Action></Column>
+                        <Column content="center"><Action link="#calls" data-bs-toggle="tab"><Graph icon="bi-inbox-fill"/><Text class="text-uppercase">Box</Text></Action></Column>
+                    </Group>
                     <!-- Tab -->
-                    <Group>
+                    <Group type="tab">
                         <Container id="contracts">
                             <Text>1</Text>
                         </Container>

@@ -189,6 +189,8 @@ class adapter(starlette.adapter):
                 element.setAttribute('style',style)
               case 'src':
                 element.setAttribute(key,value)
+              case 'role':
+                element.setAttribute(key,value)
               case 'id':
                 element.setAttribute(key,value)
               case 'disabled':
