@@ -335,7 +335,15 @@ class adapter():
                 self.att(tt,att)
                 return tt
             case _:
-                pass
+                id = att['id'] if 'id' in att else 'None'
+
+                if id not in self.components:
+                    self.components[id] = dict({'id':id,'selected':[],'pageCurrent':1,'pageRow':10,'sortField':'CardName','sortAsc':True})
+                
+                url = f'application/view/component/{tag.replace("C_","")}.xml'
+                  
+                  
+                test = await self.builder(url=url,component=self.components[id])
                   
     def mount_route(self,routes,url):
         

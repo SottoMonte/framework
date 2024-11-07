@@ -105,7 +105,26 @@ class adapter(starlette.adapter):
             x.className = x.className.replace('ui-droppable-active','')
             x.className = x.className.replace('active','')
           event.preventDefault()
-          if 'nested' in event.target.className:
+          draggable_element = js.document.getElementById(self.gg)
+          
+          if draggable_element and draggable_element.getAttribute('draggable-domain') == event.target.getAttribute('draggable-domain'):
+            component = draggable_element.getAttribute('draggable-type')
+            id = 'None'
+            print(component)
+            if component:
+              if id not in self.components:
+                self.components[id] = dict({'id':id,'selected':[],'pageCurrent':1,'pageRow':10,'sortField':'CardName','sortAsc':True})
+                  
+              url = f'application/view/component/{component}.xml'
+              view = await self.builder(url=url,component=self.components[id])
+              
+              event.target.appendChild(view)
+            else:
+              event.target.appendChild(draggable_element)
+          #elif 'nested' in event.target.className:
+            
+          
+          '''if 'nested' in event.target.className:
             draggable_element = js.document.getElementById(self.gg)
             event.target.appendChild(draggable_element)
           else:
@@ -116,7 +135,7 @@ class adapter(starlette.adapter):
               b = event.target.parentElement.querySelectorAll(".nested")
               b[0].appendChild(draggable_element)
             else:
-              a[0].appendChild(draggable_element)
+              a[0].appendChild(draggable_element)'''
           #event.target.innerHTML += '<div class=" item"><p class="text-truncate fw-lighter p-0 m-0" style=" background-color:#ccc;">3</p><div class="nested ui-droppable ui-sortable"></div></div>'
         
         async def on_drag_over(self,event,**constants): 
@@ -164,14 +183,13 @@ class adapter(starlette.adapter):
                 element.addEventListener('click',pyodide.create_proxy(self.event))
               case 'droppable':
                 element.setAttribute('ondragover','allowDrop(event)')
+                element.setAttribute('draggable-domain',value)
                 element.addEventListener('drop',pyodide.create_proxy(self.on_drop))
                 element.addEventListener('dragover',pyodide.create_proxy(self.on_drag_over))
               case 'draggable':
-                if value not in ['false','true']:
-                  element.setAttribute(key,value)
-                else:
-                  element.setAttribute(key,'true')
+                element.setAttribute(key,'true')
                 element.setAttribute('ondragstart','drag(event)')
+                element.setAttribute('draggable-domain',value)
                 element.addEventListener('dragstart',pyodide.create_proxy(self.on_drag_start))
               case 'link':
                 element.setAttribute('href',value)
@@ -284,8 +302,7 @@ class adapter(starlette.adapter):
               case 'selected':
                 element.setAttribute(value,'')
               case _:
-                #element.setAttribute(key,value)
-                pass
+                element.setAttribute(key,value)
         
         async def rebuild(self,id,tag,**constants):
                   

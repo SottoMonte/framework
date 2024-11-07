@@ -11,25 +11,25 @@
     <Group type="tab">
         <Container id="tab-tool" size="full" class="border-start">
             <Column id="box" class="flex-wrap" style="font-size: 40px;" >
-                <Action id="img" draggable="true" >
+                <Action id="img" draggable="window" draggable-type="window" >
                     <Graph icon="bi-link" />
                 </Action>
-                <Action id="img4" draggable="true" >
+                <Action id="img4" draggable="window" >
                     <Graph icon="bi-send" />
                 </Action>
-                <Action id="img34" draggable="true"  >
+                <Action id="img34" draggable="window"  >
                     <Graph icon="bi-image" />
                 </Action>
-                <Action id="img4" draggable="true" >
+                <Action id="img499" draggable="window" >
                     <Graph icon="bi-window" />
                 </Action>
-                <Action id="img44" draggable="true" >
+                <Action id="img44" draggable="window" >
                     <Graph icon="bi-layout-three-columns" />
                 </Action>
-                <Action id="img33" draggable="true" >
+                <Action id="img33" draggable="window" >
                     <Graph icon="bi-textarea" />
                 </Action>
-                <Action id="img3" draggable="true" >
+                <Action id="img3" draggable="window" >
                     <Graph icon="bi-textarea-resize" />
                 </Action>
             </Column>
@@ -53,21 +53,10 @@
 <Group type="tab">
     <Row id="framework">
         <Column padding="p-1">
-            <Container droppable="true" class="nested">
-                <Container class="item">
-                    <Text style="background-color:#ccc;">View</Text>
-                    <Container class="nested ui-droppable ui-sortable" padding="p-2"></Container>
-                </Container>
-                <Container class="item">
-                    <Text style="background-color:#ccc;">2</Text>
-                    <Container class="nested ui-droppable ui-sortable" padding="p-2"></Container>
-                </Container>
-                <Container class="item">
-                    <Text style="background-color:#ccc;">3</Text>
-                    <Container class="nested ui-droppable ui-sortable" padding="p-2"></Container>
-                </Container>
+            <Container droppable="window" class="nested">
+                
             </Container>
-            <Container droppable="true" class="nested">
+            <Container droppable="window" class="nested" >
                 <Container class="item">
                     <Column style="background-color:#ccc;">
                         <Text>src/application/view/page/cubute/overview.xml</Text>
