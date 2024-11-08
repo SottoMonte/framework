@@ -1,6 +1,6 @@
 {% extends "cardinal.xml" %}
 {% block west %}
-<Column>
+<Column size="expanded">
     <!-- TabNav -->
     <Group type="nav" margin="m-0" padding="p-0" color="#ededed" class="flex-column">
         <Action link="#tab-explore" data-bs-toggle="tab"><Graph icon="bi-archive-fill"/><Text>Explore</Text></Action>
@@ -14,7 +14,7 @@
                 <Action id="img" draggable="window" draggable-type="window" >
                     <Graph icon="bi-link" />
                 </Action>
-                <Action id="img4" draggable="window" >
+                <Action id="img4" draggable="element" draggable-type="block" >
                     <Graph icon="bi-send" />
                 </Action>
                 <Action id="img34" draggable="window"  >
@@ -35,7 +35,21 @@
             </Column>
         </Container>
         <Container id="tab-explore" size="full" class="border-start">
-            <Text>2</Text>
+                <Group type="tree" >
+                    <Group type="node" margin="m-0" padding="p-0" color="#ededed">
+                        application
+                        <Group type="node" margin="m-0" padding="p-0" color="#ededed">
+                            view
+                            <Text id="ss" draggable="window" draggable-type="window" >overview.xml</Text>
+                            <Text id="sss" draggable="window" draggable-type="window" >overview.xml</Text>
+                        </Group>
+                        <Group type="node" margin="m-0" padding="p-0" color="#ededed">
+                            <Text id="ss" draggable="window" draggable-type="window" >overview.xml</Text>
+                            <Text id="sss" draggable="window" draggable-type="window" >overview.xml</Text>
+                        </Group>
+                    </Group>
+                </Group>
+            
         </Container>
         <Container id="tab-copilot" size="full" class="border-start">
             <Text>3</Text>
@@ -46,60 +60,51 @@
 {% block north %}
 {% endblock %}
 {% block center %}
-<Group type="nav" margin="m-0" padding="p-0" color="#ededed">
-    <Action link="#framework" data-bs-toggle="tab"><Graph icon="bi-pass"/><Text>framework</Text></Action>
-    <Action link="#infrastructure" data-bs-toggle="tab"><Graph icon="bi-receipt"/><Text>infrastructure</Text></Action>
-</Group>
-<Group type="tab">
-    <Row id="framework">
-        <Column padding="p-1">
-            <Container droppable="window" class="nested">
-                
-            </Container>
-            <Container droppable="window" class="nested" >
-                <Container class="item">
-                    <Column style="background-color:#ccc;">
-                        <Text>src/application/view/page/cubute/overview.xml</Text>
-                        <Group type="nav">
-                            <Action link="#framework"><Graph icon="bi-floppy2-fill"/></Action>
-                            <Action link="#framework"><Graph icon="bi-layer-forward"/></Action>
-                            <Action link="#framework"><Graph icon="bi-layer-backward"/></Action>
-                        </Group>
-                    </Column>
+<Row size="full">
+    <Group type="nav" margin="m-0" padding="p-0" color="#ededed">
+        <Action link="#framework" data-bs-toggle="tab"><Graph icon="bi-pass"/><Text>framework</Text></Action>
+        <Action link="#infrastructure" data-bs-toggle="tab"><Graph icon="bi-receipt"/><Text>infrastructure</Text></Action>
+    </Group>
+    <Group type="tab" class="col">
+        <Column id="framework" size="full">
+            <Row droppable="window" class="col">
                     
-                    <Container class="nested ui-droppable ui-sortable" padding="p-2"></Container>
-                </Container>
-            </Container>
+            </Row>
+            <Row droppable="window" class="col">
+                
+            </Row>
         </Column>
-    </Row>
-    <Container id="infrastructure">
-        <Text>3</Text>
-    </Container>
-</Group>
+        <Container id="infrastructure" size="full">
+            <Text>3</Text>
+        </Container>
+    </Group>
+</Row>
 {% endblock %}
 {% block south %}
-<!-- TabNav -->
-<Group type="nav" margin="m-0" padding="p-0" color="#ededed">
-    <Action link="#tab-code" data-bs-toggle="tab"><Graph icon="bi-code-slash"/><Text>Code</Text></Action>
-    <Action link="#tab-build" data-bs-toggle="tab"><Graph icon="bi-tools"/><Text>Build</Text></Action>
-    <Action link="#tab-test" data-bs-toggle="tab"><Graph icon="bi-play-fill"/><Text>Test</Text></Action>
-    <Action link="#tab-release" data-bs-toggle="tab"><Graph icon="bi-rocket-fill"/><Text>Release</Text></Action>
-</Group>
-<!-- Tab -->
-<Group type="tab">
-    <Container id="tab-code">
-        <Text>1</Text>
-    </Container>
-    <Container id="tab-build">
-        <Text>2</Text>
-    </Container>
-    <Container id="tab-test">
-        <Text>3</Text>
-    </Container>
-    <Container id="tab-release">
-        <Text>4</Text>
-    </Container>
-</Group>
+<Container>
+    <!-- TabNav -->
+    <Group type="nav" margin="m-0" padding="p-0" color="#ededed">
+        <Action link="#tab-code" data-bs-toggle="tab"><Graph icon="bi-code-slash"/><Text>Code</Text></Action>
+        <Action link="#tab-build" data-bs-toggle="tab"><Graph icon="bi-tools"/><Text>Build</Text></Action>
+        <Action link="#tab-test" data-bs-toggle="tab"><Graph icon="bi-play-fill"/><Text>Test</Text></Action>
+        <Action link="#tab-release" data-bs-toggle="tab"><Graph icon="bi-rocket-fill"/><Text>Release</Text></Action>
+    </Group>
+    <!-- Tab -->
+    <Group type="tab">
+        <Container id="tab-code">
+            <Text>1</Text>
+        </Container>
+        <Container id="tab-build">
+            <Text>2</Text>
+        </Container>
+        <Container id="tab-test">
+            <Text>3</Text>
+        </Container>
+        <Container id="tab-release">
+            <Text>4</Text>
+        </Container>
+    </Group>
+</Container>
 {% endblock %}
 {% block east %}
 <Container droppable="true" class="nested">

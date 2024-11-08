@@ -101,45 +101,38 @@ class adapter(starlette.adapter):
 
         async def on_drop(self,event,**constants):
           print('on_drop')
-          for x in self.document.querySelectorAll(".nested"):
-            x.className = x.className.replace('ui-droppable-active','')
-            x.className = x.className.replace('active','')
           event.preventDefault()
+          id = 'None'
+          
+          component = js.document.getElementById(self.components[id]['id'])
+          component.className = component.className.replace('opacity-25','')
+          event.target.appendChild(component)
+        
+        async def on_drag_over(self,event,**constants): 
+          print('on_drag_over')
           draggable_element = js.document.getElementById(self.gg)
           
           if draggable_element and draggable_element.getAttribute('draggable-domain') == event.target.getAttribute('draggable-domain'):
             component = draggable_element.getAttribute('draggable-type')
             id = 'None'
-            print(component)
+            
             if component:
               if id not in self.components:
                 self.components[id] = dict({'id':id,'selected':[],'pageCurrent':1,'pageRow':10,'sortField':'CardName','sortAsc':True})
-                  
-              url = f'application/view/component/{component}.xml'
-              view = await self.builder(url=url,component=self.components[id])
               
-              event.target.appendChild(view)
+                url = f'application/view/component/{component}.xml'
+                view = await self.builder(url=url,component=self.components[id])
+                view.className += ' opacity-25'
+                
+                self.components[id]['id'] = view.getAttribute('id')
+                event.target.appendChild(view)
+              else:
+                compo = js.document.getElementById(self.components[id]['id'])
+                compo.className += ' opacity-25'
+                event.target.appendChild(compo)
+
             else:
               event.target.appendChild(draggable_element)
-          #elif 'nested' in event.target.className:
-            
-          
-          '''if 'nested' in event.target.className:
-            draggable_element = js.document.getElementById(self.gg)
-            event.target.appendChild(draggable_element)
-          else:
-            draggable_element = js.document.getElementById(self.gg)
-            a = event.target.querySelectorAll(".nested")
-            if len(a) == 0 :
-              #print(event.target.parentElement.tagName,event.target.parentElement.className)
-              b = event.target.parentElement.querySelectorAll(".nested")
-              b[0].appendChild(draggable_element)
-            else:
-              a[0].appendChild(draggable_element)'''
-          #event.target.innerHTML += '<div class=" item"><p class="text-truncate fw-lighter p-0 m-0" style=" background-color:#ccc;">3</p><div class="nested ui-droppable ui-sortable"></div></div>'
-        
-        async def on_drag_over(self,event,**constants): 
-          print('on_drag_over')
           #event.preventDefault()
         
         async def event(self,event,**constants):

@@ -4,7 +4,7 @@
         <Column size="auto">
             <Graph src="static/logo.svg" height="40px" />
         </Column>
-        <Column content="center">
+        <Column size="expanded" content="center">
             <Action route="application/view/page/company/overview.xml" class="d-inline-flex"><Graph icon="bi-people-fill"/><Text padding="px-1">Colosso</Text></Action>
             <Action route="application/view/page/inventory/overview.xml" class="d-inline-flex"><Graph icon="bi-basket3-fill"/><Text padding="px-1">Inventory</Text></Action>
             <Action route="application/view/layout/main.xml" class="d-inline-flex"><Graph icon="bi-shield-fill"/><Text padding="px-1">Security</Text></Action>
@@ -74,7 +74,7 @@
             </Window>
         </Column>
     </Column>
-    <Column id="main" type="main" margin="mb-auto" padding="p-0" class="overflow-auto" >
+    <Column id="main" type="main" size="full" margin="mb-auto" padding="p-0" class="overflow-auto" >
         
     </Column>
     <Container type="footer" color="#f1f1f1" class="border-top" size="fluid">

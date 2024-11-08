@@ -320,14 +320,33 @@ class adapter():
                         tab = self.code('ul',{'class':'nav nav-tabs'},new)
                         self.att(tab,att)
                         return tab
+                    case 'tree':
+                        tab = self.code('ul',{'class':'tree p-0'},[
+                            self.code('li',{'class':''},inner),
+                        ])
+                        self.att(tab,att)
+                        return tab
+                    case 'node':
+                        new = [] 
+                        for item in inner:
+                            li = self.code('li',{'class':''},[item])
+                            new.append(li)
+
+                        tab = self.code('details',{'class':''},[
+                            self.code('summary',{'class':''},text),
+                            self.code('ul',{'class':''},new)
+                        ])
+                        
+                        self.att(tab,att)
+                        return tab
                     case _:
                         return self.code('div',{'class':'container-fluid p-0 m-0'},inner)
             case 'Row':
-                tt = self.code('div',{'class':'d-flex flex-column row p-0 m-0'},inner)
+                tt = self.code('div',{'class':'d-flex flex-column p-0 m-0'},inner)
                 self.att(tt,att)
                 return tt
             case 'Column':
-                tt = self.code('div',{'class':'d-flex flex-row col p-0 m-0'},inner)
+                tt = self.code('div',{'class':'d-flex flex-row p-0 m-0'},inner)
                 self.att(tt,att)
                 return tt
             case 'Container':

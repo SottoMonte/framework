@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Column size="full">
-    <Row color="#fcfcfc" size="expand" class="border-end">
+    <Row color="#fcfcfc" width="auto" class="border-end">
         {% block west %}
         {% endblock %}
     </Row>
-    <Container size="fluid" padding="p-0" margin="m-0" class="d-flex flex-column container-fluid">
-        <Container size="fluid" color="#fcfcfc" class="border-bottom">
+    <Row size="fluid" padding="p-0" margin="m-0">
+        <Column size="fluid" color="#fcfcfc" height="auto" class="border-bottom">
             {% block north %}
             {% endblock %}
-        </Container>
-        <Container>
+        </Column>
+        <Column size="expanded">
             {% block center %}
             {% endblock %}
-        </Container>
-        <Container size="fluid" color="#fcfcfc" margin="mt-auto" class="border-top">
+        </Column>
+        <Column size="fluid" color="#fcfcfc" height="auto" class="border-top">
             {% block south %}
             {% endblock %}
-        </Container>
-    </Container>
-    <Row color="#fcfcfc" width="253px" size="expand" class="border-start">
+        </Column>
+    </Row>
+    <Row color="#fcfcfc" width="auto" class="border-start">
         {% block east %}
         {% endblock %}
     </Row>
