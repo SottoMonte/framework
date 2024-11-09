@@ -1,7 +1,11 @@
 #import application.port.language as language
 from collections import OrderedDict
 
-from kink import di
+try:
+    from kink import di
+except e:
+    pass
+
 import importlib
 import tomli
 import js
