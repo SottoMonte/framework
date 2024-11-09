@@ -11,6 +11,7 @@ else:
   import asyncio
   import pyodide
   import importlib
+  import uuid
     
   flow = language.load_module(area="framework",service='service',adapter='flow')
   starlette = language.load_module(area="infrastructure",service='presentation',adapter='starlette')
@@ -92,52 +93,49 @@ class adapter(starlette.adapter):
             js.document.getElementById('main').prepend(code)
 
         async def on_drag_start(self,event,**constants):
-          print('on_drag_start')
-          self.gg = event.target.id
           
-          for x in self.document.querySelectorAll(".nested"):
-            x.className += " ui-droppable-active active"
+          self.drag = event.target.id
         
 
         async def on_drop(self,event,**constants):
-          print('on_drop')
-          event.preventDefault()
-          id = 'None'
+          draggable_element = js.document.getElementById(self.drag)
+          if self.drag in self.components:
+            name = self.components[self.drag]
+            component = js.document.getElementById(name)
+            component.className = component.className.replace(' opacity-25','')
+            self.components[name] = name
           
-          component = js.document.getElementById(self.components[id]['id'])
-          component.className = component.className.replace('opacity-25','')
-          event.target.appendChild(component)
+          if self.drag == 'ss':
+            self.components.pop(self.drag)
         
-        async def on_drag_over(self,event,**constants): 
-          print('on_drag_over')
-          draggable_element = js.document.getElementById(self.gg)
-          
+        async def on_drag_over(self,event,**constants):
+          event.preventDefault()
+          draggable_element = js.document.getElementById(self.drag)
           if draggable_element and draggable_element.getAttribute('draggable-domain') == event.target.getAttribute('draggable-domain'):
-            component = draggable_element.getAttribute('draggable-type')
-            id = 'None'
             
-            if component:
-              if id not in self.components:
-                self.components[id] = dict({'id':id,'selected':[],'pageCurrent':1,'pageRow':10,'sortField':'CardName','sortAsc':True})
+            component = draggable_element.getAttribute('draggable-type')
+            
+            identifier = self.drag
+            
+            if component and identifier not in self.components:
+              self.components[identifier] = ""
+              #self.components[identifier] = identifier
+                #self.components[identifier] = dict({'id':identifier,'selected':[],'pageCurrent':1,'pageRow':10,'sortField':'CardName','sortAsc':True})
+              url = f'application/view/component/{component}.xml'
+                #view = await self.builder(url=url,component=self.components[identifier])
+              view = await self.builder(url=url)
+              view.className += ' opacity-25'
+              self.components[identifier] = view.getAttribute('id')
+                #self.components[identifier]['id'] = view.getAttribute('id')
               
-                url = f'application/view/component/{component}.xml'
-                view = await self.builder(url=url,component=self.components[id])
-                view.className += ' opacity-25'
-                
-                self.components[id]['id'] = view.getAttribute('id')
-                event.target.appendChild(view)
-              else:
-                compo = js.document.getElementById(self.components[id]['id'])
-                compo.className += ' opacity-25'
-                event.target.appendChild(compo)
-
+              event.target.appendChild(view)
             else:
-              event.target.appendChild(draggable_element)
-          #event.preventDefault()
+              component = js.document.getElementById(self.components[identifier])
+              component.className += ' opacity-25'
+              event.target.appendChild(component)
         
         async def event(self,event,**constants):
             action = event.target.getAttribute('click')
-            print(event)
             '''data = []
             if '(' in action:
               ss = action.split('(')

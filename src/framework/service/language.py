@@ -1,14 +1,10 @@
 #import application.port.language as language
 from collections import OrderedDict
 
-try:
-    from kink import di
-except Exception as e:
-    pass
 
+from kink import di
 import importlib
 import tomli
-import js
 import sys
 import os
 from jinja2 import Environment
