@@ -30,33 +30,6 @@ def ttt(**constants):
     spec.loader.exec_module(foo)
 
     return foo
-
-def loader_provider_test(**constants):
-        adapter = constants['adapter'] if 'adapter' in constants else ''
-        service = constants['service'] if 'service' in constants else ''
-        payload = constants['payload'] if 'payload' in constants else ''
-        area = constants['area'] if 'area' in constants else 'framework'
-            
-        req = js.XMLHttpRequest.new()
-        req.open("GET", f"{area}/{service}/{adapter}.py", False)
-        req.send()
-
-        req2 = js.XMLHttpRequest.new()
-        req2.open("GET", f"framework/service/language.py", False)
-        req2.send()
-
-        spec2 = importlib.util.spec_from_loader('language', loader=None)
-        module2 = importlib.util.module_from_spec(spec2)
-        exec(req2.response, module2.__dict__)
-        
-        spec = importlib.util.spec_from_loader(adapter, loader=None)
-        module = importlib.util.module_from_spec(spec)
-        module.language = module2
-        exec(req.response, module.__dict__)
-
-        
-
-        return module
             
 def load_module(**c):
     if sys.platform == 'emscripten':
@@ -119,6 +92,9 @@ def get_var(accessor_string,input_dict):
 
 
 if sys.platform != 'emscripten':
+    def loader_provider_test(**constants):
+        pass
+
     def loader_manager(**constants):
         driver = importlib.import_module(constants['path'], package=None)
         provider = getattr(driver,constants['name'])
@@ -143,6 +119,34 @@ if sys.platform != 'emscripten':
         provider = getattr(driver,'adapter')
         di[service].append(provider(config=payload))
 else:
+    import js
+    def loader_provider_test(**constants):
+        adapter = constants['adapter'] if 'adapter' in constants else ''
+        service = constants['service'] if 'service' in constants else ''
+        payload = constants['payload'] if 'payload' in constants else ''
+        area = constants['area'] if 'area' in constants else 'framework'
+            
+        req = js.XMLHttpRequest.new()
+        req.open("GET", f"{area}/{service}/{adapter}.py", False)
+        req.send()
+
+        req2 = js.XMLHttpRequest.new()
+        req2.open("GET", f"framework/service/language.py", False)
+        req2.send()
+
+        spec2 = importlib.util.spec_from_loader('language', loader=None)
+        module2 = importlib.util.module_from_spec(spec2)
+        exec(req2.response, module2.__dict__)
+        
+        spec = importlib.util.spec_from_loader(adapter, loader=None)
+        module = importlib.util.module_from_spec(spec)
+        module.language = module2
+        exec(req.response, module.__dict__)
+
+        
+
+        return module
+    
     def loader_manager(**constants):
         area,service,adapter = constants['path'].split('.')
 
