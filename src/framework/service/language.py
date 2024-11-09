@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 try:
     from kink import di
-except e:
+except Exception as e:
     pass
 
 import importlib
