@@ -37,18 +37,21 @@ def load_module(**c):
     else:
         return ttt(**c)
 
-async def get_module(path):
+async def get_module(path,lang):
     #response = js.fetch(f'application/action/{act}.py',{'method':'GET'})
     response = js.fetch(path,{'method':'GET'})
     file = await response
     aa = await file.text()
     try:
-        spec = importlib.util.spec_from_loader(act, loader=None)
+        neepath = path.replace('.py','')
+        nettt = neepath.split('/')
+        spec = importlib.util.spec_from_loader(last(nettt), loader=None)
         module = importlib.util.module_from_spec(spec)
+        setattr(module,'language',lang)
         exec(aa, module.__dict__)
         return module
     except Exception as e:
-        print(f"error load 'infrastructure module'")
+        print(f"error load 'infrastructure module'",str(e))
 
 async def loader_module(self,act):
     response = js.fetch(f'application/action/{act}.py',{'method':'GET'})
@@ -441,8 +444,8 @@ def filter(self):
 def first(self):
         pass
 
-def last(self):
-        pass
+def last(iterable):
+    return iterable[-1] if iterable else None
 
 def keys(self):
         pass

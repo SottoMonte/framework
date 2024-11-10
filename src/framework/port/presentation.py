@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class presentation(ABC):
+class port(ABC):
 
     @abstractmethod
     def loader(self, *services, **constants):

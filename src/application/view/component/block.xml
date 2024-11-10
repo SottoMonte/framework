@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Container class="item" id="{{ '{:0=8}'.format(range(0, 999999) | random) }}" draggable="window">
+<Container id="{{ '{:0=8}'.format(range(0, 999999) | random) }}" draggable="element">
     <Column style="background-color:#ccc;" alignment="center" padding="px-2">
         <Text size="expanded" >src/application/view/page/cubute/overview.xml</Text>
         <Group type="nav">
@@ -8,5 +8,5 @@
             <Action link="#framework"><Graph icon="bi-layer-backward"/></Action>
         </Group>
     </Column>
-    <Container class="nested ui-droppable ui-sortable" padding="p-2"></Container>
+    <Container droppable="element" padding="p-2"></Container>
 </Container>

@@ -12,6 +12,7 @@ else:
   import pyodide
   import importlib
   import uuid
+  import re
     
   flow = language.load_module(area="framework",service='service',adapter='flow')
   starlette = language.load_module(area="infrastructure",service='presentation',adapter='starlette')
@@ -83,19 +84,29 @@ class adapter(starlette.adapter):
         def info(self):
           return ('front-end')
 
-        async def route(self,handle,**constants):
+        async def route(self,event,**constants):
+          currentElement = event.target
+          attributeValue = None
+
+          while not attributeValue: 
+            attributeValue = currentElement.getAttribute('url')
+            currentElement = currentElement.parentElement
+
+          code = await self.builder(url=attributeValue)
+          js.document.getElementById('main').innerHTML = ''
+          js.document.getElementById('main').prepend(code)
+          '''
             # currentTarget
             url = handle.target.getAttribute('url')
             href = handle.target.getAttribute('href')
             #print(url)
             code = await self.builder(url=url,href=href)
             js.document.getElementById('main').innerHTML = ''
-            js.document.getElementById('main').prepend(code)
+            js.document.getElementById('main').prepend(code)'''
 
         async def on_drag_start(self,event,**constants):
           
           self.drag = event.target.id
-        
 
         async def on_drop(self,event,**constants):
           draggable_element = js.document.getElementById(self.drag)
@@ -105,7 +116,7 @@ class adapter(starlette.adapter):
             component.className = component.className.replace(' opacity-25','')
             self.components[name] = name
           
-          if self.drag == 'ss':
+          if 'maker' in self.drag and self.drag in self.components:
             self.components.pop(self.drag)
         
         async def on_drag_over(self,event,**constants):
@@ -114,41 +125,54 @@ class adapter(starlette.adapter):
           if draggable_element and draggable_element.getAttribute('draggable-domain') == event.target.getAttribute('draggable-domain'):
             
             component = draggable_element.getAttribute('draggable-type')
-            
             identifier = self.drag
             
             if component and identifier not in self.components:
-              self.components[identifier] = ""
-              #self.components[identifier] = identifier
-                #self.components[identifier] = dict({'id':identifier,'selected':[],'pageCurrent':1,'pageRow':10,'sortField':'CardName','sortAsc':True})
-              url = f'application/view/component/{component}.xml'
+                self.components[identifier] = ""
+                #self.components[identifier] = identifier
+                  #self.components[identifier] = dict({'id':identifier,'selected':[],'pageCurrent':1,'pageRow':10,'sortField':'CardName','sortAsc':True})
+                url = f'application/view/component/{component}.xml'
                 #view = await self.builder(url=url,component=self.components[identifier])
-              view = await self.builder(url=url)
-              view.className += ' opacity-25'
-              self.components[identifier] = view.getAttribute('id')
-                #self.components[identifier]['id'] = view.getAttribute('id')
-              
-              event.target.appendChild(view)
+                attr = dict()
+                for i in list(draggable_element.attributes):
+                  attr[i.name] = i.value
+                view = await self.builder(url=url,**attr)
+                view.className += ' opacity-25'
+                self.components[identifier] = view.getAttribute('id')
+                  #self.components[identifier]['id'] = view.getAttribute('id')
+                
+                event.target.appendChild(view)
             else:
-              component = js.document.getElementById(self.components[identifier])
-              component.className += ' opacity-25'
-              event.target.appendChild(component)
+              if self.components[identifier] != '':
+                component = js.document.getElementById(self.components[identifier])
+                component.className += ' opacity-25'
+                event.target.appendChild(component)
         
         async def event(self,event,**constants):
-            action = event.target.getAttribute('click')
-            '''data = []
-            if '(' in action:
-              ss = action.split('(')
-              action = ss[0]
-              data = ss[1].replace(')','').split(',')
+          action = event.target.getAttribute('click')
+          currentElement = event.target
+          attributeValue = None
 
-            
-            module = await language.get_module(action)
-            act = getattr(module,action)
-            _ = await act(self,event,data=data)
-            
-            
-            #print(dir(event.target),event.target.checked,self.components[target])'''
+          while not attributeValue: 
+            attributeValue = currentElement.getAttribute('click')
+            currentElement = currentElement.parentElement
+
+          # Divisione della stringa in base al separatore '|'
+          functions = attributeValue.split('|')
+
+          # Creazione del dizionario
+          result = {}
+
+          # Iterazione su ogni funzione per estrarre chiave e parametri
+          for func in functions:
+              key = re.match(r"(\w+)\(", func).group(1)
+              params = re.findall(r"'(.*?)'", func)
+              result[key] = params
+          
+          for name in result:
+            module = await language.get_module(f'application/action/{name}.py',language)
+            act = getattr(module,name)
+            _ = await act(args=result[name])
 
         def att(self,element,attributes):
           for key in attributes:
@@ -165,8 +189,6 @@ class adapter(starlette.adapter):
               case 'identifier':
                 element.setAttribute('name',value)
               case 'route':
-                for child in element.childNodes:
-                  child.setAttribute('url',value)
                 element.setAttribute('url',value)
                 element.addEventListener('click',pyodide.create_proxy(self.route))
               case 'click':

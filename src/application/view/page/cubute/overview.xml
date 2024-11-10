@@ -11,10 +11,10 @@
     <Group type="tab">
         <Container id="tab-tool" size="full" class="border-start">
             <Column id="box" class="flex-wrap" style="font-size: 40px;" >
-                <Action id="img" draggable="window" draggable-type="window" >
+                <Action id="maker-window" draggable="window" draggable-type="window" >
                     <Graph icon="bi-link" />
                 </Action>
-                <Action id="img4" draggable="element" draggable-type="block" >
+                <Action id="maker-block" draggable="element" draggable-type="block" >
                     <Graph icon="bi-send" />
                 </Action>
                 <Action id="img34" draggable="window"  >
@@ -35,21 +35,20 @@
             </Column>
         </Container>
         <Container id="tab-explore" size="full" class="border-start">
-                <Group type="tree" >
+            <Group type="tree" >
+                <Group type="node" margin="m-0" padding="p-0" color="#ededed">
+                    application
                     <Group type="node" margin="m-0" padding="p-0" color="#ededed">
-                        application
-                        <Group type="node" margin="m-0" padding="p-0" color="#ededed">
-                            view
-                            <Text id="ss" draggable="window" draggable-type="window" >overview.xml</Text>
-                            <Text id="sss" draggable="window" draggable-type="window" >overview.xml</Text>
-                        </Group>
-                        <Group type="node" margin="m-0" padding="p-0" color="#ededed">
-                            <Text id="ss" draggable="window" draggable-type="window" >overview.xml</Text>
-                            <Text id="sss" draggable="window" draggable-type="window" >overview.xml</Text>
-                        </Group>
+                        view
+                        <Text id="maker-window-2" draggable="window" draggable-type="window" value="text.html" >overview.xml</Text>
+                        <Text id="maker-2" draggable="window" draggable-type="window" value="text.html" >overview.xml</Text>
+                    </Group>
+                    <Group type="node" margin="m-0" padding="p-0" color="#ededed">
+                        <Text id="ss" draggable="window" draggable-type="window" >overview.xml</Text>
+                        <Text id="sss" draggable="window" draggable-type="window" >overview.xml</Text>
                     </Group>
                 </Group>
-            
+            </Group>
         </Container>
         <Container id="tab-copilot" size="full" class="border-start">
             <Text>3</Text>
@@ -107,20 +106,21 @@
 </Container>
 {% endblock %}
 {% block east %}
-<Container droppable="true" class="nested">
-    <Container class="item">
-        <Text style="background-color:#ccc;">View</Text>
-        <Container class="nested ui-droppable ui-sortable" padding="p-2"></Container>
-    </Container>
-    <Container class="item">
-        <Text style="background-color:#ccc;">2</Text>
-        <Container class="nested ui-droppable ui-sortable" padding="p-2"></Container>
-    </Container>
-    <Container class="item">
-        <Text style="background-color:#ccc;">3</Text>
-        <Container class="nested ui-droppable ui-sortable" padding="p-2"></Container>
-    </Container>
-</Container>
+<Group type="tree" >
+    <Group type="node" margin="m-0" padding="p-0" color="#ededed">
+        window
+        <Group type="node" margin="m-0" padding="p-0" color="#ededed">
+            column
+            <Text id="maker-window-2" draggable="window" draggable-type="window" >text.html</Text>
+            <Text id="maker-2" draggable="window" draggable-type="window" >overview.xml</Text>
+        </Group>
+        <Group type="node" margin="m-0" padding="p-0" color="#ededed">
+            row
+            <Text id="ss" draggable="window" draggable-type="window" >text</Text>
+            <Text id="sss" draggable="window" draggable-type="window" >text</Text>
+        </Group>
+    </Group>
+</Group>
 <!-- TabNav -->
 <Group type="nav" margin="m-0" padding="p-0" color="#ededed">
     <Action link="#tab-property" data-bs-toggle="tab"><Graph icon="bi-sliders2"/><Text>Property</Text></Action>
