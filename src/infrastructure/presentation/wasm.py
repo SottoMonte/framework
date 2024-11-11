@@ -173,6 +173,32 @@ class adapter(starlette.adapter):
             module = await language.get_module(f'application/action/{name}.py',language)
             act = getattr(module,name)
             _ = await act(args=result[name])
+        
+        async def act(self,**constants):
+          # Divisione della stringa in base al separatore '|'
+          functions = constants['value'].split('|')
+
+          # Creazione del dizionario
+          result = {}
+
+          # Iterazione su ogni funzione per estrarre chiave e parametri
+          for func in functions:
+              # Estrai il nome della funzione (prima della parentesi)
+              key = re.match(r"(\w+)\(", func).group(1)
+              
+              # Estrai tutti i parametri in formato chiave:valore (es. 'key': 'value')
+              params = re.findall(r"(\w+):'(.*?)'", func)
+              
+              # Converte la lista di tuple (chiave, valore) in un dizionario
+              param_dict = {k: v for k, v in params}
+              
+              # Aggiungi la funzione e i suoi parametri come dizionario
+              result[key] = param_dict
+          
+          for name in result:
+            module = await language.get_module(f'application/action/{name}.py',language)
+            act = getattr(module,name)
+            _ = await act(**result[name])
 
         def att(self,element,attributes):
           for key in attributes:
@@ -194,6 +220,9 @@ class adapter(starlette.adapter):
               case 'click':
                 element.setAttribute(key,value)
                 element.addEventListener('click',pyodide.create_proxy(self.event))
+              case 'init':
+                element.setAttribute(key,value)
+                asyncio.create_task(self.act(value=value))
               case 'droppable':
                 element.setAttribute('ondragover','allowDrop(event)')
                 element.setAttribute('draggable-domain',value)

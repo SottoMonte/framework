@@ -3,6 +3,8 @@ import js
 @flow.async_function(ports=('messenger','presenter'))
 async def load(messenger,presenter,**constants):
     url = f'application/view/component/block.xml'
-    view = await presenter.builder(url=url)
-    element = js.document.getElementById(language.last(constants['args']))
+    print(constants)
+    text = await presenter.description(url=constants['url'])
+    view = await presenter.builder(url=url,text=text)
+    element = js.document.getElementById(constants['target'])
     element.appendChild(view)

@@ -15,9 +15,10 @@ class presenter():
         return out
 
     async def description(self,**constants):
-        if 'module' in constants:
-            return await di['persistence'].read(file=constants['module'])
-        pass
+        b = language.last(self.providers)
+        out = await b.host(constants)
+        return out
+
 
     async def benchmark(self,**constants):
         if 'module' in constants:

@@ -37,11 +37,11 @@
         <Container id="tab-explore" size="full" class="border-start">
             <Group type="tree" >
                 <Group type="node" margin="m-0" padding="p-0" color="#ededed">
-                    application
+                    Application
                     <Group type="node" margin="m-0" padding="p-0" color="#ededed">
-                        view
-                        <Text id="maker-window-2" draggable="window" draggable-type="window" value="text.html" >overview.xml</Text>
-                        <Text id="maker-2" draggable="window" draggable-type="window" value="text.html" >overview.xml</Text>
+                        Action
+                        <Text id="maker-window-2" draggable="window" draggable-type="window" value="application/action/close.py" >close.py</Text>
+                        <Text id="maker-2" draggable="window" draggable-type="window" value="application/action/load.py" >load.py</Text>
                     </Group>
                     <Group type="node" margin="m-0" padding="p-0" color="#ededed">
                         <Text id="ss" draggable="window" draggable-type="window" >overview.xml</Text>
@@ -59,17 +59,17 @@
 {% block north %}
 {% endblock %}
 {% block center %}
-<Row size="full">
+<Row size="expanded" class="overflow-auto">
     <Group type="nav" margin="m-0" padding="p-0" color="#ededed">
         <Action link="#framework" data-bs-toggle="tab"><Graph icon="bi-pass"/><Text>framework</Text></Action>
         <Action link="#infrastructure" data-bs-toggle="tab"><Graph icon="bi-receipt"/><Text>infrastructure</Text></Action>
     </Group>
-    <Group type="tab" class="col">
-        <Column id="framework" size="full">
-            <Row droppable="window" class="col">
+    <Group type="tab" size="expanded" class="overflow-auto">
+        <Column id="framework" class="overflow-auto" size="full">
+            <Row droppable="window" class="col overflow-auto">
                     
             </Row>
-            <Row droppable="window" class="col">
+            <Row droppable="window" class="col overflow-auto">
                 
             </Row>
         </Column>

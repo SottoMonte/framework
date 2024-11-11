@@ -8,6 +8,15 @@
 </div>
 {% endblock %}
 {% block style %}
+<style type="text/css" media="screen">
+  html,body{
+    height:100%;
+  }
+  .editor { 
+    width: 100%;
+    height: 500px; /* Imposta l'altezza del contenitore dell'editor */
+  }
+</style>
 <style>
 
 .tree {
@@ -108,6 +117,45 @@
 </style>
 {% endblock %}
 {% block body_script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.5/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+  function updateDragula() {
+    // Seleziona tutti gli elementi con classe 'editor'
+    var editors = document.querySelectorAll('.editor');
+    
+    // Itera su ogni elemento con la classe 'editor'
+    editors.forEach(function(editorElement) {
+      // Ottieni l'id dell'elemento
+      var editorId = editorElement.id;
+      
+      // Inizializza o aggiorna l'istanza ACE per ciascun editor con il suo id
+      if (editorId && !editorElement._ace) {
+        // Inizializza ACE solo se non è già stato fatto
+        var aceEditor = ace.edit(editorId);
+        //aceEditor.setTheme("ace/theme/monokai");
+        aceEditor.session.setMode("ace/mode/python");
+        
+        // Memorizza l'istanza ACE nell'elemento (per evitare di crearne più di una)
+        editorElement._ace = aceEditor;
+      }
+    });
+  }
+
+  // Crea un MutationObserver per rilevare le modifiche al DOM
+  var observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+          if (mutation.addedNodes.length || mutation.removedNodes.length) {
+          updateDragula();
+          }
+      });
+  });
+
+  // Configura l'osservatore per monitorare le modifiche ai figli
+  var config = { childList: true, subtree: true };
+
+  // Avvia l'osservazione del nodo radice
+  observer.observe(document.body, config);
+</script>
 <script>
     /*// Inizializza Dragula
     var drake = dragula([].slice.apply(document.querySelectorAll('.nested')));

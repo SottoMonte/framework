@@ -4,12 +4,12 @@
         {% block west %}
         {% endblock %}
     </Row>
-    <Row size="fluid" padding="p-0" margin="m-0">
+    <Row size="fluid" padding="p-0" margin="m-0" class="overflow-auto">
         <Column size="fluid" color="#fcfcfc" height="auto" class="border-bottom">
             {% block north %}
             {% endblock %}
         </Column>
-        <Column size="expanded">
+        <Column size="expanded" class="overflow-auto">
             {% block center %}
             {% endblock %}
         </Column>

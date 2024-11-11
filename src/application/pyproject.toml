@@ -1,6 +1,6 @@
 [project]
 name = "hub"
-identifier ="eu.colosso.app"
+identifier ="cloud.colosso.app"
 key = "{{ SECRET_KEY }}"
 version = "0.0.1"
 readme = "README.md"

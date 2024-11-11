@@ -299,9 +299,16 @@ class adapter():
                     html += item
                 return html
             case 'Text':
-                text = self.code('p',{'class':'text-truncate fw-lighter p-0 m-0'},text)
-                self.att(text,att)
-                return text
+                tipo = att['type'] if 'type' in att else 'None'
+                match tipo:
+                    case 'editable':
+                        text = self.code('div',{'contenteditable':'true'},text)
+                        self.att(text,att)
+                        return text
+                    case _:
+                        text = self.code('p',{'class':'text-truncate fw-lighter p-0 m-0'},text)
+                        self.att(text,att)
+                        return text
             case 'Group':
                 tipo = att['type'] if 'type' in att else 'None'
                 match tipo:
