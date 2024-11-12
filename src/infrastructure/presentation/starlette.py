@@ -227,20 +227,46 @@ class adapter():
                     html += item
                 return html
             case 'Graph':
-                icon = att['icon'] if 'icon' in att else 'bi-image-alt'
-                if 'icon' in att:
-                    out = self.code('i',{'class':f'bi {icon}'})
-                    self.att(out,att)
-                    return out
+                if 'type' in att:
+                    tipo = att['type']
                 elif 'src' in att:
-                    src = att['src'] if 'src' in att else 'bi-image-alt'
-                    img = self.code('img',{'src':src})
-                    self.att(img,att)
-                    return img
+                    tipo = 'img'
+                elif 'icon' in att:
+                    tipo = 'icon'
                 else:
-                    out = self.code('i',{'class':f'bi {icon}'})
-                    self.att(out,att)
-                    return out
+                    tipo = 'None'
+                
+                
+                match tipo:
+                    case 'icon':
+                        icon = att['icon'] if 'icon' in att else 'bi-image-alt'
+                        out = self.code('i',{'class':f'bi {icon}'})
+                        self.att(out,att)
+                        return out
+                    case 'img':
+                        src = att['src'] if 'src' in att else 'bi-image-alt'
+                        img = self.code('img',{'src':src})
+                        self.att(img,att)
+                        return img
+                    case 'carousel':
+                        ind = []
+                        for item in inner:
+                            self.att(item,{'class':'carousel-item'})
+                            #s = self.code('button',{'data-bs-target':'test','data-bs-slide-to':'0'},[])
+                            ind.append(self.code('button',{'type':'button','data-bs-target':f'#{att["id"]}','data-bs-slide-to':str(len(ind))})) 
+                        self.att(ind[0],{'class':'active','aria-current':'true'})
+                        self.att(inner[0],{'class':'active'})
+                        carousel = self.code('div',{'class':'carousel carousel-dark slide','data-bs-ride':'carousel'},[
+                            self.code('div',{'class':'carousel-indicators'},ind),
+                            self.code('div',{'class':'carousel-inner'},inner)
+                        ])
+                        self.att(carousel,att)
+                        return carousel
+                    case _:
+                        icon = att['icon'] if 'icon' in att else 'bi-image-alt'
+                        out = self.code('i',{'class':f'bi {icon}'})
+                        self.att(out,att)
+                        return out
             case 'View':
                 copy = data.copy()
                 test = await self.builder(**copy|att)

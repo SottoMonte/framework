@@ -61,8 +61,8 @@
 {% block center %}
 <Row size="expanded" class="overflow-auto">
     <Group type="nav" margin="m-0" padding="p-0" color="#ededed">
-        <Action link="#framework" data-bs-toggle="tab"><Graph icon="bi-pass"/><Text>framework</Text></Action>
-        <Action link="#infrastructure" data-bs-toggle="tab"><Graph icon="bi-receipt"/><Text>infrastructure</Text></Action>
+        <Action link="#framework" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-pass"/><Text padding="ps-1">framework</Text></Action>
+        <Action link="#infrastructure" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-receipt"/><Text padding="ps-1">infrastructure</Text></Action>
     </Group>
     <Group type="tab" size="expanded" class="overflow-auto">
         <Column id="framework" class="overflow-auto" size="full">

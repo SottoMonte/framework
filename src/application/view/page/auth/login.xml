@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Column>
-    <Row>
-        <Text>GitHub Login</Text>
-    </Row>
-    <Row>
+<Column size="expanded" content="mid" alignment="center">
+    <Row size="5" padding="p-5">
         <Message title="Failed build" type="system"><Text>Login: disponibile</Text></Message>
         <Message title="Failed build"><Text>Login: disponibile</Text></Message>
         <Action type="form" act="/login">
@@ -14,5 +11,15 @@
                 <Text>GitHub Login</Text>
             </Action>
         </Action>
+    </Row>
+    <Row size="expanded" class="h-100 border-start" color="#444" >
+        <Graph id="test" type="carousel">
+            <Container>
+                <Graph src="https://kinsta.com/it/wp-content/uploads/sites/2/2022/08/what-is-cloud-storage.jpg"/>
+            </Container>
+            <Container>
+                <Graph src="https://kinsta.com/it/wp-content/uploads/sites/2/2022/08/what-is-cloud-storage.jpg"/>
+            </Container>
+        </Graph>
     </Row>
 </Column>

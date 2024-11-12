@@ -131,9 +131,14 @@
       // Inizializza o aggiorna l'istanza ACE per ciascun editor con il suo id
       if (editorId && !editorElement._ace) {
         // Inizializza ACE solo se non è già stato fatto
-        var aceEditor = ace.edit(editorId);
-        //aceEditor.setTheme("ace/theme/monokai");
-        aceEditor.session.setMode("ace/mode/python");
+        //var aceEditor = ace.edit(editorId);
+
+        var aceEditor = ace.edit(editorId, {
+        mode: "ace/mode/python",
+        autoScrollEditorIntoView: true,
+        minLines: 100,
+        hasCssTransforms: true,
+        });
         
         // Memorizza l'istanza ACE nell'elemento (per evitare di crearne più di una)
         editorElement._ace = aceEditor;

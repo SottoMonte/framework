@@ -301,7 +301,7 @@ class adapter(starlette.adapter):
                 elif element.tagName == 'BUTTON': element.className += f" btn-{value} "
                 elif value == 'auto': element.className += " col-auto"
                 elif value == 'expanded': element.className += " col"
-                else: element.className += " col"
+                else: element.className += f" col-{value} "
                   
               case 'color':
                 if element.tagName in ['DIV','NAV','FOOTER']:
