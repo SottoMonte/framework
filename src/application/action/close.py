@@ -4,5 +4,5 @@ import js
 async def close(messenger,presenter,**constants):
     _ = await presenter.builder()
     print('ciao da close',constants)
-    element = js.document.getElementById(language.last(constants['args']))
+    element = js.document.getElementById(constants['target'])
     element.remove()

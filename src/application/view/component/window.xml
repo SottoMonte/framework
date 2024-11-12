@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Row id="{% set id = '{:0=8}'.format(range(0, 99999999) | random) %}{{ id }}" class="overflow-auto" init="load(url:'{{ value }}',target:'window-{{ id }}')" draggable="window" size="expanded" >
     <Column style="background-color:#2fcc76;" alignment="center" padding="px-2">
-        <Text size="expaded">{{ value or  '' }}</Text>
+        <Text size="expanded">{{ value or  '' }}</Text>
         <Group type="nav">
             <Action link="#framework"><Graph icon="bi-grid-1x2"/></Action>
             <Action click="load('window-{{ id }}')" link="#framework"><Graph icon="bi-fullscreen"/></Action>

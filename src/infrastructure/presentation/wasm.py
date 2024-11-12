@@ -157,7 +157,8 @@ class adapter(starlette.adapter):
             attributeValue = currentElement.getAttribute('click')
             currentElement = currentElement.parentElement
 
-          # Divisione della stringa in base al separatore '|'
+          _ = await self.act(value=attributeValue)
+          '''# Divisione della stringa in base al separatore '|'
           functions = attributeValue.split('|')
 
           # Creazione del dizionario
@@ -172,33 +173,35 @@ class adapter(starlette.adapter):
           for name in result:
             module = await language.get_module(f'application/action/{name}.py',language)
             act = getattr(module,name)
-            _ = await act(args=result[name])
+            _ = await act(args=result[name])'''
         
         async def act(self,**constants):
           # Divisione della stringa in base al separatore '|'
           functions = constants['value'].split('|')
-
           # Creazione del dizionario
-          result = {}
+          lista = []
 
           # Iterazione su ogni funzione per estrarre chiave e parametri
           for func in functions:
-              # Estrai il nome della funzione (prima della parentesi)
-              key = re.match(r"(\w+)\(", func).group(1)
+            result = {}
+            # Estrai il nome della funzione (prima della parentesi)
+            key = re.match(r"(\w+)\(", func).group(1)
               
-              # Estrai tutti i parametri in formato chiave:valore (es. 'key': 'value')
-              params = re.findall(r"(\w+):'(.*?)'", func)
+            # Estrai tutti i parametri in formato chiave:valore (es. 'key': 'value')
+            params = re.findall(r"(\w+):'(.*?)'", func)
               
-              # Converte la lista di tuple (chiave, valore) in un dizionario
-              param_dict = {k: v for k, v in params}
+            # Converte la lista di tuple (chiave, valore) in un dizionario
+            param_dict = {k: v for k, v in params}
               
-              # Aggiungi la funzione e i suoi parametri come dizionario
-              result[key] = param_dict
+            # Aggiungi la funzione e i suoi parametri come dizionario
+            result[key] = param_dict
+            lista.append(result)
           
-          for name in result:
-            module = await language.get_module(f'application/action/{name}.py',language)
-            act = getattr(module,name)
-            _ = await act(**result[name])
+          for n in lista:
+            for name in n:
+              module = await language.get_module(f'application/action/{name}.py',language)
+              act = getattr(module,name)
+              _ = await act(**n[name])
 
         def att(self,element,attributes):
           for key in attributes:
