@@ -5,8 +5,8 @@
         <Group type="nav">
             <Action link="#framework"><Graph icon="bi-grid-1x2"/></Action>
             <Action click="load('window-{{ id }}')" link="#framework"><Graph icon="bi-fullscreen"/></Action>
-            <Action click="close('{{ id }}')"><Graph icon="bi-x-lg"/></Action>
+            <Action click="close(target:'{{ id }}')"><Graph icon="bi-x-lg"/></Action>
         </Group>
     </Column>
-    <Row id="window-{{ id }}" class="overflow-auto" size="expanded" droppable="element" padding="pb-5"></Row>
+    <Row id="window-{{ id }}" class="overflow-auto" size="expanded" droppable="element" margin="mb-3"></Row>
 </Row>

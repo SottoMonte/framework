@@ -18,6 +18,18 @@
     <Graph icon="bi-receipt" />
     <Text>Invoices</Text>
 </Action>
+<Action route="application/view/page/company/invoices.xml">
+    <Graph icon="bi-ticket-detailed" />
+    <Text>Tickets</Text>
+</Action>
+<Action route="application/view/page/company/invoices.xml">
+    <Graph icon="bi-rocket" />
+    <Text>Partnership</Text>
+</Action>
+<Action route="application/view/page/company/invoices.xml">
+    <Graph icon="bi-mortarboard" />
+    <Text>Academy</Text>
+</Action>
 {% endblock %}
 {% block content %}
 <Container color="#fafafa" size="fluid" padding="p-4" expand="True" class="border-top border-bottom">

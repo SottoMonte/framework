@@ -346,11 +346,13 @@ class adapter():
                         self.att(tab,att)
                         return tab
                     case 'nav':
-                        new = [] 
+                        new = []
                         for item in inner:
                             li = self.code('li',{'class':'nav-item'},[item])
                             new.append(li)
-                        tab = self.code('ul',{'class':'nav nav-tabs'},new)
+                        ul = self.code('ul',{'class':'nav nav-tabs col'},new)
+                        tab = self.code('div',{'class':'d-flex align-items-center justify-content-center'},[ul])
+                        self.att(ul,att)
                         self.att(tab,att)
                         return tab
                     case 'tree':

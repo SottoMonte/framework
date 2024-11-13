@@ -2,11 +2,14 @@
 {% block west %}
 <Column size="expanded">
     <!-- TabNav -->
-    <Group type="nav" margin="m-0" padding="p-0" color="#ededed" class="flex-column">
-        <Action link="#tab-explore" data-bs-toggle="tab"><Graph icon="bi-archive-fill"/><Text>Explore</Text></Action>
-        <Action link="#tab-tool" data-bs-toggle="tab"><Graph icon="bi-tools"/><Text>Tools</Text></Action>
-        <Action link="#tab-copilot" data-bs-toggle="tab"><Graph icon="bi-stars"/><Text>Copilot</Text></Action>
-    </Group>
+    <Row>
+        <Group type="nav" margin="m-0" padding="p-0" class="flex-column" size="expanded">
+            <Action width="75px" link="#tab-explore" data-bs-toggle="tab"><Graph icon="bi-archive-fill"/><Text>Explore</Text></Action>
+            <Action width="75px" link="#tab-tool" data-bs-toggle="tab"><Graph icon="bi-tools"/><Text>Tools</Text></Action>
+            <Action width="75px" link="#tab-copilot" data-bs-toggle="tab"><Graph icon="bi-stars"/><Text>Copilot</Text></Action>
+        </Group>
+        <Action link="#tab-code" data-bs-toggle="tab"><Graph icon="bi bi-plus-square"/></Action>
+    </Row>
     <!-- Tab -->
     <Group type="tab">
         <Container id="tab-tool" size="full" class="border-start">
@@ -57,13 +60,17 @@
 </Column>
 {% endblock %}
 {% block north %}
+<Text>Colosso/Framework</Text>
 {% endblock %}
 {% block center %}
 <Row size="expanded" class="overflow-auto">
-    <Group type="nav" margin="m-0" padding="p-0" color="#ededed">
-        <Action id="nav-1" link="#framework" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-pass"/><Text padding="ps-1">framework</Text><Action padding="p-0" click="close(target:'framework')|close(target:'nav-1')"><Graph icon="bi-x"/></Action></Action>
-        <Action id="nav-2" link="#infrastructure" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-receipt"/><Text padding="ps-1">infrastructure</Text><Action padding="p-0" click="close(target:'infrastructure')|close(target:'nav-2')"><Graph icon=" bi-x"/></Action></Action>
-    </Group>
+    <Column>
+        <Group type="nav" margin="m-0" padding="p-0" color="#ededed" size="expanded">
+            <Action id="nav-1" link="#framework" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-pass"/><Text padding="ps-1">framework</Text><Action padding="p-0" click="close(target:'framework')|close(target:'nav-1')"><Graph icon="bi-x"/></Action></Action>
+            <Action id="nav-2" link="#infrastructure" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-receipt"/><Text padding="ps-1">infrastructure</Text><Action padding="p-0" click="close(target:'infrastructure')|close(target:'nav-2')"><Graph icon=" bi-x"/></Action></Action>
+        </Group>
+        <Action link="#tab-code" data-bs-toggle="tab" class="border-bottom border-start"><Graph icon="bi bi-plus-square"/></Action>
+    </Column>
     <Group type="tab" size="expanded" class="overflow-auto">
         <Column id="framework" class="overflow-auto" size="full">
             <Row droppable="window" class="col overflow-auto">
@@ -82,7 +89,7 @@
 {% block south %}
 <Container>
     <!-- TabNav -->
-    <Group type="nav" margin="m-0" padding="p-0" color="#ededed">
+    <Group type="nav" margin="m-0" padding="p-0" >
         <Action link="#tab-code" data-bs-toggle="tab"><Graph icon="bi-code-slash"/><Text>Code</Text></Action>
         <Action link="#tab-build" data-bs-toggle="tab"><Graph icon="bi-tools"/><Text>Build</Text></Action>
         <Action link="#tab-test" data-bs-toggle="tab"><Graph icon="bi-play-fill"/><Text>Test</Text></Action>
@@ -122,7 +129,7 @@
     </Group>
 </Group>
 <!-- TabNav -->
-<Group type="nav" margin="m-0" padding="p-0" color="#ededed">
+<Group type="nav" margin="m-0" padding="p-0">
     <Action link="#tab-property" data-bs-toggle="tab"><Graph icon="bi-sliders2"/><Text>Property</Text></Action>
     <Action link="#tab-style" data-bs-toggle="tab"><Graph icon="bi-rulers"/><Text>Style</Text></Action>
     <Action link="#tab-event" data-bs-toggle="tab"><Graph icon="bi-lightning-fill"/><Text>Event</Text></Action>

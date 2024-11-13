@@ -2,7 +2,7 @@ flow = language.load_module(area="framework",service='service',adapter='flow')
 import js
 @flow.async_function(ports=('messenger','presenter'))
 async def load(messenger,presenter,**constants):
-    url = f'application/view/component/block.xml'
+    url = f'application/view/component/editor.xml'
     print(constants)
     text = await presenter.description(url=constants['url'])
     view = await presenter.builder(url=url,text=text)
