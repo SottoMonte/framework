@@ -114,6 +114,19 @@
     .item {
         padding: 8px;
     }
+
+  /* Stile di default per l'elemento di destinazione */
+  .drop-target {
+    border: 2px dashed #ccc;
+    padding: 10px;
+    margin: 10px;
+  }
+
+  /* Stile quando l'elemento è sopra la destinazione (bordo evidenziato) */
+  .drop-target.highlight {
+    border-color: #4caf50;
+    border-width: 3px solid;
+  }
 </style>
 {% endblock %}
 {% block body_script %}

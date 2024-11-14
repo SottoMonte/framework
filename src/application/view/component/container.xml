@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Container id="{% set id = '{:0=8}'.format(range(0, 99999999) | random) %}{{ id }}" size="expanded" class="drop-target" draggable="element">
+</Container>

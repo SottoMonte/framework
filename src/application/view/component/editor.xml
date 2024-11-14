@@ -3,8 +3,8 @@
     <Column style="background-color:#ccc;" alignment="center">
         <Text size="expanded" ></Text>
         <Group type="nav" margin="m-0" padding="p-0">
-            <Action id="nav-1" link="#visual" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-eye-fill"/></Action>
-            <Action id="nav-2" link="#text" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-code"/></Action>
+            <Action id="nav-1" link="#visual-{{ id }}" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-eye-fill"/></Action>
+            <Action id="nav-2" link="#text-{{ id }}" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-code"/></Action>
         </Group>
         <Group type="nav">
             <Action link="#framework"><Graph icon="bi-floppy2-fill"/></Action>
@@ -12,10 +12,12 @@
     </Column>
     <Row droppable="element" padding="p-0" size="expanded" >
         <Group type="tab" size="expanded" class="overflow-auto">
-            <Column id="visual" class="overflow-auto" >
-                
+            <Column id="visual-{{ id }}" size="full" class="overflow-auto" >
+                <Row droppable="element" padding="p-0" size="expanded" >
+
+                </Row>
             </Column>
-            <Container id="text" size="full" padding="p-0">
+            <Container id="text-{{ id }}" size="full" padding="p-0">
                 <Text id="block-editor-{{ id }}" class="editor h-100 border" type="editable">{{ text or '' }}</Text>
             </Container>
         </Group>

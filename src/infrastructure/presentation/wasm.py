@@ -105,7 +105,7 @@ class adapter(starlette.adapter):
             js.document.getElementById('main').prepend(code)'''
 
         async def on_drag_start(self,event,**constants):
-          
+          #print('on_drag_start')
           self.drag = event.target.id
 
         async def on_drop(self,event,**constants):
@@ -114,14 +114,19 @@ class adapter(starlette.adapter):
             name = self.components[self.drag]
             component = js.document.getElementById(name)
             component.className = component.className.replace(' opacity-25','')
+            component.className = component.className.replace('highlight','')
             self.components[name] = name
           
           if 'maker' in self.drag and self.drag in self.components:
             self.components.pop(self.drag)
         
+        async def on_drag_leave(self,event,**constants):
+          event.target.className = event.target.className.replace('highlight','')
+        
         async def on_drag_over(self,event,**constants):
           event.preventDefault()
           draggable_element = js.document.getElementById(self.drag)
+          #print(draggable_element.getAttribute('draggable-domain'),event.target.getAttribute('draggable-domain'))
           if draggable_element and draggable_element.getAttribute('draggable-domain') == event.target.getAttribute('draggable-domain'):
             
             component = draggable_element.getAttribute('draggable-type')
@@ -142,10 +147,13 @@ class adapter(starlette.adapter):
                   #self.components[identifier]['id'] = view.getAttribute('id')
                 
                 event.target.appendChild(view)
+                event.target.className += ' highlight'
             else:
               if self.components[identifier] != '':
                 component = js.document.getElementById(self.components[identifier])
-                component.className += ' opacity-25'
+                if 'highlight' not in event.target.className:
+                  event.target.className += ' highlight'
+                  component.className += ' opacity-25'
                 event.target.appendChild(component)
         
         async def event(self,event,**constants):
@@ -231,6 +239,7 @@ class adapter(starlette.adapter):
                 element.setAttribute('draggable-domain',value)
                 element.addEventListener('drop',pyodide.create_proxy(self.on_drop))
                 element.addEventListener('dragover',pyodide.create_proxy(self.on_drag_over))
+                element.addEventListener('dragleave',pyodide.create_proxy(self.on_drag_leave))
               case 'draggable':
                 element.setAttribute(key,'true')
                 element.setAttribute('ondragstart','drag(event)')

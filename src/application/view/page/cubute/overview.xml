@@ -12,29 +12,22 @@
     </Row>
     <!-- Tab -->
     <Group type="tab">
-        <Container id="tab-tool" size="full" class="border-start">
+        <Container id="tab-tool" class="border-start h-100" width="200px" padding="p-0">
+            <!-- Layout -->
             <Column id="box" class="flex-wrap" style="font-size: 40px;" >
-                <Action id="maker-window" draggable="window" draggable-type="window" >
-                    <Graph icon="bi-link" />
-                </Action>
-                <Action id="maker-block" draggable="element" draggable-type="block" >
-                    <Graph icon="bi-send" />
-                </Action>
-                <Action id="img34" draggable="window"  >
-                    <Graph icon="bi-image" />
-                </Action>
-                <Action id="img499" draggable="window" >
-                    <Graph icon="bi-window" />
-                </Action>
-                <Action id="img44" draggable="window" >
-                    <Graph icon="bi-layout-three-columns" />
-                </Action>
-                <Action id="img33" draggable="window" >
-                    <Graph icon="bi-textarea" />
-                </Action>
-                <Action id="img3" draggable="window" >
-                    <Graph icon="bi-textarea-resize" />
-                </Action>
+                <Container color="#eb556270" style="font-size: 15px;"><Text>Layout</Text></Container>
+                <Action id="maker-container" draggable="element" draggable-type="container" ><Graph icon="bi-crop" /></Action>
+                <Action id="maker-column" draggable="element" draggable-type="column" ><Graph icon="bi-layout-three-columns" /></Action>
+                <Action id="maker-row" draggable="element" draggable-type="row" ><Graph icon="bi-columns" /></Action>
+                <Action id="maker-window" draggable="element" draggable-type="window" ><Graph icon="bi-window" /></Action>
+                <Container color="#eb8d5570" style="font-size: 15px;"><Text>Content</Text></Container>
+                <Action id="maker-alert" draggable="element" draggable-type="button"  ><Graph icon="bi-image" /></Action>
+                <Action id="maker-text" draggable="element" draggable-type="text" ><Graph icon="bi-textarea-t" /></Action>
+                <Container color="#8b55eb70" style="font-size: 15px;"><Text>Forms</Text></Container>
+                <Action id="maker-block" draggable="element" draggable-type="input" ><Graph icon="bi-input-cursor" /></Action>
+                <Action id="maker-button" draggable="element" draggable-type="button" ><Graph icon="bi-command" /></Action>
+                <Container color="#55c8eb70" style="font-size: 15px;"><Text>Components</Text></Container>
+                
             </Column>
         </Container>
         <Container id="tab-explore" size="full" class="border-start">
