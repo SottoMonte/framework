@@ -21,7 +21,7 @@
                 <Action id="maker-row" draggable="element" draggable-type="row" ><Graph icon="bi-columns" /></Action>
                 <Action id="maker-window" draggable="element" draggable-type="window" ><Graph icon="bi-window" /></Action>
                 <Container color="#eb8d5570" style="font-size: 15px;"><Text>Content</Text></Container>
-                <Action id="maker-alert" draggable="element" draggable-type="button"  ><Graph icon="bi-image" /></Action>
+                <Action id="maker-alert" draggable="element" draggable-type="image"  ><Graph icon="bi-image" /></Action>
                 <Action id="maker-text" draggable="element" draggable-type="text" ><Graph icon="bi-textarea-t" /></Action>
                 <Container color="#8b55eb70" style="font-size: 15px;"><Text>Forms</Text></Container>
                 <Action id="maker-block" draggable="element" draggable-type="input" ><Graph icon="bi-input-cursor" /></Action>
@@ -124,19 +124,174 @@
 <!-- TabNav -->
 <Group type="nav" margin="m-0" padding="p-0">
     <Action link="#tab-property" data-bs-toggle="tab"><Graph icon="bi-sliders2"/><Text>Property</Text></Action>
+    <Action link="#tab-cont" data-bs-toggle="tab"><Graph icon="bi-sliders2"/><Text>Content</Text></Action>
     <Action link="#tab-style" data-bs-toggle="tab"><Graph icon="bi-rulers"/><Text>Style</Text></Action>
     <Action link="#tab-event" data-bs-toggle="tab"><Graph icon="bi-lightning-fill"/><Text>Event</Text></Action>
 </Group>
 <!-- Tab -->
 <Group type="tab">
     <Container id="tab-property">
-        <Text>1</Text>
+        
+            <Container color="#eb556270" style="font-size: 15px;"><Text>Layout</Text></Container>
+            <Group type="input">
+                <Graph icon="bi-bounding-box" />
+                <Input></Input>
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-arrows" />
+                <Text>Width</Text>
+                <Input></Input>
+                <Text>px</Text>
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-arrows-vertical" />
+                <Text>Height</Text>
+                <Input></Input>
+                <Text>%</Text>
+            </Group>
+            <Group type="input">
+                <Text>expand</Text>
+                <Graph icon="bi-arrows-angle-expand" />
+                <Graph icon="bi-arrows-angle-contract" />
+            </Group>
+            <Group type="input">
+                <Text>Padding</Text>
+                <Graph icon="bi-border" />
+                <Graph icon="bi-border-outer" />
+                <Graph icon="bi-border-bottom" />
+                <Graph icon="bi-border-left" />
+                <Graph icon="bi-border-right" />
+                <Graph icon="bi-border-top" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-border-width" />
+                <Input width="16px" height="24px"/>
+                <Input width="16px" height="24px"/>
+                <Input width="16px" height="24px"/>
+                <Input width="16px" height="24px"/>
+                <Input width="16px" height="24px"/>
+                <Input width="16px" height="24px"/>
+            </Group>
+
+            <Group type="input">
+                <Text>Marging</Text>
+                <Graph icon="bi-border" />
+                <Graph icon="bi-border-outer" />
+                <Graph icon="bi-border-bottom" />
+                <Graph icon="bi-border-left" />
+                <Graph icon="bi-border-right" />
+                <Graph icon="bi-border-top" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-border-width" />
+                <Input width="16px" height="24px"/>
+                <Input width="16px" height="24px"/>
+                <Input width="16px" height="24px"/>
+                <Input width="16px" height="24px"/>
+                <Input width="16px" height="24px"/>
+                <Input width="16px" height="24px"/>
+            </Group>    
     </Container>
+    <Container id="tab-cont">
+        <Group type="input">
+            <Text>Alighn</Text>
+            <Graph icon="bi-align-bottom" />
+            <Graph icon="bi-align-center" />
+            <Graph icon="bi-align-end" />
+            <Graph icon="bi bi-align-middle" />
+            <Graph icon="bi-align-start" />
+            <Graph icon="bi-align-top" />
+        </Group>
+        <Group type="input">
+            <Text>Alighn</Text>
+            <Graph icon="bi-distribute-horizontal" />
+            <Graph icon="bi-distribute-vertical" />
+        </Group>
+    
+</Container>
     <Container id="tab-style">
-        <Text>2</Text>
+        
+            <Container color="#eb556270" style="font-size: 15px;"><Text>Layout</Text></Container>
+            <Group type="input">
+                <Graph icon="bi-palette-fill" />
+                <Input></Input>
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-bounding-box" />
+                <Input></Input>
+            </Group>
+            <Group type="input">
+                <Text>Class</Text>
+                <Input></Input>
+            </Group>
+            <Group type="input">
+                <Text>Border</Text>
+                <Graph icon="bi-border" />
+                <Graph icon="bi-border-outer" />
+                <Graph icon="bi-border-bottom" />
+                <Graph icon="bi-border-left" />
+                <Graph icon="bi-border-right" />
+                <Graph icon="bi-border-top" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-border-width" />
+                <Input width="16px" height="24px"/>
+                <Input width="16px" height="24px"/>
+                <Input width="16px" height="24px"/>
+                <Input width="16px" height="24px"/>
+                <Input width="16px" height="24px"/>
+                <Input width="16px" height="24px"/>
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-border-style" />
+                <Graph icon="bi-border" />
+                <Graph icon="bi-border-outer" />
+                <Graph icon="bi-border-bottom" />
+                <Graph icon="bi-border-left" />
+                <Graph icon="bi-border-right" />
+                <Graph icon="bi-border-top" />
+            </Group>
+        
     </Container>
     <Container id="tab-event">
-        <Text>3</Text>
+        <Group type="input">
+            <Text>init</Text>
+            <Input/>
+        </Group>
+
+        <Group type="input">
+            <Text>onclick</Text>
+            <Input/>
+        </Group>
+        <Group type="input">
+            <Text>ondblclick</Text>
+            <Input/>
+        </Group>
+        <Group type="input">
+            <Text>onmousedown</Text>
+            <Input/>
+        </Group>
+        <Group type="input">
+            <Text>onmousemove</Text>
+            <Input/>
+        </Group>
+        <Group type="input">
+            <Text>onmouseout</Text>
+            <Input/>
+        </Group>
+        <Group type="input">
+            <Text>onmouseover</Text>
+            <Input/>
+        </Group>
+        <Group type="input">
+            <Text>onmouseup</Text>
+            <Input/>
+        </Group>
+        <Group type="input">
+            <Text>onwheel</Text>
+            <Input/>
+        </Group>
+        
     </Container>
 </Group>
 {% endblock %}

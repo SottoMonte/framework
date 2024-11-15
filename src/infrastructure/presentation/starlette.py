@@ -284,7 +284,9 @@ class adapter():
                 elif model == 'flesh':
                     return self.code('div',{'class':'alert alert-primary','role':'alert'},inner)
             case 'Input':
-                return self.code('input',{'class':'form-control'})
+                input = self.code('input',{'class':'form-control'})
+                self.att(input,att)
+                return input
             case 'Action':
                 model = att['type'] if 'type' in att else 'button'
                 url = att['url'] if 'url' in att else '#'
@@ -359,6 +361,15 @@ class adapter():
                         tab = self.code('ul',{'class':'tree p-0'},[
                             self.code('li',{'class':''},inner),
                         ])
+                        self.att(tab,att)
+                        return tab
+                    case 'input':
+                        new = []
+                        for item in inner:
+                            
+                            li = self.code('span',{'class':'input-group-text'},[item])
+                            new.append(li)
+                        tab = self.code('div',{'class':'input-group'},new)
                         self.att(tab,att)
                         return tab
                     case 'node':

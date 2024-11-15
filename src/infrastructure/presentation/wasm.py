@@ -106,22 +106,29 @@ class adapter(starlette.adapter):
 
         async def on_drag_start(self,event,**constants):
           #print('on_drag_start')
+          for x in self.document.querySelectorAll(".drop-target"):
+            x.className += " highlight"
           self.drag = event.target.id
 
         async def on_drop(self,event,**constants):
+          event.preventDefault()
           draggable_element = js.document.getElementById(self.drag)
           if self.drag in self.components:
             name = self.components[self.drag]
             component = js.document.getElementById(name)
             component.className = component.className.replace(' opacity-25','')
-            component.className = component.className.replace('highlight','')
+            #component.className = component.className.replace('highlight','')
             self.components[name] = name
           
           if 'maker' in self.drag and self.drag in self.components:
             self.components.pop(self.drag)
+
+          for x in self.document.querySelectorAll(".drop-target"):
+            x.className = x.className.replace('highlight','')
         
         async def on_drag_leave(self,event,**constants):
-          event.target.className = event.target.className.replace('highlight','')
+          pass
+          #event.target.className = event.target.className.replace('highlight','')
         
         async def on_drag_over(self,event,**constants):
           event.preventDefault()
@@ -145,16 +152,29 @@ class adapter(starlette.adapter):
                 view.className += ' opacity-25'
                 self.components[identifier] = view.getAttribute('id')
                   #self.components[identifier]['id'] = view.getAttribute('id')
-                
+                view.className += ' highlight'
                 event.target.appendChild(view)
-                event.target.className += ' highlight'
+                
             else:
               if self.components[identifier] != '':
                 component = js.document.getElementById(self.components[identifier])
-                if 'highlight' not in event.target.className:
-                  event.target.className += ' highlight'
+                if 'opacity-25' not in event.target.className:
                   component.className += ' opacity-25'
-                event.target.appendChild(component)
+                if event.target != component and component.parentNode != event.target:
+                  mouseY = event.clientY # Posizione verticale del mouse rispetto al viewport
+                  containerRect = event.target.getBoundingClientRect() # Ottieni la posizione e dimensione dell'elemento di destinazione
+                  containerTop = containerRect.top # La posizione in alto dell'elemento di destinazione
+                  containerHeight = containerRect.height # Altezza dell'elemento di destinazione
+
+                  # Calcola la posizione relativa del mouse all'interno dell'elemento di destinazione
+                  mousePos = mouseY - containerTop
+
+                  # Se il mouse è nella parte superiore dell'elemento, inserisci sopra, altrimenti sotto
+                  if (mousePos < containerHeight / 2):
+                    event.target.insertBefore(component, event.target.firstChild)
+                  else:
+                    event.target.appendChild(component)
+                
         
         async def event(self,event,**constants):
           action = event.target.getAttribute('click')
