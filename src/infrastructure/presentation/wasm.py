@@ -378,6 +378,84 @@ class adapter(starlette.adapter):
               case _:
                 element.setAttribute(key,value)
         
+        def att2(self,element,attributes):
+          # 'property'
+          base = ['id','opacity','color','shadow','border','class','width','height','visibility','position','padding','margin','expand','style','matter'],
+          tt = {
+            'div':[],
+            'p':[],
+            'matter':['color','size','alignment','position'],
+            'text':['color','size','alignment','position'],
+            'style':['border','opacity','class'],
+            'border':['color','thickness','radius','opacity','position','style'],
+          }
+
+          sizes = ['0','1','2','3','4','5']
+          events = ['click']
+          colors = ['primary','primary-subtle','secondary','secondary-subtle','success','success-subtle','danger','danger-subtle','warning','warning-subtle','info','info-subtle','light','light-subtle','dark','dark-subtle','black','white']
+          
+          for key in attributes:
+            value = attributes[key]
+            match key:
+              case 'event-click':pass
+              case 'text-size':
+                if value in sizes:
+                  element.className += f" fs-{value}"
+              case 'text-font':pass
+              case 'text-color':
+                if value in colors:
+                  element.className += f" fs-{value}"
+              case 'text-style':pass
+              case 'alignment-content':pass
+              case 'alignment-vertical':pass
+              case 'alignment-horizontal':pass
+              case 'id':
+                element.setAttribute(key,value)
+              case 'width':
+                style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
+                style += f" width:{value};"
+                element.setAttribute('style',style)
+              case 'height':
+                style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
+                style += f" height:{value};"
+                element.setAttribute('style',style)
+              case 'background-opacity':pass
+              case 'background-color':pass
+              # Shadow
+              case 'shadow':
+                match value:
+                  case'none': element.className += " shadow-none"
+                  case 'lg':  element.className += " shadow-lg"
+                  case'md': element.className += " shadow"
+                  case'sm': element.className += " shadow-sm"
+              # Class
+              case 'class':element.className += f' {value}'
+              # Border
+              case 'border-position':
+                match value:
+                  case 'outer': element.className += " border"
+                  case 'top': element.className += " border-top"
+                  case 'bottom': element.className += " border-bottom"
+                  case 'right': element.className += " border-start"
+                  case 'left': element.className += " border-end"
+              case 'border-thickness':
+                if value in sizes:
+                  element.className += f" border-{value}"
+              case 'border-radius-size':
+                if value in sizes:
+                  element.className += f" rounded-{value}"
+              case 'border-color':
+                if value in colors:
+                  element.className += f" border-{value}"
+              case 'border-radius':
+                match value:
+                  case 'pill': element.className += " rounded-pill"
+                  case 'circle': element.className += " rounded-circle"
+                  case 'top': element.className += " rounded-top"
+                  case 'bottom': element.className += " rounded-bottom"
+                  case 'right': element.className += " rounded-start"
+                  case 'left': element.className += " rounded-end"
+
         async def rebuild(self,id,tag,**constants):
                   
           #response = js.fetch(f"gather?model={self.components[id]['model']}&row={self.components[id]['pageRow']}&page={self.components[id]['pageCurrent']}&order={self.components[id]['sortField']}",{'method':'GET'})

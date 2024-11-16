@@ -123,18 +123,16 @@
 </Group>
 <!-- TabNav -->
 <Group type="nav" margin="m-0" padding="p-0">
-    <Action link="#tab-property" data-bs-toggle="tab"><Graph icon="bi-sliders2"/><Text>Property</Text></Action>
-    <Action link="#tab-cont" data-bs-toggle="tab"><Graph icon="bi-sliders2"/><Text>Content</Text></Action>
-    <Action link="#tab-style" data-bs-toggle="tab"><Graph icon="bi-rulers"/><Text>Style</Text></Action>
+    <Action link="#tab-property" data-bs-toggle="tab"><Graph icon="bi-rulers"/><Text>Property</Text></Action>
+    <Action link="#tab-cont" data-bs-toggle="tab"><Graph icon="bi-bounding-box"/><Text>Matter</Text></Action>
+    <Action link="#tab-style" data-bs-toggle="tab"><Graph icon="bi-palette2"/><Text>Style</Text></Action>
     <Action link="#tab-event" data-bs-toggle="tab"><Graph icon="bi-lightning-fill"/><Text>Event</Text></Action>
 </Group>
 <!-- Tab -->
 <Group type="tab">
     <Container id="tab-property">
-        
-            <Container color="#eb556270" style="font-size: 15px;"><Text>Layout</Text></Container>
             <Group type="input">
-                <Graph icon="bi-bounding-box" />
+                <Graph icon="bi-layers-half" />
                 <Input></Input>
             </Group>
             <Group type="input">
@@ -147,54 +145,50 @@
                 <Graph icon="bi-arrows-vertical" />
                 <Text>Height</Text>
                 <Input></Input>
-                <Text>%</Text>
+                <Text>px</Text>
             </Group>
             <Group type="input">
-                <Text>expand</Text>
+                <Text>Expand</Text>
                 <Graph icon="bi-arrows-angle-expand" />
+                <Graph icon="bi-arrows-collapse" />
+                <Graph icon="bi-arrows-collapse-vertical" />
+                <Text>Collapse</Text>
                 <Graph icon="bi-arrows-angle-contract" />
+                <Graph icon="bi-arrows-expand" />
+                <Graph icon="bi-arrows-expand-vertical" />
             </Group>
             <Group type="input">
-                <Text>Padding</Text>
-                <Graph icon="bi-border" />
-                <Graph icon="bi-border-outer" />
-                <Graph icon="bi-border-bottom" />
-                <Graph icon="bi-border-left" />
-                <Graph icon="bi-border-right" />
-                <Graph icon="bi-border-top" />
+                <Text>Visibility</Text>
+                <Input type="checkbox" />
             </Group>
             <Group type="input">
-                <Graph icon="bi-border-width" />
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-            </Group>
-
-            <Group type="input">
-                <Text>Marging</Text>
-                <Graph icon="bi-border" />
-                <Graph icon="bi-border-outer" />
-                <Graph icon="bi-border-bottom" />
-                <Graph icon="bi-border-left" />
-                <Graph icon="bi-border-right" />
-                <Graph icon="bi-border-top" />
+                <Text>Position</Text>
+                <Row>
+                    <Column><Input type="radio" /><Input type="radio" /><Input type="radio" /></Column>
+                    <Column><Input type="radio" /><Input type="radio" /><Input type="radio" /></Column>
+                    <Column><Input type="radio" /><Input type="radio" /><Input type="radio" /></Column>
+                </Row>
             </Group>
             <Group type="input">
-                <Graph icon="bi-border-width" />
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-            </Group>    
+                <Row><Graph icon="bi-border-width" /><Text>Padding</Text></Row>
+                <Row><Graph icon="bi-border-outer" /><Input width="16px" height="24px"/></Row>
+                <Row><Graph icon="bi-border-bottom" /><Input width="16px" height="24px"/></Row>
+                <Row><Graph icon="bi-border-left" /><Input width="16px" height="24px"/></Row>
+                <Row><Graph icon="bi-border-right" /><Input width="16px" height="24px"/></Row>
+                <Row><Graph icon="bi-border-top" /><Input width="16px" height="24px"/></Row>
+            </Group>
+            <Group type="input">
+                <Row><Graph icon="bi-border-width" /><Text>Margin</Text></Row>
+                <Row><Graph icon="bi-border-outer" /><Input width="16px" height="24px"/></Row>
+                <Row><Graph icon="bi-border-bottom" /><Input width="16px" height="24px"/></Row>
+                <Row><Graph icon="bi-border-left" /><Input width="16px" height="24px"/></Row>
+                <Row><Graph icon="bi-border-right" /><Input width="16px" height="24px"/></Row>
+                <Row><Graph icon="bi-border-top" /><Input width="16px" height="24px"/></Row>
+            </Group>
     </Container>
     <Container id="tab-cont">
         <Group type="input">
-            <Text>Alighn</Text>
+            <Text>Vertical</Text>
             <Graph icon="bi-align-bottom" />
             <Graph icon="bi-align-center" />
             <Graph icon="bi-align-end" />
@@ -203,53 +197,84 @@
             <Graph icon="bi-align-top" />
         </Group>
         <Group type="input">
-            <Text>Alighn</Text>
+            <Text>Horizontal</Text>
+            <Graph icon="bi-align-bottom" />
+            <Graph icon="bi-align-center" />
+            <Graph icon="bi-align-end" />
+            <Graph icon="bi bi-align-middle" />
+            <Graph icon="bi-align-start" />
+            <Graph icon="bi-align-top" />
+        </Group>
+        <Group type="input">
+            <Text>Content</Text>
             <Graph icon="bi-distribute-horizontal" />
             <Graph icon="bi-distribute-vertical" />
         </Group>
-    
+        <Group type="input">
+            <Graph icon="bi-palette-fill" />
+            <Input type="color" width="50px" ></Input>
+        </Group>
+        <Group type="input">
+            <Graph icon="bi-fonts" />
+            <Input type="text" width="50px" ></Input>
+        </Group>
+        <Group type="input">
+            <Text>Size</Text>
+            <Input type="text" width="50px" ></Input>
+        </Group>
 </Container>
     <Container id="tab-style">
-        
-            <Container color="#eb556270" style="font-size: 15px;"><Text>Layout</Text></Container>
             <Group type="input">
                 <Graph icon="bi-palette-fill" />
-                <Input></Input>
+                <Input type="color" width="50px" ></Input>
             </Group>
             <Group type="input">
                 <Graph icon="bi-bounding-box" />
                 <Input></Input>
             </Group>
             <Group type="input">
+                <Graph icon="bi-shadows" />
+                <Input type="range"/>
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-transparency" />
+                <Input type="range"/>
+            </Group>
+            <Group type="input">
                 <Text>Class</Text>
                 <Input></Input>
             </Group>
             <Group type="input">
-                <Text>Border</Text>
-                <Graph icon="bi-border" />
-                <Graph icon="bi-border-outer" />
-                <Graph icon="bi-border-bottom" />
-                <Graph icon="bi-border-left" />
-                <Graph icon="bi-border-right" />
-                <Graph icon="bi-border-top" />
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-border-width" />
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-border-style" />
-                <Graph icon="bi-border" />
-                <Graph icon="bi-border-outer" />
-                <Graph icon="bi-border-bottom" />
-                <Graph icon="bi-border-left" />
-                <Graph icon="bi-border-right" />
-                <Graph icon="bi-border-top" />
+                <Row>
+                    <Graph icon="bi-bullseye" />
+                    <Graph icon="bi-border-width" />
+                    <Graph icon="bi-border-style" />
+                </Row>
+                <Row>
+                    <Graph icon="bi-border-outer" />
+                    <Input width="16px" height="24px"/>
+                    <Graph icon="bi-border-left" />
+                </Row>
+                <Row>
+                    <Graph icon="bi-border-bottom" />
+                    <Input width="16px" height="24px"/>
+                    <Graph icon="bi-border-left" />
+                </Row>
+                <Row>
+                    <Graph icon="bi-border-left" />
+                    <Input width="16px" height="24px"/>
+                    <Graph icon="bi-border-left" />
+                </Row>
+                <Row>
+                    <Graph icon="bi-border-right" />
+                    <Input width="16px" height="24px"/>
+                    <Graph icon="bi-border-right" />
+                </Row>
+                <Row>
+                    <Graph icon="bi-border-top" />
+                    <Input width="16px" height="24px"/>
+                    <Graph icon="bi-border-top" />
+                </Row>
             </Group>
         
     </Container>

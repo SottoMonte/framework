@@ -284,9 +284,18 @@ class adapter():
                 elif model == 'flesh':
                     return self.code('div',{'class':'alert alert-primary','role':'alert'},inner)
             case 'Input':
-                input = self.code('input',{'class':'form-control'})
-                self.att(input,att)
-                return input
+                tipo = att['type'] if 'type' in att else 'None'
+                tipi = ["button","checkbox","color","date","datetime-local","email","file","hidden","image","month","number","password","radio","range","reset","search","submit","tel","text","time","url","week"]
+
+                if tipo in tipi:
+                    #form-range
+                    input = self.code('input',{'class':'form-control','type':tipo})
+                    self.att(input,att)
+                    return input
+                else:
+                    input = self.code('input',{'class':'form-control','type':'text'})
+                    self.att(input,att)
+                    return input
             case 'Action':
                 model = att['type'] if 'type' in att else 'button'
                 url = att['url'] if 'url' in att else '#'
@@ -366,7 +375,6 @@ class adapter():
                     case 'input':
                         new = []
                         for item in inner:
-                            
                             li = self.code('span',{'class':'input-group-text'},[item])
                             new.append(li)
                         tab = self.code('div',{'class':'input-group'},new)
@@ -383,6 +391,15 @@ class adapter():
                             self.code('ul',{'class':''},new)
                         ])
                         
+                        self.att(tab,att)
+                        return tab
+                    case 'accordion':
+                        new = [] 
+                        for item in inner:
+                            li = self.code('div',{'class':'accordion-item'},[item])
+                            new.append(li)
+
+                        tab = self.code('div',{'class':'accordion'},new)
                         self.att(tab,att)
                         return tab
                     case _:
