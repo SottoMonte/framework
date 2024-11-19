@@ -34,7 +34,12 @@ try:
 
     from starlette.datastructures import MutableHeaders
     import http.cookies
+    import markupsafe
+    from bs4 import BeautifulSoup
 except Exception as e:
+    import markupsafe
+    import xml.etree.ElementTree as ET
+    from bs4 import BeautifulSoup
     flow = language.load_module(area="framework",service='service',adapter='flow')
     starlette = None
     import untangle
@@ -88,6 +93,7 @@ class adapter():
         text = await self.host(constants)
         template = self.env.from_string(text)
         content = template.render(constants)
+        print(constants,content)
         xml = untangle.parse(content)
         out = await self.mount_view(xml.children[0],constants)
         return out
@@ -202,6 +208,84 @@ class adapter():
 
     def att(self,element,attributes):
         pass
+
+    def convert(self, html):
+        # Parsing del codice HTML con BeautifulSoup
+        soup = BeautifulSoup(html, 'html.parser')
+        
+        # Mappatura dei tipi di elementi da convertire
+        element_map = {
+            'Layout': {'tags': ['div'], 'attrs': {}},
+            'Text': {'tags': ['p'], 'attrs': {}},
+            'Action': {'tags': ['a', 'form'], 'attrs': {'href': 'route'}},
+            'Graph': {'tags': ['img','i'], 'attrs': {'class': 'icon'}},
+            'Group': {'tags': ['li','ul'], 'attrs': {}},
+        }
+        
+        # Iterare attraverso gli elementi da mappare
+        for category, settings in element_map.items():
+            # Estrarre i tag da modificare
+            tags_to_process = settings['tags']
+            attribute_map = settings['attrs']
+            
+            # Per ogni tag definito nella mappatura
+            for tag in tags_to_process:
+                for tag_element in soup.find_all(tag):
+                    # Cambiare il nome del tag
+                    tag_element.name = category
+                    
+                    # Gestire gli attributi specifici per ogni tag
+                    for attr, new_attr in attribute_map.items():
+                        if attr in tag_element.attrs:
+                            # Rinomina l'attributo, se presente
+                            tag_element[new_attr] = tag_element[attr]
+                            del tag_element[attr]  # Rimuovere l'attributo originale
+
+        # Restituisci l'HTML modificato
+        return str(soup)
+    
+    def convert2(self,html):
+            soup = BeautifulSoup(html, 'html.parser')
+            tab = {
+                'Layout':{'tags':['div'],'attr':{}},
+                'Text':{'tags':['p'],'attr':{}},
+                'Action':{'tags':['a','form'],'attr':{'href':'route'}},
+                'Graph':{'tags':['img'],'attr':{}},
+            }
+
+            for elm in tab:
+                obj = tab[elm]
+                for tag in obj['tags']:
+                    for p_tag in soup.find_all(tag):
+                        p_tag.name = elm
+                        for att in p_tag.attrs.copy():
+                            if att in obj['attr']:
+                                p_tag[obj['attr'][att]] = p_tag[att]
+                        #attributes = p_tag.attrs
+            '''# Sostituire i tag HTML con i tag XML personalizzati
+            for div in soup.find_all('div', class_='toast'):
+                group = soup.new_tag('Group')
+                window = soup.new_tag('Window')
+                group.append(window)
+                window.append(div.find('Row', class_='toast-body').find('p'))
+                div.insert_before(group)
+                div.decompose()
+
+            for form in soup.find_all('form'):
+                action = soup.new_tag('Action', actionType="submit", url=form['action'])
+                for input_tag in form.find_all('input'):
+                    input_tag.name = 'Input'
+                    action.append(input_tag)
+                for a_tag in form.find_all('a'):
+                    a_tag.name = 'Action'
+                    action.append(a_tag)
+                form.insert_before(action)
+                form.decompose()'''
+            
+            
+            return soup.prettify()
+            
+
     
     async def mount_view(self,root,data=dict()):
         tags = ['Messenger','Storekeeper']
@@ -269,8 +353,8 @@ class adapter():
                         return out
             case 'View':
                 copy = data.copy()
-                test = await self.builder(**copy|att)
-                return self.code('div',{'class':'container-fluid d-flex flex-row col p-0 m-0'},[test])
+                view = await self.builder(**copy|att)
+                return self.code('div',{'class':'container-fluid d-flex flex-row col p-0 m-0'},[view])
             case 'Message':
                 model = att['type'] if 'type' in att else 'flesh'
                 title = att['title'] if 'title' in att else ''
@@ -330,11 +414,6 @@ class adapter():
                         ])
                     case _:
                         return self.code('div',{'class':'container-fluid d-flex h-100 p-0 m-0'},inner)
-            case 'Panel':
-                html = ''
-                for item in inner:
-                    html += item
-                return html
             case 'Text':
                 tipo = att['type'] if 'type' in att else 'None'
                 match tipo:
@@ -404,28 +483,47 @@ class adapter():
                         return tab
                     case _:
                         return self.code('div',{'class':'container-fluid p-0 m-0'},inner)
-            case 'Row':
-                tt = self.code('div',{'class':'d-flex flex-column p-0 m-0'},inner)
-                self.att(tt,att)
-                return tt
-            case 'Column':
-                tt = self.code('div',{'class':'d-flex flex-row p-0 m-0'},inner)
-                self.att(tt,att)
-                return tt
-            case 'Container':
-                tt = self.code('div',{'class':'container-fluid'},inner)
+            case 'Layout':
+                print(inner)
+                tt = self.code('div',{},inner)
                 self.att(tt,att)
                 return tt
             case _:
                 id = att['id'] if 'id' in att else 'None'
 
                 if id not in self.components:
-                    self.components[id] = dict({'id':id,'selected':[],'pageCurrent':1,'pageRow':10,'sortField':'CardName','sortAsc':True})
+                    self.components[id] = dict({'id':id})
                 
-                url = f'application/view/component/{tag.replace("C_","")}.xml'
-                  
-                  
-                test = await self.builder(url=url,component=self.components[id])
+                # Creiamo l'elemento principale per l'XML
+                xml_root = ET.Element(root._name, root._attributes)
+                xml_root.text = root.cdata
+                xml_str = ""
+
+                def untangle_to_elementtree(untangle_element):
+                    element = ET.Element(untangle_element._name,untangle_element._attributes)
+
+                    if untangle_element.cdata:
+                        element.text = untangle_element.cdata
+                    
+                    for child in untangle_element.children:
+                        element.append(untangle_to_elementtree(child))
+                    return element
+                
+                root_et = untangle_to_elementtree(root)
+
+                for child in root_et:
+                    xml_str += ET.tostring(child, encoding="utf-8", method="xml").decode("utf-8")
+                
+                
+                url = f'application/view/component/{tag}.xml'
+                copy = data.copy()
+                html = ''
+                for x in inner:
+                    html += x.outerHTML
+                #view = await self.builder(**copy|{'url':url,'inner':markupsafe.Markup(self.convert(html))})
+                view = await self.builder(**copy|{'url':url,'inner':markupsafe.Markup(xml_str)})
+                #print(view.outerHTML)
+                return view
                   
     def mount_route(self,routes,url):
         

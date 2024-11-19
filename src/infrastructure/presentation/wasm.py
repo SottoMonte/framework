@@ -95,14 +95,6 @@ class adapter(starlette.adapter):
           code = await self.builder(url=attributeValue)
           js.document.getElementById('main').innerHTML = ''
           js.document.getElementById('main').prepend(code)
-          '''
-            # currentTarget
-            url = handle.target.getAttribute('url')
-            href = handle.target.getAttribute('href')
-            #print(url)
-            code = await self.builder(url=url,href=href)
-            js.document.getElementById('main').innerHTML = ''
-            js.document.getElementById('main').prepend(code)'''
 
         async def on_drag_start(self,event,**constants):
           #print('on_drag_start')
@@ -231,7 +223,7 @@ class adapter(starlette.adapter):
               act = getattr(module,name)
               _ = await act(**n[name])
 
-        def att(self,element,attributes):
+        def at2(self,element,attributes):
           for key in attributes:
             value = attributes[key]
             match key:
@@ -378,7 +370,7 @@ class adapter(starlette.adapter):
               case _:
                 element.setAttribute(key,value)
         
-        def att2(self,element,attributes):
+        def att(self,element,attributes):
           # 'property'
           base = ['id','opacity','color','shadow','border','class','width','height','visibility','position','padding','margin','expand','style','matter'],
           tt = {
@@ -397,6 +389,8 @@ class adapter(starlette.adapter):
           for key in attributes:
             value = attributes[key]
             match key:
+              case 'route':
+                element.setAttribute('href',value)
               case 'event-click':pass
               case 'text-size':
                 if value in sizes:
