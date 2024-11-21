@@ -39,7 +39,8 @@ class adapter(starlette.adapter):
           self.config = constants['config']
           http_loader = MyLoader()
           self.env = Environment(loader=http_loader,autoescape=select_autoescape(["html", "xml"]))
-          self.document = js.document         
+          self.document = js.document
+          self.cash = dict()         
 
         def loader(self, *services, **constants):
           code = asyncio.create_task(self.async_loader(),name="loader")
@@ -222,15 +223,89 @@ class adapter(starlette.adapter):
               module = await language.get_module(f'application/action/{name}.py',language)
               act = getattr(module,name)
               _ = await act(**n[name])
+        
+        def att(self,element,attributes):
+          # 'property'
+          base = ['id','opacity','color','shadow','border','class','width','height','visibility','position','padding','margin','expand','style','matter'],
+          tt = {
+            'div':[],
+            'p':[],
+            'matter':['color','size','alignment','position'],
+            'text':['color','size','alignment','position'],
+            'style':['border','opacity','class'],
+            'border':['color','thickness','radius','opacity','position','style'],
+          }
 
-        def at2(self,element,attributes):
+          sizes = ['0','1','2','3','4','5']
+          events = ['click']
+          colors = ['primary','primary-subtle','secondary','secondary-subtle','success','success-subtle','danger','danger-subtle','warning','warning-subtle','info','info-subtle','light','light-subtle','dark','dark-subtle','black','white']
+          
           for key in attributes:
             value = attributes[key]
             match key:
-              case 'alignment':
-                element.className += f" align-items-{value} "
-              case 'content':
-                element.className += f" justify-content-{value} "
+              # Property
+              case 'margin':
+                if ';' in value:
+                  pp = value.split(';')
+                  for x in pp:
+                    element.className += ' '+x
+                else:
+                  element.className += ' '+value
+              case 'padding':
+                if ';' in value:
+                  pp = value.split(';')
+                  for x in pp:
+                    element.className += ' '+x
+                else:
+                  element.className += ' '+value
+              case 'alignment-horizontal':
+                enums = ['start','end','center','between','around','evenly']
+                if value in enums:
+                  element.className += f" justify-content-{value}"
+              case 'alignment-vertical':
+                enums = ['start','end','center','baseline','stretch']
+                if value in enums:
+                  element.className += f" align-items-{value}"
+              case 'alignment-content':
+                #enums = ['start','end','center','baseline','stretch']
+                match value:
+                  case 'vertical':
+                    element.className += " d-flex flex-column"
+                  case 'horizontal':
+                    element.className += " d-flex flex-row"
+              case 'expand':
+                match value:
+                  case 'vertical':
+                    element.className += " h-100"
+                  case 'horizontal':
+                    element.className += " w-100"
+                  case 'full':
+                    element.className += " w-100 h-100"
+                  case 'auto':
+                    element.className += " col-auto"
+                  case 'dynamic':
+                    element.className += " col"
+                  case _:
+                    element.className += f" col-{value} "
+              case 'collapse':
+                match value:
+                  case 'full':
+                    element.className += " d-none"
+                  case 'visibility':
+                    element.className += " invisible"
+              # Style
+              case 'style':
+                style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
+                style += ' '+value
+                element.setAttribute('style',style)
+              case 'background':
+                if '#' in value:
+                    style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
+                    style += f" background:{value};"
+                    element.setAttribute('style',style)
+                else:
+                  element.className += f" bg-{value}"
+              # Event
               case 'action':
                 element.setAttribute(key,value)
               case 'method':
@@ -257,140 +332,6 @@ class adapter(starlette.adapter):
                 element.setAttribute('ondragstart','drag(event)')
                 element.setAttribute('draggable-domain',value)
                 element.addEventListener('dragstart',pyodide.create_proxy(self.on_drag_start))
-              case 'link':
-                element.setAttribute('href',value)
-              case 'icon':
-                element.className += ' '+value
-              case 'width':
-                style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
-                style += f" width:{value};"
-                element.className += ' col-auto'
-                element.setAttribute('style',style)
-              case 'height':
-                style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
-                style += f" height:{value};"
-                element.className += ' col-auto'
-                element.setAttribute('style',style)
-              case 'src':
-                element.setAttribute(key,value)
-              case 'role':
-                element.setAttribute(key,value)
-              case 'id':
-                element.setAttribute(key,value)
-              case 'disabled':
-                element.setAttribute('disabled','')
-              case 'readonly':
-                element.setAttribute('readonly','')
-              case 'type':
-                #element.setAttribute('type',value)
-                if element.tagName in ['INPUT','BUTTON']:element.setAttribute(key,value)
-                elif 'alert' in element.className: element.className += f" alert-{value} "
-                else:element.className += f" {value} "
-              case 'target':
-                element.setAttribute('data-bs-toggle','modal')
-                element.setAttribute('data-bs-target',value)
-              case 'data-bs-target':
-                element.setAttribute('data-bs-target',value)
-              case 'data-toggle':
-                element.setAttribute(key,value)
-              case 'data-bs-toggle':
-                element.setAttribute('data-bs-toggle',value)
-              case 'data-bs-dismiss':
-                element.setAttribute(key,value)
-              case 'position':
-                if 'modal-dialog' in element.className:
-                  element.className += f" modal-dialog-{value} "
-                else:
-                  style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
-                  style += f"position:{value};"
-                  element.setAttribute('style',style)
-              case 'top':
-                style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
-                style += f"top:{value};"
-                element.setAttribute('style',style)
-              case 'start':
-                style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
-                style += f"start:{value};"
-                element.setAttribute('style',style)
-              case 'end':
-                style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
-                style += f"end:{value};"
-                element.setAttribute('style',style)
-              case 'size':
-                if value == 'full': element.className += " w-100 h-100"
-                elif value == 'elastic': element.className += " flex-grow-1"
-                elif value == 'expand': element.className += " d-flex h-100 flex-column"
-                elif value == 'fluid': element.className += " container-fluid p-0 m-0"
-                elif 'modal-dialog' in element.className: element.className += f" modal-{value} "
-                elif element.tagName == 'BUTTON': element.className += f" btn-{value} "
-                elif value == 'auto': element.className += " col-auto"
-                elif value == 'expanded': element.className += " col"
-                else: element.className += f" col-{value} "
-                  
-              case 'color':
-                if element.tagName in ['DIV','NAV','FOOTER']:
-                  msg = f" background:{value};"
-                elif element.tagName in ['P']:
-                  msg = f" text-{value}"
-                else :
-                  msg = ''
-                
-                if '#' in value or 'rgba' in value:
-                  a = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
-                  a += msg
-                  element.setAttribute('style',a)
-                else:
-                  element.className += msg
-
-              case 'style':
-                style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
-                style += ' '+value
-                element.setAttribute('style',style)
-              case 'class':
-                element.className += ' '+value
-              case 'margin':
-                if ';' in value:
-                  pp = value.split(';')
-                  for x in pp:
-                    element.className += ' '+x
-                else:
-                  element.className += ' '+value
-              case 'padding':
-                if ';' in value:
-                  pp = value.split(';')
-                  for x in pp:
-                    element.className += ' '+x
-                else:
-                  element.className += ' '+value
-              case 'target':
-                element.setAttribute('data-bs-toggle','modal')
-                element.setAttribute('data-bs-target',value)
-              case 'selected':
-                element.setAttribute(value,'')
-              case _:
-                element.setAttribute(key,value)
-        
-        def att(self,element,attributes):
-          # 'property'
-          base = ['id','opacity','color','shadow','border','class','width','height','visibility','position','padding','margin','expand','style','matter'],
-          tt = {
-            'div':[],
-            'p':[],
-            'matter':['color','size','alignment','position'],
-            'text':['color','size','alignment','position'],
-            'style':['border','opacity','class'],
-            'border':['color','thickness','radius','opacity','position','style'],
-          }
-
-          sizes = ['0','1','2','3','4','5']
-          events = ['click']
-          colors = ['primary','primary-subtle','secondary','secondary-subtle','success','success-subtle','danger','danger-subtle','warning','warning-subtle','info','info-subtle','light','light-subtle','dark','dark-subtle','black','white']
-          
-          for key in attributes:
-            value = attributes[key]
-            match key:
-              case 'route':
-                element.setAttribute('href',value)
               case 'event-click':pass
               case 'text-size':
                 if value in sizes:
@@ -489,7 +430,11 @@ class adapter(starlette.adapter):
             url="application/view/layout/app.xml"
           else:
             url = constants['url']
-          response = js.fetch(url,{'method':'GET'})
-          file = await response
-          aa = await file.text()
-          return aa
+          if url not in self.cash:
+            response = js.fetch(url,{'method':'GET'})
+            file = await response
+            aa = await file.text()
+            self.cash[url] = aa
+            return aa
+          else:
+            return self.cash[url]

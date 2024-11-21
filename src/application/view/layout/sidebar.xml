@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Column size="expanded" >
-    <Row color="#fcfcfc" size="auto" width="80px" class="border-end">
+<Column expand="dynamic" >
+    <Row background="#fcfcfc" size="auto" width="80px" class="border-end">
         {% block bar %}
         {% endblock %}
     </Row>
-    <Row size="expanded">
-        <Column size="auto" padding="p-5">
+    <Row expand="dynamic">
+        <Column expand="auto" padding="p-5">
             <Row>
                 <Text type="h1" class="h1">{% block title %}{% endblock %}</Text>
                 <Text>{% block subtitle %}{% endblock %}</Text>

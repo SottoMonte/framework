@@ -56,16 +56,16 @@
 <Text>Colosso/Framework</Text>
 {% endblock %}
 {% block center %}
-<Row size="expanded" class="overflow-auto">
+<Row expand="dynamic" class="overflow-auto">
     <Column>
-        <Group type="nav" margin="m-0" padding="p-0" color="#ededed" size="expanded">
+        <Group type="nav" margin="m-0" padding="p-0" color="#ededed" expand="dynamic">
             <Action id="nav-1" link="#framework" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-pass"/><Text padding="ps-1">framework</Text><Action padding="p-0" click="close(target:'framework')|close(target:'nav-1')"><Graph icon="bi-x"/></Action></Action>
             <Action id="nav-2" link="#infrastructure" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-receipt"/><Text padding="ps-1">infrastructure</Text><Action padding="p-0" click="close(target:'infrastructure')|close(target:'nav-2')"><Graph icon=" bi-x"/></Action></Action>
         </Group>
         <Action link="#tab-code" data-bs-toggle="tab" class="border-bottom border-start"><Graph icon="bi bi-plus-square"/></Action>
     </Column>
-    <Group type="tab" size="expanded" class="overflow-auto">
-        <Column id="framework" class="overflow-auto" size="full">
+    <Group type="tab" expand="dynamic" class="overflow-auto">
+        <Column id="framework" class="overflow-auto" expand="full">
             <Row droppable="window" class="col overflow-auto">
                     
             </Row>
@@ -73,7 +73,7 @@
                 
             </Row>
         </Column>
-        <Container id="infrastructure" size="full">
+        <Container id="infrastructure" expand="full">
             <Text>3</Text>
         </Container>
     </Group>

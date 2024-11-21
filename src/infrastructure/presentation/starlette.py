@@ -93,10 +93,9 @@ class adapter():
         text = await self.host(constants)
         template = self.env.from_string(text)
         content = template.render(constants)
-        print(constants,content)
         xml = untangle.parse(content)
-        out = await self.mount_view(xml.children[0],constants)
-        return out
+        view = await self.mount_view(xml.children[0],constants)
+        return view
         
     @flow.async_function(ports=('defender',))
     async def logout(self,request,defender) -> None:
@@ -440,7 +439,7 @@ class adapter():
                         for item in inner:
                             li = self.code('li',{'class':'nav-item'},[item])
                             new.append(li)
-                        ul = self.code('ul',{'class':'nav nav-tabs col'},new)
+                        ul = self.code('ul',{'class':'nav col'},new)
                         tab = self.code('div',{'class':'d-flex align-items-center justify-content-center'},[ul])
                         self.att(ul,att)
                         self.att(tab,att)
@@ -484,46 +483,45 @@ class adapter():
                     case _:
                         return self.code('div',{'class':'container-fluid p-0 m-0'},inner)
             case 'Layout':
-                print(inner)
                 tt = self.code('div',{},inner)
                 self.att(tt,att)
                 return tt
             case _:
                 id = att['id'] if 'id' in att else 'None'
-
                 if id not in self.components:
-                    self.components[id] = dict({'id':id})
-                
-                # Creiamo l'elemento principale per l'XML
-                xml_root = ET.Element(root._name, root._attributes)
-                xml_root.text = root.cdata
-                xml_str = ""
+                    self.components[id] = {'id': id}
 
-                def untangle_to_elementtree(untangle_element):
-                    element = ET.Element(untangle_element._name,untangle_element._attributes)
+                # Funzione per convertire ricorsivamente gli elementi in XML
+                def untangle_to_xml(untangle_element):
+                    attributes = ' '.join(f'{key}="{value}"' for key, value in untangle_element._attributes.items())
+                    attributes = f' {attributes}' if attributes else ''
 
-                    if untangle_element.cdata:
-                        element.text = untangle_element.cdata
-                    
-                    for child in untangle_element.children:
-                        element.append(untangle_to_elementtree(child))
-                    return element
-                
-                root_et = untangle_to_elementtree(root)
+                    children_xml = ''.join(untangle_to_xml(child) for child in untangle_element.children)
+                    cdata = untangle_element.cdata or ''
 
-                for child in root_et:
-                    xml_str += ET.tostring(child, encoding="utf-8", method="xml").decode("utf-8")
-                
-                
+                    if children_xml or cdata:
+                        return f'<{untangle_element._name}{attributes}>{cdata}{children_xml}</{untangle_element._name}>'
+                    else:
+                        return f'<{untangle_element._name}{attributes} />'
+
+                # Convertiamo l'intera struttura in una stringa XML
+                xml_str = ''.join(untangle_to_xml(child) for child in root.children)
+
                 url = f'application/view/component/{tag}.xml'
-                copy = data.copy()
-                html = ''
-                for x in inner:
-                    html += x.outerHTML
-                #view = await self.builder(**copy|{'url':url,'inner':markupsafe.Markup(self.convert(html))})
-                view = await self.builder(**copy|{'url':url,'inner':markupsafe.Markup(xml_str)})
-                #print(view.outerHTML)
+                html = ''.join(x.outerHTML for x in inner)
+
+                # Creiamo la vista
+                view = await self.builder(
+                    attributes=att,
+                    url=url,
+                    inner=markupsafe.Markup(xml_str)
+                )
+
+                #view = await self.mount_view(root,data)
+
+                self.att(view, att)
                 return view
+                
                   
     def mount_route(self,routes,url):
         

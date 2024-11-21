@@ -1,4 +1,4 @@
-{% extends "main.xml" %}
+{% extends "sidebar.xml" %}
 {% block title %}Overview{% endblock %}
 {% block subtitle %}Keep track of your inventory{% endblock %}
 {% block bar %}
@@ -36,7 +36,7 @@
 </Action>
 {% endblock %}
 {% block content %}
-<Container color="#fafafa" size="fluid" padding="p-4" expand="True" class="border-top border-bottom">
+<Container background="#fafafa" size="fluid" padding="p-4" expand="True" class="border-top border-bottom">
     <Input disabled="True"></Input>
 </Container>
 {% endblock %}
