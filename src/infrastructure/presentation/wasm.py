@@ -166,8 +166,7 @@ class adapter(starlette.adapter):
                   if (mousePos < containerHeight / 2):
                     event.target.insertBefore(component, event.target.firstChild)
                   else:
-                    event.target.appendChild(component)
-                
+                    event.target.appendChild(component)         
         
         async def event(self,event,**constants):
           action = event.target.getAttribute('click')
@@ -244,6 +243,19 @@ class adapter(starlette.adapter):
             value = attributes[key]
             match key:
               # Property
+              case 'layer':pass
+              case 'identifier':
+                element.setAttribute('name',value)
+              case 'id':
+                element.setAttribute(key,value)
+              case 'width':
+                style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
+                style += f" width:{value};"
+                element.setAttribute('style',style)
+              case 'height':
+                style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
+                style += f" height:{value};"
+                element.setAttribute('style',style)
               case 'margin':
                 if ';' in value:
                   pp = value.split(';')
@@ -293,7 +305,25 @@ class adapter(starlette.adapter):
                     element.className += " d-none"
                   case 'visibility':
                     element.className += " invisible"
+              case 'flow':
+                match value:
+                  case 'auto':element.className += f" overflow-{value} "
+                  case 'hidden':element.className += f" overflow-{value} "
+                  case 'visible':element.className += f" overflow-{value} "
+                  case 'scroll':element.className += f" overflow-{value} "
               # Style
+              case 'text-size':
+                if 'px' in value:
+                  style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
+                  style += f' font-size: {value};'
+                  element.setAttribute('style',style)
+                elif value in sizes:
+                  element.className += f" fs-{value}"
+              case 'text-font':pass
+              case 'text-color':
+                if value in colors:
+                  element.className += f" fs-{value}"
+              case 'text-style':pass
               case 'style':
                 style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
                 style += ' '+value
@@ -305,67 +335,18 @@ class adapter(starlette.adapter):
                     element.setAttribute('style',style)
                 else:
                   element.className += f" bg-{value}"
-              # Event
-              case 'action':
-                element.setAttribute(key,value)
-              case 'method':
-                element.setAttribute('method',value)
-              case 'identifier':
-                element.setAttribute('name',value)
-              case 'route':
-                element.setAttribute('url',value)
-                element.addEventListener('click',pyodide.create_proxy(self.route))
-              case 'click':
-                element.setAttribute(key,value)
-                element.addEventListener('click',pyodide.create_proxy(self.event))
-              case 'init':
-                element.setAttribute(key,value)
-                asyncio.create_task(self.act(value=value))
-              case 'droppable':
-                element.setAttribute('ondragover','allowDrop(event)')
-                element.setAttribute('draggable-domain',value)
-                element.addEventListener('drop',pyodide.create_proxy(self.on_drop))
-                element.addEventListener('dragover',pyodide.create_proxy(self.on_drag_over))
-                element.addEventListener('dragleave',pyodide.create_proxy(self.on_drag_leave))
-              case 'draggable':
-                element.setAttribute(key,'true')
-                element.setAttribute('ondragstart','drag(event)')
-                element.setAttribute('draggable-domain',value)
-                element.addEventListener('dragstart',pyodide.create_proxy(self.on_drag_start))
-              case 'event-click':pass
-              case 'text-size':
-                if value in sizes:
-                  element.className += f" fs-{value}"
-              case 'text-font':pass
-              case 'text-color':
-                if value in colors:
-                  element.className += f" fs-{value}"
-              case 'text-style':pass
-              case 'alignment-content':pass
-              case 'alignment-vertical':pass
-              case 'alignment-horizontal':pass
-              case 'id':
-                element.setAttribute(key,value)
-              case 'width':
-                style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
-                style += f" width:{value};"
-                element.setAttribute('style',style)
-              case 'height':
-                style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
-                style += f" height:{value};"
-                element.setAttribute('style',style)
               case 'background-opacity':pass
               case 'background-color':pass
-              # Shadow
               case 'shadow':
                 match value:
                   case'none': element.className += " shadow-none"
                   case 'lg':  element.className += " shadow-lg"
                   case'md': element.className += " shadow"
                   case'sm': element.className += " shadow-sm"
-              # Class
-              case 'class':element.className += f' {value}'
-              # Border
+              case 'class':
+                element.className += f' {value}'
+              case 'border':
+                element.className += f" border-{value}"
               case 'border-position':
                 match value:
                   case 'outer': element.className += " border"
@@ -390,7 +371,32 @@ class adapter(starlette.adapter):
                   case 'bottom': element.className += " rounded-bottom"
                   case 'right': element.className += " rounded-start"
                   case 'left': element.className += " rounded-end"
-
+              # Event
+              case 'link':
+                element.setAttribute('href',value)
+                element.setAttribute('data-bs-toggle','tab')
+              case 'route':
+                element.setAttribute('url',value)
+                element.addEventListener('click',pyodide.create_proxy(self.route))
+              case 'click':
+                element.setAttribute(key,value)
+                element.addEventListener('click',pyodide.create_proxy(self.event))
+              case 'init':
+                element.setAttribute(key,value)
+                asyncio.create_task(self.act(value=value))
+              case 'droppable':
+                element.setAttribute('ondragover','allowDrop(event)')
+                element.setAttribute('draggable-domain',value)
+                element.addEventListener('drop',pyodide.create_proxy(self.on_drop))
+                element.addEventListener('dragover',pyodide.create_proxy(self.on_drag_over))
+                element.addEventListener('dragleave',pyodide.create_proxy(self.on_drag_leave))
+              case 'draggable':
+                element.setAttribute(key,'true')
+                element.setAttribute('ondragstart','drag(event)')
+                element.setAttribute('draggable-domain',value)
+                element.addEventListener('dragstart',pyodide.create_proxy(self.on_drag_start))
+              
+              
         async def rebuild(self,id,tag,**constants):
                   
           #response = js.fetch(f"gather?model={self.components[id]['model']}&row={self.components[id]['pageRow']}&page={self.components[id]['pageCurrent']}&order={self.components[id]['sortField']}",{'method':'GET'})

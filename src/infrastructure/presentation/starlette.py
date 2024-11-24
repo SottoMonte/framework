@@ -38,7 +38,6 @@ try:
     from bs4 import BeautifulSoup
 except Exception as e:
     import markupsafe
-    import xml.etree.ElementTree as ET
     from bs4 import BeautifulSoup
     flow = language.load_module(area="framework",service='service',adapter='flow')
     starlette = None
@@ -506,12 +505,13 @@ class adapter():
 
                 # Convertiamo l'intera struttura in una stringa XML
                 xml_str = ''.join(untangle_to_xml(child) for child in root.children)
-
+                
                 url = f'application/view/component/{tag}.xml'
                 html = ''.join(x.outerHTML for x in inner)
 
                 # Creiamo la vista
                 view = await self.builder(
+                    component=self.components[id],
                     attributes=att,
                     url=url,
                     inner=markupsafe.Markup(xml_str)

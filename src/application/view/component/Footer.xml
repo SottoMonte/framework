@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Row background="#f1f1f1" class="border-top">
+    <Column background="#ededed" height="200px" alignment-vertical="center" border="bottom" collapse="full" >
+        <Graph src="static/logo.svg" />
+        <Column border="start" expand="full" alignment-horizontal="evenly">
+            <Row>
+                <Text>Products</Text>
+            </Row>
+            <Row>
+                <Text>Products</Text>
+            </Row>
+            <Row>
+                <Text>Products</Text>
+            </Row>
+        </Column>
+    </Column>
+    <Column alignment-vertical="center">
+        <Column>
+            <Action text-size="14px"><Graph icon="bi-globe"/></Action>
+            <Action text-size="14px"><Graph icon="bi-terminal"/></Action>
+            <Action text-size="14px"><Graph icon="bi-x-octagon"/></Action>
+            <Action text-size="14px"><Graph icon="bi-exclamation-triangle"/></Action>
+            <Action text-size="14px"><Graph icon="bi-bug"/></Action>
+        </Column>
+        <Column expand="dynamic" alignment-horizontal="center">
+            <Text>Created with Cubute by Colosso</Text>
+            <Text> Version 0.1.0</Text>
+        </Column>
+        <Column>
+            <Action text-size="14px"><Graph icon="bi-caret-up-square-fill"/></Action>
+            <Action text-size="14px"><Graph icon="bi-bell"/></Action>
+        </Column>
+    </Column>
+</Row>

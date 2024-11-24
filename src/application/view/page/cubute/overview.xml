@@ -106,21 +106,9 @@
 </Container>
 {% endblock %}
 {% block east %}
-<Group type="tree" >
-    <Group type="node" margin="m-0" padding="p-0" color="#ededed">
-        window
-        <Group type="node" margin="m-0" padding="p-0" color="#ededed">
-            column
-            <Text id="maker-window-2" draggable="window" draggable-type="window" >text.html</Text>
-            <Text id="maker-2" draggable="window" draggable-type="window" >overview.xml</Text>
-        </Group>
-        <Group type="node" margin="m-0" padding="p-0" color="#ededed">
-            row
-            <Text id="ss" draggable="window" draggable-type="window" >text</Text>
-            <Text id="sss" draggable="window" draggable-type="window" >text</Text>
-        </Group>
-    </Group>
-</Group>
+<Tree>
+    
+</Tree>
 <!-- TabNav -->
 <Group type="nav" margin="m-0" padding="p-0">
     <Action link="#tab-property" data-bs-toggle="tab"><Graph icon="bi-rulers"/><Text>Property</Text></Action>
