@@ -2,26 +2,25 @@
 <Window type="main" layout="application/view/layout/base.html" >
     {% if user %}
     <Row background="#f8f8f8" class="w-100"  margin="m-0" padding="p-0" >
-        <Column background="#fbfbfb" height="48px" padding="py-1" margin="m-0" alignment-horizontal="center" class="border-bottom">
-            <Column size="auto">
+        <Column background="#fbfbfb" height="48px" padding="py-1" margin="m-0" class="border-bottom">
+            <Column>
                 <Graph src="static/logo.svg" height="40px" />
             </Column>
-            <Column size="expanded" content="center">
+            <Column expand="dynamic" alignment-horizontal="center" >
                 <Action route="application/view/page/company/overview.xml" class="d-inline-flex border-end"><Graph icon="bi-people-fill"/><Text padding="px-1">Colosso</Text></Action>
                 <Action route="application/view/page/inventory/overview.xml" class="d-inline-flex"><Graph icon="bi-basket3-fill"/><Text padding="px-1">Inventory</Text></Action>
                 <Action route="application/view/layout/main.xml" class="d-inline-flex"><Graph icon="bi-shield-fill"/><Text padding="px-1">Security</Text></Action>
                 <Action route="" class="d-inline-flex"><Graph icon="bi-kanban-fill"/><Text padding="px-1">Monitoring</Text></Action>
                 <Action route="application/view/page/cubute/overview.xml" class="d-inline-flex"><Graph icon="bi-box-fill"/><Text padding="px-1">Cubute</Text></Action>
-                <Action route="" class="d-inline-flex"><Graph icon="bi-building-fill"/><Text padding="px-1">Facility</Text></Action>
             </Column>
-            <Column size="auto" padding="pe-4" content="end" alignment="center" >
+            <Column padding="pe-4" content="end" alignment-horizontal="center" >
                 <Group type="nav" margin="m-0" padding="p-0" class="border-bottom">
                     <Action  link="#tab-notifications" data-bs-toggle="tab" padding="p-0">
                         <Graph icon="bi-inbox-fill" color="white"/> 
                     </Action>
                 </Group>
                 <Action id="button3" size="sm" init="offcanvas(target:'button3',act:'open',id:'#profile')"  padding="p-0">
-                    <Column alignment="center">
+                    <Column alignment-vertical="center" >
                         <Graph icon="bi-question-circle-fill" color="white"/>
                         <Graph src="{{ user.avatar or 'static/logo.svg' }}" margin="mx-2" width="40px" height="40px" class="rounded-2 border" />
                         <Text>{{ user.username or 'NaM' }}</Text>
@@ -73,7 +72,7 @@
                 </Window>
             </Column>
         </Column>
-        <Column id="main" size="full" expand="full" margin="mb-auto" padding="p-0" class="overflow-auto" >
+        <Column id="main" expand="full" margin="mb-auto" padding="p-0" class="overflow-auto" >
             
         </Column>
         <Footer></Footer>
