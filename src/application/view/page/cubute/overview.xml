@@ -85,7 +85,8 @@
         <Action link="#tab-code" data-bs-toggle="tab"><Graph icon="bi-code-slash"/><Text>Code</Text></Action>
         <Action link="#tab-build" data-bs-toggle="tab"><Graph icon="bi-tools"/><Text>Build</Text></Action>
         <Action link="#tab-test" data-bs-toggle="tab"><Graph icon="bi-play-fill"/><Text>Test</Text></Action>
-        <Action link="#tab-release" data-bs-toggle="tab"><Graph icon="bi-rocket-fill"/><Text>Release</Text></Action>
+        <Action link="#tab-release" data-bs-toggle="tab"><Graph icon="bi-box-seam-fill"/><Text>Package</Text></Action>
+        <Action link="#tab-release" data-bs-toggle="tab"><Graph icon="bi-rocket-fill"/><Text>Deploy</Text></Action>
     </Group>
     <!-- Tab -->
     <Group type="tab">
