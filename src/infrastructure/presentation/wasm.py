@@ -250,11 +250,11 @@ class adapter(starlette.adapter):
                 element.setAttribute(key,value)
               case 'width':
                 style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
-                style += f" width:{value};"
+                style += f" max-width:{value};"
                 element.setAttribute('style',style)
               case 'height':
                 style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
-                style += f" height:{value};"
+                style += f" max-height:{value};"
                 element.setAttribute('style',style)
               case 'margin':
                 if ';' in value:

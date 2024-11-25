@@ -473,8 +473,14 @@ class adapter():
                     case 'input':
                         new = []
                         for item in inner:
-                            li = self.code('span',{'class':'input-group-text'},[item])
-                            new.append(li)
+                            
+                            if item.tagName.lower() in ['input','select']:
+                                self.att(item,{'class':'rounded-0'})
+                                new.append(item)
+                            else:
+                                li = self.code('span',{'class':'input-group-text rounded-0'},[item])
+                                new.append(li)
+                                
                         tab = self.code('div',{'class':'input-group'},new)
                         self.att(tab,att)
                         return tab
