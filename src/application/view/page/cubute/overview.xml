@@ -1,52 +1,51 @@
 {% extends "cardinal.xml" %}
 {% block west %}
-<Column size="expanded">
+<Column expand="vertical">
     <!-- TabNav -->
-    <Row>
-        <Group type="nav" margin="m-0" padding="p-0" class="flex-column" size="expanded">
+    <Row expand="vertical">
+        <Group type="nav" margin="m-0" padding="p-0" alignment-content="vertical" expand="vertical">
             <Action width="75px" link="#tab-explore" data-bs-toggle="tab"><Graph icon="bi-archive-fill"/><Text>Explore</Text></Action>
             <Action width="75px" link="#tab-tool" data-bs-toggle="tab"><Graph icon="bi-tools"/><Text>Tools</Text></Action>
             <Action width="75px" link="#tab-copilot" data-bs-toggle="tab"><Graph icon="bi-stars"/><Text>Copilot</Text></Action>
         </Group>
-        <Action link="#tab-code" data-bs-toggle="tab"><Graph icon="bi bi-plus-square"/></Action>
+        <Action link="#tab-code" data-bs-toggle="tab" border="top"><Graph icon="bi bi-plus-square"/></Action>
     </Row>
     <!-- Tab -->
     <Group type="tab">
-        <Container id="tab-tool" class="border-start h-100" width="200px" padding="p-0">
+        <Container id="tab-tool" expand="vertical" width="200px" border="start" padding="p-0">
             <!-- Layout -->
             <Column id="box" class="flex-wrap" style="font-size: 40px;" >
                 <Container color="#eb556270" style="font-size: 15px;"><Text>Layout</Text></Container>
-                <Action id="maker-container" draggable="element" draggable-type="container" ><Graph icon="bi-crop" /></Action>
-                <Action id="maker-column" draggable="element" draggable-type="column" ><Graph icon="bi-layout-three-columns" /></Action>
-                <Action id="maker-row" draggable="element" draggable-type="row" ><Graph icon="bi-columns" /></Action>
-                <Action id="maker-window" draggable="element" draggable-type="window" ><Graph icon="bi-window" /></Action>
+                <Action id="maker-container" draggable="element" draggable-component="container" ><Graph icon="bi-crop" /></Action>
+                <Action id="maker-column" draggable="element" draggable-component="column" ><Graph icon="bi-layout-three-columns" /></Action>
+                <Action id="maker-row" draggable="element" draggable-component="row" ><Graph icon="bi-columns" /></Action>
+                <Action id="maker-window" draggable="element" draggable-component="window" ><Graph icon="bi-window" /></Action>
                 <Container color="#eb8d5570" style="font-size: 15px;"><Text>Content</Text></Container>
-                <Action id="maker-alert" draggable="element" draggable-type="image"  ><Graph icon="bi-image" /></Action>
-                <Action id="maker-text" draggable="element" draggable-type="text" ><Graph icon="bi-textarea-t" /></Action>
+                <Action id="maker-alert" draggable="element" draggable-component="image"  ><Graph icon="bi-image" /></Action>
+                <Action id="maker-text" draggable="element" draggable-component="text" ><Graph icon="bi-textarea-t" /></Action>
                 <Container color="#8b55eb70" style="font-size: 15px;"><Text>Forms</Text></Container>
-                <Action id="maker-block" draggable="element" draggable-type="input" ><Graph icon="bi-input-cursor" /></Action>
-                <Action id="maker-button" draggable="element" draggable-type="button" ><Graph icon="bi-command" /></Action>
+                <Action id="maker-block" draggable="element" draggable-component="input" ><Graph icon="bi-input-cursor" /></Action>
+                <Action id="maker-button" draggable="element" draggable-component="button" ><Graph icon="bi-command" /></Action>
                 <Container color="#55c8eb70" style="font-size: 15px;"><Text>Components</Text></Container>
-                
             </Column>
         </Container>
-        <Container id="tab-explore" size="full" class="border-start">
+        <Container id="tab-explore" expand="vertical" border="start">
             <Group type="tree" >
                 <Group type="node" margin="m-0" padding="p-0" color="#ededed">
                     Application
                     <Group type="node" margin="m-0" padding="p-0" color="#ededed">
                         Action
-                        <Text id="maker-window-2" draggable="window" draggable-type="window" value="application/action/close.py" >close.py</Text>
-                        <Text id="maker-2" draggable="window" draggable-type="window" value="application/action/load.py" >load.py</Text>
+                        <Text id="maker-window-2" draggable="window" draggable-component="window" value="application/action/close.py" >close.py</Text>
+                        <Text id="maker-2" draggable="window" draggable-component="window" value="application/action/load.py" >load.py</Text>
                     </Group>
                     <Group type="node" margin="m-0" padding="p-0" color="#ededed">
-                        <Text id="ss" draggable="window" draggable-type="window" >overview.xml</Text>
-                        <Text id="sss" draggable="window" draggable-type="window" >overview.xml</Text>
+                        <Text id="ss" draggable="window" draggable-component="window" >overview.xml</Text>
+                        <Text id="sss" draggable="window" draggable-component="window" >overview.xml</Text>
                     </Group>
                 </Group>
             </Group>
         </Container>
-        <Container id="tab-copilot" size="full" class="border-start">
+        <Container id="tab-copilot" expand="vertical" border="start">
             <Text>3</Text>
         </Container>
     </Group>
@@ -58,7 +57,7 @@
 {% block center %}
 <Row expand="dynamic" class="overflow-auto">
     <Column>
-        <Group type="nav" margin="m-0" padding="p-0" color="#ededed" expand="dynamic">
+        <Group type="nav" margin="m-0" padding="p-0" background="#ededed" expand="dynamic" border="bottom">
             <Action id="nav-1" link="#framework" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-pass"/><Text padding="ps-1">framework</Text><Action padding="p-0" click="close(target:'framework')|close(target:'nav-1')"><Graph icon="bi-x"/></Action></Action>
             <Action id="nav-2" link="#infrastructure" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-receipt"/><Text padding="ps-1">infrastructure</Text><Action padding="p-0" click="close(target:'infrastructure')|close(target:'nav-2')"><Graph icon=" bi-x"/></Action></Action>
         </Group>
@@ -82,7 +81,7 @@
 {% block south %}
 <Container>
     <!-- TabNav -->
-    <Group type="nav" margin="m-0" padding="p-0" >
+    <Group type="nav" margin="m-0" padding="p-0" border="bottom" >
         <Action link="#tab-code" data-bs-toggle="tab"><Graph icon="bi-code-slash"/><Text>Code</Text></Action>
         <Action link="#tab-build" data-bs-toggle="tab"><Graph icon="bi-tools"/><Text>Build</Text></Action>
         <Action link="#tab-test" data-bs-toggle="tab"><Graph icon="bi-play-fill"/><Text>Test</Text></Action>
@@ -109,202 +108,7 @@
 <Tree>
     
 </Tree>
-<!-- TabNav -->
-<Group type="nav" margin="m-0" padding="p-0">
-    <Action link="#tab-property" data-bs-toggle="tab"><Graph icon="bi-rulers"/><Text>Property</Text></Action>
-    <Action link="#tab-cont" data-bs-toggle="tab"><Graph icon="bi-bounding-box"/><Text>Matter</Text></Action>
-    <Action link="#tab-style" data-bs-toggle="tab"><Graph icon="bi-palette2"/><Text>Style</Text></Action>
-    <Action link="#tab-event" data-bs-toggle="tab"><Graph icon="bi-lightning-fill"/><Text>Event</Text></Action>
-</Group>
-<!-- Tab -->
-<Group type="tab">
-    <Container id="tab-property">
-            <Group type="input">
-                <Graph icon="bi-layers-half" />
-                <Input></Input>
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-arrows" />
-                <Text>Width</Text>
-                <Input></Input>
-                <Text>px</Text>
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-arrows-vertical" />
-                <Text>Height</Text>
-                <Input></Input>
-                <Text>px</Text>
-            </Group>
-            <Group type="input">
-                <Text>Expand</Text>
-                <Graph icon="bi-arrows-angle-expand" />
-                <Graph icon="bi-arrows-collapse" />
-                <Graph icon="bi-arrows-collapse-vertical" />
-                <Text>Collapse</Text>
-                <Graph icon="bi-arrows-angle-contract" />
-                <Graph icon="bi-arrows-expand" />
-                <Graph icon="bi-arrows-expand-vertical" />
-            </Group>
-            <Group type="input">
-                <Text>Visibility</Text>
-                <Input type="checkbox" />
-            </Group>
-            <Group type="input">
-                <Text>Position</Text>
-                <Row>
-                    <Column><Input type="radio" /><Input type="radio" /><Input type="radio" /></Column>
-                    <Column><Input type="radio" /><Input type="radio" /><Input type="radio" /></Column>
-                    <Column><Input type="radio" /><Input type="radio" /><Input type="radio" /></Column>
-                </Row>
-            </Group>
-            <Group type="input">
-                <Row><Graph icon="bi-border-width" /><Text>Padding</Text></Row>
-                <Row><Graph icon="bi-border-outer" /><Input width="16px" height="24px"/></Row>
-                <Row><Graph icon="bi-border-bottom" /><Input width="16px" height="24px"/></Row>
-                <Row><Graph icon="bi-border-left" /><Input width="16px" height="24px"/></Row>
-                <Row><Graph icon="bi-border-right" /><Input width="16px" height="24px"/></Row>
-                <Row><Graph icon="bi-border-top" /><Input width="16px" height="24px"/></Row>
-            </Group>
-            <Group type="input">
-                <Row><Graph icon="bi-border-width" /><Text>Margin</Text></Row>
-                <Row><Graph icon="bi-border-outer" /><Input width="16px" height="24px"/></Row>
-                <Row><Graph icon="bi-border-bottom" /><Input width="16px" height="24px"/></Row>
-                <Row><Graph icon="bi-border-left" /><Input width="16px" height="24px"/></Row>
-                <Row><Graph icon="bi-border-right" /><Input width="16px" height="24px"/></Row>
-                <Row><Graph icon="bi-border-top" /><Input width="16px" height="24px"/></Row>
-            </Group>
-    </Container>
-    <Container id="tab-cont">
-        <Group type="input">
-            <Text>Vertical</Text>
-            <Graph icon="bi-align-bottom" />
-            <Graph icon="bi-align-center" />
-            <Graph icon="bi-align-end" />
-            <Graph icon="bi bi-align-middle" />
-            <Graph icon="bi-align-start" />
-            <Graph icon="bi-align-top" />
-        </Group>
-        <Group type="input">
-            <Text>Horizontal</Text>
-            <Graph icon="bi-align-bottom" />
-            <Graph icon="bi-align-center" />
-            <Graph icon="bi-align-end" />
-            <Graph icon="bi bi-align-middle" />
-            <Graph icon="bi-align-start" />
-            <Graph icon="bi-align-top" />
-        </Group>
-        <Group type="input">
-            <Text>Content</Text>
-            <Graph icon="bi-distribute-horizontal" />
-            <Graph icon="bi-distribute-vertical" />
-        </Group>
-        <Group type="input">
-            <Graph icon="bi-palette-fill" />
-            <Input type="color" width="50px" ></Input>
-        </Group>
-        <Group type="input">
-            <Graph icon="bi-fonts" />
-            <Input type="text" width="50px" ></Input>
-        </Group>
-        <Group type="input">
-            <Text>Size</Text>
-            <Input type="text" width="50px" ></Input>
-        </Group>
-</Container>
-    <Container id="tab-style">
-            <Group type="input">
-                <Graph icon="bi-palette-fill" />
-                <Input type="color" width="50px" ></Input>
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-bounding-box" />
-                <Input></Input>
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-shadows" />
-                <Input type="range"/>
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-transparency" />
-                <Input type="range"/>
-            </Group>
-            <Group type="input">
-                <Text>Class</Text>
-                <Input></Input>
-            </Group>
-            <Group type="input">
-                <Row>
-                    <Graph icon="bi-bullseye" />
-                    <Graph icon="bi-border-width" />
-                    <Graph icon="bi-border-style" />
-                </Row>
-                <Row>
-                    <Graph icon="bi-border-outer" />
-                    <Input width="16px" height="24px"/>
-                    <Graph icon="bi-border-left" />
-                </Row>
-                <Row>
-                    <Graph icon="bi-border-bottom" />
-                    <Input width="16px" height="24px"/>
-                    <Graph icon="bi-border-left" />
-                </Row>
-                <Row>
-                    <Graph icon="bi-border-left" />
-                    <Input width="16px" height="24px"/>
-                    <Graph icon="bi-border-left" />
-                </Row>
-                <Row>
-                    <Graph icon="bi-border-right" />
-                    <Input width="16px" height="24px"/>
-                    <Graph icon="bi-border-right" />
-                </Row>
-                <Row>
-                    <Graph icon="bi-border-top" />
-                    <Input width="16px" height="24px"/>
-                    <Graph icon="bi-border-top" />
-                </Row>
-            </Group>
-        
-    </Container>
-    <Container id="tab-event">
-        <Group type="input">
-            <Text>init</Text>
-            <Input/>
-        </Group>
+<Editor>
 
-        <Group type="input">
-            <Text>onclick</Text>
-            <Input/>
-        </Group>
-        <Group type="input">
-            <Text>ondblclick</Text>
-            <Input/>
-        </Group>
-        <Group type="input">
-            <Text>onmousedown</Text>
-            <Input/>
-        </Group>
-        <Group type="input">
-            <Text>onmousemove</Text>
-            <Input/>
-        </Group>
-        <Group type="input">
-            <Text>onmouseout</Text>
-            <Input/>
-        </Group>
-        <Group type="input">
-            <Text>onmouseover</Text>
-            <Input/>
-        </Group>
-        <Group type="input">
-            <Text>onmouseup</Text>
-            <Input/>
-        </Group>
-        <Group type="input">
-            <Text>onwheel</Text>
-            <Input/>
-        </Group>
-        
-    </Container>
-</Group>
+</Editor>
 {% endblock %}

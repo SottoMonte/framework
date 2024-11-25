@@ -368,16 +368,39 @@ class adapter():
             case 'Input':
                 tipo = att['type'] if 'type' in att else 'None'
                 tipi = ["button","checkbox","color","date","datetime-local","email","file","hidden","image","month","number","password","radio","range","reset","search","submit","tel","text","time","url","week"]
-
-                if tipo in tipi:
-                    #form-range
-                    input = self.code('input',{'class':'form-control','type':tipo})
-                    self.att(input,att)
-                    return input
-                else:
-                    input = self.code('input',{'class':'form-control','type':'text'})
-                    self.att(input,att)
-                    return input
+                match tipo:
+                    case 'select':
+                        options = []
+                        for x in inner:
+                            option = self.code('option',{},[x])
+                            options.append(option)
+                        input = self.code('select',{'class':'form-select'},options)
+                        self.att(input,att)
+                        return input
+                    case 'checkbox':
+                        input = self.code('input',{'class':'form-check form-check-input','type':'checkbox'})
+                        self.att(input,att)
+                        return input
+                    case 'radio':
+                        input = self.code('input',{'class':'form-check form-check-input','type':'radio'})
+                        self.att(input,att)
+                        return input
+                    case 'switch':
+                        input = self.code('input',{'class':'form-check form-switch form-check-input','type':'checkbox','role':'switch'})
+                        self.att(input,att)
+                        return input
+                    case 'color':
+                        input = self.code('input',{'class':'form-control form-control-color','type':'color'})
+                        self.att(input,att)
+                        return input
+                    case 'range':
+                        input = self.code('input',{'class':'form-range','type':'range'})
+                        self.att(input,att)
+                        return input
+                    case _:
+                        input = self.code('input',{'class':'form-control','type':'text'})
+                        self.att(input,att)
+                        return input
             case 'Action':
                 model = att['type'] if 'type' in att else 'button'
                 url = att['url'] if 'url' in att else '#'
@@ -438,9 +461,7 @@ class adapter():
                         for item in inner:
                             li = self.code('li',{'class':'nav-item'},[item])
                             new.append(li)
-                        ul = self.code('ul',{'class':'nav col'},new)
-                        tab = self.code('div',{'class':'d-flex align-items-center justify-content-center'},[ul])
-                        self.att(ul,att)
+                        tab = self.code('ul',{'class':'nav'},new)
                         self.att(tab,att)
                         return tab
                     case 'tree':

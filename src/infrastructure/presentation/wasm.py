@@ -129,7 +129,7 @@ class adapter(starlette.adapter):
           #print(draggable_element.getAttribute('draggable-domain'),event.target.getAttribute('draggable-domain'))
           if draggable_element and draggable_element.getAttribute('draggable-domain') == event.target.getAttribute('draggable-domain'):
             
-            component = draggable_element.getAttribute('draggable-type')
+            component = draggable_element.getAttribute('draggable-component')
             identifier = self.drag
             
             if component and identifier not in self.components:
@@ -149,7 +149,7 @@ class adapter(starlette.adapter):
                 event.target.appendChild(view)
                 
             else:
-              if self.components[identifier] != '':
+              if identifier in self.components and self.components[identifier] != '':
                 component = js.document.getElementById(self.components[identifier])
                 if 'opacity-25' not in event.target.className:
                   component.className += ' opacity-25'
@@ -395,7 +395,8 @@ class adapter(starlette.adapter):
                 element.setAttribute('ondragstart','drag(event)')
                 element.setAttribute('draggable-domain',value)
                 element.addEventListener('dragstart',pyodide.create_proxy(self.on_drag_start))
-              
+              case 'draggable-component':
+                element.setAttribute(key,value)
               
         async def rebuild(self,id,tag,**constants):
                   

@@ -24,7 +24,6 @@
             <Action text-size="14px"><Graph icon="bi-x-octagon"/></Action>
             <Action text-size="14px"><Graph icon="bi-exclamation-triangle"/></Action>
             <Action text-size="14px"><Graph icon="bi-bug"/></Action>
-            <Action text-size="14px"><Graph icon="bi-ethernet"/></Action>
             <Action text-size="14px"><Graph icon="bi-wifi-off"/></Action>
         </Column>
         <Column expand="dynamic" alignment-horizontal="center">
@@ -37,10 +36,11 @@
                 <Text>Riga 45,Colonna 89 Spazi:4 UTF-8 LF XML</Text>
             </Column>
             <Action text-size="14px"><Graph icon="bi-translate"/></Action>
+            <Action text-size="14px"><Graph icon="bi-ethernet"/></Action>
             <Action text-size="14px"><Graph icon="bi-keyboard-fill"/></Action>
             <Action text-size="14px"><Graph icon="bi-mouse-fill"/></Action>
             <Action text-size="14px"><Graph icon="bi-caret-up-square-fill"/></Action>
-            <Action text-size="14px"><Graph icon="bi-bell-fill"/></Action>
+            <Action text-size="14px"><Graph icon="bi-layout-sidebar-inset-reverse"/></Action>
         </Column>
     </Column>
 </Row>
