@@ -250,11 +250,11 @@ class adapter(starlette.adapter):
                 element.setAttribute(key,value)
               case 'width':
                 style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
-                style += f" max-width:{value};"
+                style += f" max-width:{value};width:{value};"
                 element.setAttribute('style',style)
               case 'height':
                 style = element.getAttribute('style') if type(element.getAttribute('style')) == type('') else ''
-                style += f" max-height:{value};"
+                style += f" max-height:{value};height:{value};"
                 element.setAttribute('style',style)
               case 'margin':
                 if ';' in value:
@@ -311,6 +311,8 @@ class adapter(starlette.adapter):
                   case 'hidden':element.className += f" overflow-{value} "
                   case 'visible':element.className += f" overflow-{value} "
                   case 'scroll':element.className += f" overflow-{value} "
+              case 'type':
+                element.setAttribute(key,value)
               # Style
               case 'text-size':
                 if 'px' in value:

@@ -1,162 +1,180 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Container id="{% set id = '{:0=8}'.format(range(0, 99999999) | random) %}{{ attributes['id'] or id }}" >
+<Container id="{% set id = '{:0=8}'.format(range(0, 99999999) | random) %}{{ attributes['id'] or id }}">
     <!-- TabNav -->
     <Group type="nav" margin="m-0" padding="p-0" border="bottom">
-        <Action link="#tab-property" data-bs-toggle="tab"><Graph icon="bi-rulers"/><Text>Property</Text></Action>
-        <Action link="#tab-cont" data-bs-toggle="tab"><Graph icon="bi-bounding-box"/><Text>Matter</Text></Action>
-        <Action link="#tab-style" data-bs-toggle="tab"><Graph icon="bi-palette2"/><Text>Style</Text></Action>
-        <Action link="#tab-event" data-bs-toggle="tab"><Graph icon="bi-lightning-fill"/><Text>Event</Text></Action>
+        <Action link="#tab-property" data-bs-toggle="tab">
+            <Graph icon="bi-rulers" />
+            <Text>Property</Text>
+        </Action>
+        <Action link="#tab-matter" data-bs-toggle="tab">
+            <Graph icon="bi bi-grid-1x2-fill" />
+            <Text>Matter</Text>
+        </Action>
+        <Action link="#tab-style" data-bs-toggle="tab">
+            <Graph icon="bi-palette2" />
+            <Text>Style</Text>
+        </Action>
+        <Action link="#tab-event" data-bs-toggle="tab">
+            <Graph icon="bi-lightning-fill" />
+            <Text>Event</Text>
+        </Action>
     </Group>
     <!-- Tab -->
-    <Group type="tab" width="285px" expand="full">
+    <Group type="tab" width="285px">
+        <Container id="tab-matter">
+            <Group type="input">
+                <Graph icon="bi-fingerprint" />
+                <Input placeholder="id" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-fingerprint" />
+                <Input placeholder="identifier" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-symmetry-horizontal" />
+                <Graph expand="dynamic" icon="bi-align-bottom" />
+                <Graph expand="dynamic" icon="bi-align-center" />
+                <Graph expand="dynamic" icon="bi-align-end" />
+                <Graph expand="dynamic" icon="bi bi-align-middle" />
+                <Graph expand="dynamic" icon="bi-align-start" />
+                <Graph expand="dynamic" icon="bi-align-top" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-symmetry-vertical" />
+                <Graph expand="dynamic" icon="bi-align-bottom" />
+                <Graph expand="dynamic" icon="bi-align-center" />
+                <Graph expand="dynamic" icon="bi-align-end" />
+                <Graph expand="dynamic" icon="bi bi-align-middle" />
+                <Graph expand="dynamic" icon="bi-align-start" />
+                <Graph expand="dynamic" icon="bi-align-top" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-binoculars-fill" />
+                <Graph expand="dynamic" icon="bi-distribute-horizontal" />
+                <Graph expand="dynamic" icon="bi-distribute-vertical" />
+            </Group>
+        </Container>
         <Container id="tab-property">
-                <Group type="input">
-                    <Graph icon="bi-layers-half" />
-                    <Input></Input>
-                    <Container>
-                        <Input type="select" width="60px" class="form-select-sm" >
-                            <Text>px</Text>
-                            <Text>%</Text>
-                            <Text>enum</Text>
-                        </Input>
-                    </Container>
-                </Group>
-                <Group type="input">
-                    <Graph icon="bi-arrows" />
-                    <Input></Input>
-                    <Container>
-                        <Input type="select" width="60px" class="form-select-sm" >
-                            <Text>px</Text>
-                            <Text>%</Text>
-                            <Text>enum</Text>
-                        </Input>
-                    </Container>
-                </Group>
-                <Group type="input">
-                    <Graph icon="bi-arrows-vertical" />
-                    <Input></Input>
-                    <Container>
-                        <Input type="select" width="60px" class="form-select-sm" >
-                            <Text>px</Text>
-                            <Text>%</Text>
-                            <Text>enum</Text>
-                        </Input>
-                    </Container>
-                </Group>
-                <Group type="input">
-                    <Graph icon="bi-arrows-move" />
-                    <Graph icon="bi-arrows-angle-contract" />
-                    <Graph icon="bi-arrows-collapse" />
-                    <Graph icon="bi-arrows-collapse-vertical" />
-                    <Graph icon="bi-arrows-angle-expand" />
-                    <Graph icon="bi-arrows-expand" />
-                    <Graph icon="bi-arrows-expand-vertical" />
-                </Group>
-                <Group type="input">
-                    <Graph icon="bi-symmetry-horizontal" />
-                    <Graph icon="bi-align-bottom" />
-                    <Graph icon="bi-align-center" />
-                    <Graph icon="bi-align-end" />
-                    <Graph icon="bi bi-align-middle" />
-                    <Graph icon="bi-align-start" />
-                    <Graph icon="bi-align-top" />
-                </Group>
-                <Group type="input">
-                    <Graph icon="bi-symmetry-vertical" />
-                    <Graph icon="bi-align-bottom" />
-                    <Graph icon="bi-align-center" />
-                    <Graph icon="bi-align-end" />
-                    <Graph icon="bi bi-align-middle" />
-                    <Graph icon="bi-align-start" />
-                    <Graph icon="bi-align-top" />
-                </Group>
-                <Group type="input">
-                    <Graph icon="bi-binoculars-fill" />
-                    <Graph icon="bi-distribute-horizontal" />
-                    <Graph icon="bi-distribute-vertical" />
-                </Group>
-                <Group type="input">
-                    <Graph icon="bi-bounding-box" />
-                    <Row expand="dynamic">
-                        <Column><Input type="radio" /><Input type="radio" /><Input type="radio" /></Column>
-                        <Column><Input type="radio" /><Input type="radio" /><Input type="radio" /></Column>
-                        <Column><Input type="radio" /><Input type="radio" /><Input type="radio" /></Column>
-                    </Row>
-                </Group>
-                <Group type="input">
-                    <Graph icon="bi-border" />
-                    <Graph width="30px" icon="bi-border-outer" />
-                    <Graph width="30px" icon="bi-border-bottom" />
-                    <Graph width="30px" icon="bi-border-left" />
-                    <Graph width="30px" icon="bi-border-right" />
-                    <Graph width="30px" icon="bi-border-top" />
-                </Group>
-                <Group type="input">
-                    <Graph icon="bi-border-width" />
-                    <Input expand="dynamic" />
-                    <Input expand="dynamic" />
-                    <Input expand="dynamic" />
-                    <Input expand="dynamic" />
-                    <Input expand="dynamic" />
-                </Group>
-                <Group type="input">
-                    <Graph icon="bi-border-width" />
-                    <Input expand="dynamic" />
-                    <Input expand="dynamic" />
-                    <Input expand="dynamic" />
-                    <Input expand="dynamic" />
-                    <Input expand="dynamic" />
-                </Group>
+            <Group type="input">
+                <Graph icon="bi-layers-half" />
+                <Input></Input>
+                <Input type="select" width="70px">
+                    <Text>px</Text>
+                    <Text>%</Text>
+                    <Text>enum</Text>
+                </Input>
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-arrows" />
+                <Input></Input>
+                <Input type="select" width="70px">
+                    <Text>px</Text>
+                    <Text>%</Text>
+                    <Text>enum</Text>
+                </Input>
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-arrows-vertical" />
+                <Input></Input>
+                <Input type="select" width="70px">
+                    <Text>px</Text>
+                    <Text>%</Text>
+                    <Text>enum</Text>
+                </Input>
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-arrows-move" />
+                <Graph icon="bi-arrows-angle-contract" />
+                <Graph icon="bi-arrows-collapse" />
+                <Graph icon="bi-arrows-collapse-vertical" />
+                <Graph icon="bi-arrows-angle-expand" />
+                <Graph icon="bi-arrows-expand" />
+                <Graph icon="bi-arrows-expand-vertical" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-bounding-box" />
+                <Container expand="dynamic" class="position-relative" height="200px" margin="m-1">
+                    <Input type="radio" identifier="position"
+                        class="position-absolute top-0 start-0" />
+                    <Input type="radio" identifier="position"
+                        class="position-absolute top-0 start-50" />
+                    <Input type="radio" identifier="position" class="position-absolute top-0 end-0" />
+                    <Input type="radio" identifier="position" class="position-absolute top-0 end-50" />
+
+                    <Input type="radio" identifier="position"
+                        class="position-absolute top-50 start-0" />
+                    <Input type="radio" identifier="position"
+                        class="position-absolute top-50 start-50" />
+                    <Input type="radio" identifier="position" class="position-absolute top-50 end-0" />
+                    <Input type="radio" identifier="position"
+                        class="position-absolute top-50 end-50" />
+
+                    <Input type="radio" identifier="position"
+                        class="position-absolute bottom-0 start-0" />
+                    <Input type="radio" identifier="position"
+                        class="position-absolute bottom-0 start-50" />
+                    <Input type="radio" identifier="position"
+                        class="position-absolute bottom-0 end-0" />
+                    <Input type="radio" identifier="position"
+                        class="position-absolute bottom-0 end-50" />
+
+                    <Input type="radio" identifier="position"
+                        class="position-absolute bottom-50 start-0" />
+                    <Input type="radio" identifier="position"
+                        class="position-absolute bottom-50 start-50" />
+                    <Input type="radio" identifier="position"
+                        class="position-absolute bottom-50 end-0" />
+                    <Input type="radio" identifier="position"
+                        class="position-absolute bottom-50 end-50" />
+                </Container>
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-border" />
+                <Graph expand="dynamic" icon="bi-border-outer" />
+                <Graph expand="dynamic" icon="bi-border-bottom" />
+                <Graph expand="dynamic" icon="bi-border-left" />
+                <Graph expand="dynamic" icon="bi-border-right" />
+                <Graph expand="dynamic" icon="bi-border-top" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-border-width" />
+                <Input expand="dynamic" />
+                <Input expand="dynamic" />
+                <Input expand="dynamic" />
+                <Input expand="dynamic" />
+                <Input expand="dynamic" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-border-width" />
+                <Input expand="dynamic" />
+                <Input expand="dynamic" />
+                <Input expand="dynamic" />
+                <Input expand="dynamic" />
+                <Input expand="dynamic" />
+            </Group>
         </Container>
         <Container id="tab-style">
             <Column>
-                <Graph icon="bi-paint-bucket" />
-                <Input expand="dynamic" class="rounded-0" type="color" width="50px" />
+                <Group type="input" expand="dynamic">
+                    <Graph icon="bi-paint-bucket" />
+                    <Input expand="dynamic" type="color" />
+                </Group>
+                <Group type="input" expand="dynamic">
+                    <Graph icon="bi-border-style" />
+                    <Input expand="dynamic" type="color" />
+                </Group>
+                <Group type="input" expand="dynamic">
+                    <Graph icon="bi-body-text" />
+                    <Input expand="dynamic" class="rounded-0" type="color" />
+                </Group>
             </Column>
-            <Column>
-                <Graph icon="bi-palette" />
-                <Input expand="dynamic" class="rounded-0" type="color" width="50px" />
-            </Column>
-            <Column>
-                <Graph icon="bi-bounding-box" />
-                <Input expand="dynamic" class="rounded-0"/>
-            </Column>
-            <Column>
-                <Graph icon="bi-shadows" />
-                <Input expand="dynamic" class="rounded-0" type="range"/>
-            </Column>
-            <Column>
-                <Graph icon="bi-transparency" />
-                <Input class="rounded-0" type="range"/>
-            </Column>
-            <Column>
-                <Text padding="p-1" expand="auto" >Class</Text>
-                <Input class="rounded-0" />
-            </Column>
-            <Column expand="dynamic">
-                <Graph icon="bi-border" />
-                <Graph icon="bi-border-outer" />
-                <Graph icon="bi-border-bottom" />
-                <Graph icon="bi-border-left" />
-                <Graph icon="bi-border-right" />
-                <Graph icon="bi-border-top" />
-            </Column>
-            <Column>
-                <Graph icon="bi-border-width" />
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-                <Input width="16px" height="24px"/>
-            </Column>
-            <Column>
-                <Graph icon="bi-border-style" />
-                <Input type="select" class="form-select-sm" >
-                    <Text>none</Text>
+            <Group type="input">
+                <Graph icon="bi-fonts" />
+                <Input type="select" expand="dynamic" class="rounded-0" >
+                    <Text>solid</Text>
                     <Text>hidden</Text>
                     <Text>dotted</Text>
                     <Text>dashed</Text>
-                    <Text>solid</Text>
                     <Text>double</Text>
                     <Text>groove</Text>
                     <Text>ridge</Text>
@@ -165,19 +183,124 @@
                     <Text>initial</Text>
                     <Text>inherit</Text>
                 </Input>
-            </Column>
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-paragraph" />
+                <Input expand="dynamic" class="rounded-0" />
+                <Input type="select" width="70px">
+                    <Text>px</Text>
+                    <Text>%</Text>
+                    <Text>enum</Text>
+                </Input>
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-shadows" />
+                <Input expand="dynamic" class="rounded-0" type="range" />
+                
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-transparency" />
+                <Input expand="dynamic" class="rounded-0" type="range" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-asterisk" />
+                <Input class="rounded-0" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-border" />
+                <Graph expand="dynamic" icon="bi-border-outer" />
+                <Graph expand="dynamic" icon="bi-border-bottom" />
+                <Graph expand="dynamic" icon="bi-border-left" />
+                <Graph expand="dynamic" icon="bi-border-right" />
+                <Graph expand="dynamic" icon="bi-border-top" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-border-width" />
+                <Input expand="dynamic" />
+                <Input expand="dynamic" />
+                <Input expand="dynamic" />
+                <Input expand="dynamic" />
+                <Input expand="dynamic" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-border-style" />
+                <Input type="select" class="form-select-sm">
+                    <Text>solid</Text>
+                    <Text>hidden</Text>
+                    <Text>dotted</Text>
+                    <Text>dashed</Text>
+                    <Text>double</Text>
+                    <Text>groove</Text>
+                    <Text>ridge</Text>
+                    <Text>inset</Text>
+                    <Text>outset</Text>
+                    <Text>initial</Text>
+                    <Text>inherit</Text>
+                </Input>
+            </Group>
         </Container>
         <Container id="tab-event" alignment-vertical="center">
+            <!-- Window -->
             <Group type="input">
-                <Text padding="p-1" >init</Text>
-                <Input />
+                <Graph icon="bi-window" />
+                <Input placeholder="" />
+            </Group>
+            <!-- Mouse -->
+            <Group type="input">
+                <Graph icon="bi-mouse" />
+                <Input placeholder="onclick" />
             </Group>
             <Group type="input">
-                <Text padding="p-1" >onclick</Text>
-                <Input />
+                <Graph icon="bi-mouse" />
+                <Input placeholder="ondblclick" />
             </Group>
             <Group type="input">
-                <Text padding="p-1" >ondblclick</Text>
+                <Graph icon="bi-mouse" />
+                <Input placeholder="onmousedown" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-mouse" />
+                <Input placeholder="onmousemove" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-mouse" />
+                <Input placeholder="onmouseout" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-mouse" />
+                <Input placeholder="onmouseover" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-mouse" />
+                <Input placeholder="onmouseup" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-mouse" />
+                <Input placeholder="onwheel" />
+            </Group>
+            <!-- Keyboard -->
+            <Group type="input">
+                <Graph icon="bi-keyboard" />
+                <Input />
+            </Group>
+            <!-- Input -->
+            <Group type="input">
+                <Graph icon="bi-input-cursor" />
+                <Input />
+            </Group>
+            <!-- Drag -->
+            <Group type="input">
+                <Graph icon="bi-arrows-move" />
+                <Input />
+            </Group>
+            <!-- Clipboard -->
+            <Group type="input">
+                <Graph icon="bi-clipboard" />
+                <Input />
+            </Group>
+            <!-- Media -->
+            <Group type="input">
+                <Graph icon="bi-collection" />
                 <Input />
             </Group>
         </Container>

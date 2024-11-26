@@ -322,7 +322,7 @@ class adapter():
                 match tipo:
                     case 'icon':
                         icon = att['icon'] if 'icon' in att else 'bi-image-alt'
-                        out = self.code('i',{'class':f'bi {icon}'})
+                        out = self.code('i',{'class':f'bi {icon}','type':'icon'})
                         self.att(out,att)
                         return out
                     case 'img':
@@ -368,6 +368,8 @@ class adapter():
             case 'Input':
                 tipo = att['type'] if 'type' in att else 'None'
                 tipi = ["button","checkbox","color","date","datetime-local","email","file","hidden","image","month","number","password","radio","range","reset","search","submit","tel","text","time","url","week"]
+                valor = att['value'] if 'value' in att else ''
+                placeholder = att['placeholder'] if 'placeholder' in att else ''
                 match tipo:
                     case 'select':
                         options = []
@@ -398,7 +400,7 @@ class adapter():
                         self.att(input,att)
                         return input
                     case _:
-                        input = self.code('input',{'class':'form-control','type':'text'})
+                        input = self.code('input',{'class':'form-control','type':'text','value':valor,'placeholder':placeholder})
                         self.att(input,att)
                         return input
             case 'Action':
@@ -443,7 +445,7 @@ class adapter():
                         self.att(text,att)
                         return text
                     case _:
-                        text = self.code('p',{'class':'text-truncate fw-lighter p-0 m-0'},text)
+                        text = self.code('p',{'class':'text-truncate fw-lighter p-0 m-0','type':'data'},text)
                         self.att(text,att)
                         return text
             case 'Group':
@@ -473,13 +475,20 @@ class adapter():
                     case 'input':
                         new = []
                         for item in inner:
-                            
-                            if item.tagName.lower() in ['input','select']:
+                            #print(dir(item))
+                            #item_attr = item._attributes
+                            #tipo = item_attr['type'] if 'type' in item_attr else None
+                            tipo = item.getAttribute('type')
+                            classe = item.getAttribute('class')
+                            if tipo and tipo in ['data','icon','range']:
+                                
+                                expand = 'col' if ' col' in classe else ''
+                                li = self.code('span',{'class':f'input-group-text rounded-0 {expand}'},[item])
+                                new.append(li)
+                            else:
                                 self.att(item,{'class':'rounded-0'})
                                 new.append(item)
-                            else:
-                                li = self.code('span',{'class':'input-group-text rounded-0'},[item])
-                                new.append(li)
+                                
                                 
                         tab = self.code('div',{'class':'input-group'},new)
                         self.att(tab,att)
@@ -546,7 +555,7 @@ class adapter():
 
                 #view = await self.mount_view(root,data)
 
-                self.att(view, att)
+                self.att(view, att|{'type':tag})
                 return view
                 
                   

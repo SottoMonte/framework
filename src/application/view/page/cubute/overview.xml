@@ -106,10 +106,10 @@
 </Container>
 {% endblock %}
 {% block east %}
-<Tree>
+<Tree expand="dynamic">
     
 </Tree>
-<Editor>
+<Editor expand="dynamic">
 
 </Editor>
 {% endblock %}
