@@ -36,7 +36,7 @@
                     <Group type="node" margin="m-0" padding="p-0" color="#ededed">
                         Action
                         <Text id="maker-window-2" draggable="window" draggable-component="window" value="application/action/close.py" >close.py</Text>
-                        <Text id="maker-2" draggable="window" draggable-component="window" value="application/action/load.py" >load.py</Text>
+                       <Action id="maker-2" draggable="window" draggable-component="window" value="application/action/load.py"><Text>load.py</Text></Action>
                     </Group>
                     <Group type="node" margin="m-0" padding="p-0" color="#ededed">
                         <Text id="ss" draggable="window" draggable-component="window" >overview.xml</Text>

@@ -406,14 +406,15 @@ class adapter():
             case 'Action':
                 model = att['type'] if 'type' in att else 'button'
                 url = att['url'] if 'url' in att else '#'
-                
+                valor = att['value'] if 'value' in att else ''
+
                 if model == 'form':
                     act = att['act'] if 'act' in att else '#'
                     form = self.code('form',{'action':act,'method':'POST'},inner)
                     self.att(form,att)
                     return form
                 elif model == 'button':
-                    button = self.code('a',{'class':'btn rounded-0'},inner)
+                    button = self.code('a',{'class':'btn rounded-0','value':valor},inner)
                     self.att(button,att)
                     return button
             case 'Window':
@@ -452,10 +453,10 @@ class adapter():
                 tipo = att['type'] if 'type' in att else 'None'
                 match tipo:
                     case 'tab':
-                        #self.att(inner[0],{'class':'active show'})
+                        self.att(inner[0],{'class':'active show'})
                         for item in inner:
                             self.att(item,{'class':'tab-pane fade','role':'tabpanel'})
-                        tab = self.code('div',{'class':'tab-content'},inner)
+                        tab = self.code('div',{'class':'d-flex flex-row tab-content'},inner)
                         self.att(tab,att)
                         return tab
                     case 'nav':
@@ -480,8 +481,7 @@ class adapter():
                             #tipo = item_attr['type'] if 'type' in item_attr else None
                             tipo = item.getAttribute('type')
                             classe = item.getAttribute('class')
-                            if tipo and tipo in ['data','icon','range']:
-                                
+                            if tipo and tipo in ['data','icon','range']:  
                                 expand = 'col' if ' col' in classe else ''
                                 li = self.code('span',{'class':f'input-group-text rounded-0 {expand}'},[item])
                                 new.append(li)

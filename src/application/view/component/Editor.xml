@@ -54,14 +54,21 @@
                 <Graph expand="dynamic" icon="bi-distribute-vertical" />
             </Group>
         </Container>
+        <!-- property -->
         <Container id="tab-property">
             <Group type="input">
                 <Graph icon="bi-layers-half" />
-                <Input></Input>
-                <Input type="select" width="70px">
-                    <Text>px</Text>
-                    <Text>%</Text>
-                    <Text>enum</Text>
+                <Input type="select">
+                    <Text>Background</Text>
+                    <Text>Content</Text>
+                    <Text>Navbar</Text>
+                    <Text>Dropdown</Text>
+                    <Text>Tooltip</Text>
+                    <Text>Sidebar</Text>
+                    <Text>Modal</Text>
+                    <Text>Overlay</Text>
+                    <Text>Notification</Text>
+                    <Text>Critical</Text>
                 </Input>
             </Group>
             <Group type="input">

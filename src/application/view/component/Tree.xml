@@ -1,20 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Group id="{% set id = '{:0=8}'.format(range(0, 99999999) | random) %}{{ attributes['id'] or id }}" type="tree" >
-    {% for item in data if item.state %}
-    <Group type="node" margin="m-0" padding="p-0" color="#ededed">
-        window
-        <Group type="node" margin="m-0" padding="p-0" color="#ededed">
-            column
-            
-            <Text id="maker-2" draggable="window" draggable-type="window" >overview.xml</Text>
+    {% if 'type' not in attributes  %}
+        {% set tree_data = dict({
+    'id': 'root',
+    'name': 'Root Node',
+    'children': [
+        {
+            'id': 'node1',
+            'name': 'Node 1',
+            'children': [
+                {'id': 'node1_1', 'name': 'Node 1.1', 'children': []},
+                {'id': 'node1_2', 'name': 'Node 1.2', 'children': []}
+            ]
+        },
+        {
+            'id': 'node2',
+            'name': 'Node 2',
+            'children': [
+                {'id': 'node2_1', 'name': 'Node 2.1', 'children': []}
+            ]
+        }
+    ]
+}) %}
+    {% else  %}
+        {% set another = dict({'tag':'#'}) %}
+    {% endif  %}
+
+    {% macro render_node(node) %}
+        {% if node['children'] and node['children']|length != 0 %}
+        <Group id="{{ node['id'] }}" type="node" name="{{ node['name'] }}">
+            {{node.name}}
+ 
+            {% if node['children'] and node['children']|length != 0 %}
+                {% for child in node['children'] %}
+                    {{ render_node(child) }}
+                {% endfor %}
+            {% endif %}
         </Group>
-        <Group type="node" margin="m-0" padding="p-0" color="#ededed">
-            row
-            <Text id="ss" draggable="window" draggable-type="window" >text</Text>
-            <Text id="sss" draggable="window" draggable-type="window" >text</Text>
-        </Group>
-    </Group>
-    {% else %}
-    <Text id="maker-window-2" draggable="window" draggable-type="window" >text.html</Text>
-    {% endfor %}
+        {% else %}
+            <Text id="ss" draggable="window" draggable-type="window" >{{node.name}}</Text>
+        {% endif %}
+    {% endmacro %}
+
+    {{ render_node(tree_data) }}
 </Group>
