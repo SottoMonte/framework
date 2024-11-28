@@ -7,11 +7,16 @@
                 <Graph src="static/logo.svg" height="40px" />
             </Column>
             <Column expand="dynamic" alignment-horizontal="center" >
-                <Action route="application/view/page/company/overview.xml" class="d-inline-flex border-end"><Graph icon="bi-people-fill"/><Text padding="px-1">Colosso</Text></Action>
+                <Action type="dropdown" border="end" >
+                    <Text>Colosso</Text>
+                    <Text>SottoMonte</Text>
+                    <Action route="application/view/page/company/overview.xml" alignment-content="horizontal" ><Graph icon="bi-buildings-fill"/><Text padding="px-1">Colosso</Text></Action>
+                </Action>
                 <Action route="application/view/page/inventory/overview.xml" class="d-inline-flex"><Graph icon="bi-basket3-fill"/><Text padding="px-1">Inventory</Text></Action>
                 <Action route="application/view/layout/main.xml" class="d-inline-flex"><Graph icon="bi-shield-fill"/><Text padding="px-1">Security</Text></Action>
-                <Action route="" class="d-inline-flex"><Graph icon="bi-kanban-fill"/><Text padding="px-1">Monitoring</Text></Action>
-                <Action route="application/view/page/cubute/overview.xml" class="d-inline-flex"><Graph icon="bi-box-fill"/><Text padding="px-1">Cubute</Text></Action>
+                <Action route="" class="d-inline-flex"><Graph icon="bi-easel-fill"/><Text padding="px-1">Monitoring</Text></Action>
+                <Action route="application/view/page/cubute/overview.xml" class="d-inline-flex"><Graph icon="bi-box-fill"/><Text padding="px-1">Developer</Text></Action>
+                <Action route="application/view/page/cubute/overview.xml" class="d-inline-flex"><Graph icon="bi-kanban-fill"/><Text padding="px-1">Planning</Text></Action>
             </Column>
             <Column padding="pe-4" content="end" alignment-horizontal="center" >
                 <Group type="nav" margin="m-0" padding="p-0" class="border-bottom">

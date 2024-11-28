@@ -14,20 +14,30 @@
     <Group type="tab">
         <Container id="tab-tool" expand="vertical" width="200px" border="start" padding="p-0">
             <!-- Layout -->
-            <Column id="box" class="flex-wrap" style="font-size: 40px;" >
-                <Container color="#eb556270" style="font-size: 15px;"><Text>Layout</Text></Container>
-                <Action id="maker-container" draggable="element" draggable-component="container" ><Graph icon="bi-crop" /></Action>
-                <Action id="maker-column" draggable="element" draggable-component="column" ><Graph icon="bi-layout-three-columns" /></Action>
-                <Action id="maker-row" draggable="element" draggable-component="row" ><Graph icon="bi-columns" /></Action>
-                <Action id="maker-window" draggable="element" draggable-component="window" ><Graph icon="bi-window" /></Action>
-                <Container color="#eb8d5570" style="font-size: 15px;"><Text>Content</Text></Container>
-                <Action id="maker-alert" draggable="element" draggable-component="image"  ><Graph icon="bi-image" /></Action>
-                <Action id="maker-text" draggable="element" draggable-component="text" ><Graph icon="bi-textarea-t" /></Action>
-                <Container color="#8b55eb70" style="font-size: 15px;"><Text>Forms</Text></Container>
-                <Action id="maker-block" draggable="element" draggable-component="input" ><Graph icon="bi-input-cursor" /></Action>
-                <Action id="maker-button" draggable="element" draggable-component="button" ><Graph icon="bi-command" /></Action>
-                <Container color="#55c8eb70" style="font-size: 15px;"><Text>Components</Text></Container>
-            </Column>
+            <Row id="box" style="font-size: 40px;" >
+                <Group type="accordion">
+                    <Action><Text>Layout</Text></Action>
+                    <Container>
+                        <Action id="maker-container" draggable="element" draggable-component="container" ><Graph icon="bi-crop" /></Action>
+                        <Action id="maker-column" draggable="element" draggable-component="column" ><Graph icon="bi-layout-three-columns" /></Action>
+                        <Action id="maker-row" draggable="element" draggable-component="row" ><Graph icon="bi-columns" /></Action>
+                        <Action id="maker-window" draggable="element" draggable-component="window" ><Graph icon="bi-window" /></Action>
+                    </Container>
+                    <Action><Text>Content</Text></Action>
+                    <Container>
+                        <Action id="maker-alert" draggable="element" draggable-component="image"  ><Graph icon="bi-image" /></Action>
+                        <Action id="maker-text" draggable="element" draggable-component="text" ><Graph icon="bi-textarea-t" /></Action>
+                    </Container>
+                    <Action><Text>Forms</Text></Action>
+                    <Container>
+                        <Action id="maker-block" draggable="element" draggable-component="input" ><Graph icon="bi-input-cursor" /></Action>
+                        <Action id="maker-button" draggable="element" draggable-component="button" ><Graph icon="bi-command" /></Action>
+                    </Container>
+                    <Action><Text>Components</Text></Action>
+                    <Container>
+                    </Container>
+                </Group>
+            </Row>
         </Container>
         <Container id="tab-explore" expand="vertical" border="start">
             <Group type="tree" >
@@ -52,7 +62,10 @@
 </Column>
 {% endblock %}
 {% block north %}
-<Text>Colosso/Framework</Text>
+<Input type="select" class="form-select-sm">
+    <Text>Colosso</Text>
+    <Text>Colosso</Text>
+</Input>
 {% endblock %}
 {% block center %}
 <Row expand="dynamic" class="overflow-auto">

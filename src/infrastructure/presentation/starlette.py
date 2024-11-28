@@ -407,16 +407,30 @@ class adapter():
                 model = att['type'] if 'type' in att else 'button'
                 url = att['url'] if 'url' in att else '#'
                 valor = att['value'] if 'value' in att else ''
-
-                if model == 'form':
-                    act = att['act'] if 'act' in att else '#'
-                    form = self.code('form',{'action':act,'method':'POST'},inner)
-                    self.att(form,att)
-                    return form
-                elif model == 'button':
-                    button = self.code('a',{'class':'btn rounded-0','value':valor},inner)
-                    self.att(button,att)
-                    return button
+                match model:
+                    case 'form':
+                        act = att['act'] if 'act' in att else '#'
+                        form = self.code('form',{'action':act,'method':'POST'},inner)
+                        self.att(form,att)
+                        return form
+                    case 'button':
+                        button = self.code('a',{'class':'btn rounded-0','value':valor},inner)
+                        self.att(button,att)
+                        return button
+                    case 'dropdown':
+                        new = []
+                        for item in inner:
+                            li = self.code('li',{'class':'dropdown-item'},[item])
+                            new.append(li)
+                        ul = self.code('ul',{'class':'dropdown-menu'},new)
+                        btn = self.code('button',{'class':'btn dropdown-toggle','type':'button','data-bs-toggle':'dropdown'},'Colosso')
+                        button = self.code('a',{'class':'','value':valor},[btn,ul])
+                        self.att(button,att)
+                        return button
+                    case _:
+                        button = self.code('a',{'class':'btn rounded-0','value':valor},inner)
+                        self.att(button,att)
+                        return button
             case 'Window':
                 tipo = att['type'] if 'type' in att else 'None'
                 id = att['id'] if 'id' in att else 'None'
@@ -507,12 +521,22 @@ class adapter():
                         self.att(tab,att)
                         return tab
                     case 'accordion':
-                        new = [] 
+                        new = []
+                        id = "#accordionExample"
+                        cc = 0
                         for item in inner:
-                            li = self.code('div',{'class':'accordion-item'},[item])
+                            
+                            if item.tagName not in ['A']:
+                                #body = self.code('div',{'class':''},[item])
+                                li = self.code('div',{'class':'accordion-collapse collapse show','data-bs-parent':id,'id':str(cc)},[item])
+                                cc += 1
+                            else:
+                                bb = self.code('div',{'class':'accordion-button py-0','type':'button','data-bs-toggle':'collapse','data-bs-target':f'#{str(cc)}'},[item])
+                                li = self.code('div',{'class':'accordion-header'},[bb])
+                            #li = self.code('div',{'class':''},[hh1,cola])
                             new.append(li)
 
-                        tab = self.code('div',{'class':'accordion'},new)
+                        tab = self.code('div',{'class':'accordion','id':id},new)
                         self.att(tab,att)
                         return tab
                     case _:

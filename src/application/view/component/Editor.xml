@@ -246,69 +246,92 @@
                 </Input>
             </Group>
         </Container>
-        <Container id="tab-event" alignment-vertical="center">
-            <!-- Window -->
-            <Group type="input">
-                <Graph icon="bi-window" />
-                <Input placeholder="" />
-            </Group>
-            <!-- Mouse -->
-            <Group type="input">
-                <Graph icon="bi-mouse" />
-                <Input placeholder="onclick" />
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-mouse" />
-                <Input placeholder="ondblclick" />
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-mouse" />
-                <Input placeholder="onmousedown" />
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-mouse" />
-                <Input placeholder="onmousemove" />
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-mouse" />
-                <Input placeholder="onmouseout" />
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-mouse" />
-                <Input placeholder="onmouseover" />
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-mouse" />
-                <Input placeholder="onmouseup" />
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-mouse" />
-                <Input placeholder="onwheel" />
-            </Group>
-            <!-- Keyboard -->
-            <Group type="input">
-                <Graph icon="bi-keyboard" />
-                <Input />
-            </Group>
-            <!-- Input -->
-            <Group type="input">
-                <Graph icon="bi-input-cursor" />
-                <Input />
-            </Group>
-            <!-- Drag -->
-            <Group type="input">
-                <Graph icon="bi-arrows-move" />
-                <Input />
-            </Group>
-            <!-- Clipboard -->
-            <Group type="input">
-                <Graph icon="bi-clipboard" />
-                <Input />
-            </Group>
-            <!-- Media -->
-            <Group type="input">
-                <Graph icon="bi-collection" />
-                <Input />
+        <Container id="tab-event" alignment-vertical="center" expand="horizontal">
+            <Group type="accordion">
+                <!-- Window -->
+                <Action><Text>Window</Text></Action>
+                <Container>
+                    <Group type="input">
+                        <Graph icon="bi-window" />
+                        <Input placeholder="" />
+                    </Group>
+                </Container>
+                <!-- Mouse -->
+                <Action><Text>Mouse</Text></Action>
+                <Container>
+                    <Group type="input">
+                        <Graph icon="bi-mouse" />
+                        <Input placeholder="onclick" />
+                    </Group>
+                    <Group type="input">
+                        <Graph icon="bi-mouse" />
+                        <Input placeholder="ondblclick" />
+                    </Group>
+                    <Group type="input">
+                        <Graph icon="bi-mouse" />
+                        <Input placeholder="onmousedown" />
+                    </Group>
+                    <Group type="input">
+                        <Graph icon="bi-mouse" />
+                        <Input placeholder="onmousemove" />
+                    </Group>
+                    <Group type="input">
+                        <Graph icon="bi-mouse" />
+                        <Input placeholder="onmouseout" />
+                    </Group>
+                    <Group type="input">
+                        <Graph icon="bi-mouse" />
+                        <Input placeholder="onmouseover" />
+                    </Group>
+                    <Group type="input">
+                        <Graph icon="bi-mouse" />
+                        <Input placeholder="onmouseup" />
+                    </Group>
+                    <Group type="input">
+                        <Graph icon="bi-mouse" />
+                        <Input placeholder="onwheel" />
+                    </Group>
+                </Container>
+                <!-- Keyboard -->
+                <Action><Text>Keyboard</Text></Action>
+                <Container>
+                    <Group type="input">
+                        <Graph icon="bi-keyboard" />
+                        <Input />
+                    </Group>
+                </Container>
+                <!-- Input -->
+                <Action><Text>Input</Text></Action>
+                <Container>
+                    <Group type="input">
+                        <Graph icon="bi-input-cursor" />
+                        <Input />
+                    </Group>
+                </Container>
+                <!-- Drag -->
+                <Action><Text>Drag</Text></Action>
+                <Container>
+                    <Group type="input">
+                        <Graph icon="bi-arrows-move" />
+                        <Input />
+                    </Group>
+                </Container>
+                <!-- Clipboard -->
+                <Action><Text>Clipboard</Text></Action>
+                <Container>
+                    <Group type="input">
+                        <Graph icon="bi-clipboard" />
+                        <Input />
+                    </Group>
+                </Container>
+                <!-- Media -->
+                <Action><Text>Media</Text></Action>
+                <Container>
+                    <Group type="input">
+                        <Graph icon="bi-collection" />
+                        <Input />
+                    </Group>
+                </Container>
             </Group>
         </Container>
     </Group>
