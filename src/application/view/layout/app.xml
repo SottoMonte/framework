@@ -7,10 +7,9 @@
                 <Graph src="static/logo.svg" height="40px" />
             </Column>
             <Column expand="dynamic" alignment-horizontal="center" >
-                <Action type="dropdown" border="end" >
-                    <Text>Colosso</Text>
-                    <Text>SottoMonte</Text>
-                    <Action route="application/view/page/company/overview.xml" alignment-content="horizontal" ><Graph icon="bi-buildings-fill"/><Text padding="px-1">Colosso</Text></Action>
+                <Action type="dropdown" border="end" id="lazio" >
+                    <Action id="nn1" route="application/view/page/company/overview.xml" click="move(target:'nn1',place:'lazio-btn')" alignment-content="horizontal" ><Graph icon="bi-buildings-fill"/><Text padding="px-1">Colosso</Text></Action>
+                    <Action id="nn2" route="application/view/page/company/overview.xml" click="move(target:'nn2',place:'lazio-btn')" alignment-content="horizontal" ><Graph icon="bi-person-fill"/><Text padding="px-1">SottoMonte</Text></Action>
                 </Action>
                 <Action route="application/view/page/inventory/overview.xml" class="d-inline-flex"><Graph icon="bi-basket3-fill"/><Text padding="px-1">Inventory</Text></Action>
                 <Action route="application/view/layout/main.xml" class="d-inline-flex"><Graph icon="bi-shield-fill"/><Text padding="px-1">Security</Text></Action>

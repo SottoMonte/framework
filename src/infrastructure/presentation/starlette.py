@@ -419,12 +419,12 @@ class adapter():
                         return button
                     case 'dropdown':
                         new = []
-                        for item in inner:
+                        for item in inner[1:]:
                             li = self.code('li',{'class':'dropdown-item'},[item])
                             new.append(li)
-                        ul = self.code('ul',{'class':'dropdown-menu'},new)
-                        btn = self.code('button',{'class':'btn dropdown-toggle','type':'button','data-bs-toggle':'dropdown'},'Colosso')
-                        button = self.code('a',{'class':'','value':valor},[btn,ul])
+                        ul = self.code('ul',{'class':'dropdown-menu','id':f"{att['id']}-ul"},new)
+                        btn = self.code('button',{'class':'btn p-0 m-0 d-inline-flex align-items-center dropdown-toggle','type':'button','data-bs-toggle':'dropdown','id':f"{att['id']}-btn"},[inner[0]])
+                        button = self.code('a',{'class':'px-2','value':valor},[btn,ul])
                         self.att(button,att)
                         return button
                     case _:

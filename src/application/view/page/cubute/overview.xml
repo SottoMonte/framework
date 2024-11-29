@@ -12,6 +12,24 @@
     </Row>
     <!-- Tab -->
     <Group type="tab">
+        <!-- Explore -->
+        <Container id="tab-explore" expand="vertical" border="start">
+            <Group type="tree" >
+                <Group type="node" margin="m-0" padding="p-0" color="#ededed">
+                    Application
+                    <Group type="node" margin="m-0" padding="p-0" color="#ededed">
+                        Action
+                        <Text id="maker-window-2" draggable="window" draggable-component="window" value="application/action/close.py" >close.py</Text>
+                       <Action id="maker-2" draggable="window" draggable-component="window" value="application/action/load.py"><Text>load.py</Text></Action>
+                    </Group>
+                    <Group type="node" margin="m-0" padding="p-0" color="#ededed">
+                        <Text id="ss" draggable="window" draggable-component="window" >overview.xml</Text>
+                        <Text id="sss" draggable="window" draggable-component="window" >overview.xml</Text>
+                    </Group>
+                </Group>
+            </Group>
+        </Container>
+        <!-- Tool -->
         <Container id="tab-tool" expand="vertical" width="200px" border="start" padding="p-0">
             <!-- Layout -->
             <Row id="box" style="font-size: 40px;" >
@@ -39,22 +57,7 @@
                 </Group>
             </Row>
         </Container>
-        <Container id="tab-explore" expand="vertical" border="start">
-            <Group type="tree" >
-                <Group type="node" margin="m-0" padding="p-0" color="#ededed">
-                    Application
-                    <Group type="node" margin="m-0" padding="p-0" color="#ededed">
-                        Action
-                        <Text id="maker-window-2" draggable="window" draggable-component="window" value="application/action/close.py" >close.py</Text>
-                       <Action id="maker-2" draggable="window" draggable-component="window" value="application/action/load.py"><Text>load.py</Text></Action>
-                    </Group>
-                    <Group type="node" margin="m-0" padding="p-0" color="#ededed">
-                        <Text id="ss" draggable="window" draggable-component="window" >overview.xml</Text>
-                        <Text id="sss" draggable="window" draggable-component="window" >overview.xml</Text>
-                    </Group>
-                </Group>
-            </Group>
-        </Container>
+        <!-- AI -->
         <Container id="tab-copilot" expand="vertical" border="start">
             <Text>3</Text>
         </Container>

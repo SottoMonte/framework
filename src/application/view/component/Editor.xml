@@ -21,39 +21,6 @@
     </Group>
     <!-- Tab -->
     <Group type="tab" width="285px">
-        <Container id="tab-matter">
-            <Group type="input">
-                <Graph icon="bi-fingerprint" />
-                <Input placeholder="id" />
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-fingerprint" />
-                <Input placeholder="identifier" />
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-symmetry-horizontal" />
-                <Graph expand="dynamic" icon="bi-align-bottom" />
-                <Graph expand="dynamic" icon="bi-align-center" />
-                <Graph expand="dynamic" icon="bi-align-end" />
-                <Graph expand="dynamic" icon="bi bi-align-middle" />
-                <Graph expand="dynamic" icon="bi-align-start" />
-                <Graph expand="dynamic" icon="bi-align-top" />
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-symmetry-vertical" />
-                <Graph expand="dynamic" icon="bi-align-bottom" />
-                <Graph expand="dynamic" icon="bi-align-center" />
-                <Graph expand="dynamic" icon="bi-align-end" />
-                <Graph expand="dynamic" icon="bi bi-align-middle" />
-                <Graph expand="dynamic" icon="bi-align-start" />
-                <Graph expand="dynamic" icon="bi-align-top" />
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-binoculars-fill" />
-                <Graph expand="dynamic" icon="bi-distribute-horizontal" />
-                <Graph expand="dynamic" icon="bi-distribute-vertical" />
-            </Group>
-        </Container>
         <!-- property -->
         <Container id="tab-property">
             <Group type="input">
@@ -160,6 +127,41 @@
                 <Input expand="dynamic" />
             </Group>
         </Container>
+        <!-- Tab Matter -->
+        <Container id="tab-matter">
+            <Group type="input">
+                <Graph icon="bi-fingerprint" />
+                <Input placeholder="id" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-fingerprint" />
+                <Input placeholder="identifier" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-symmetry-horizontal" />
+                <Graph expand="dynamic" icon="bi-align-bottom" />
+                <Graph expand="dynamic" icon="bi-align-center" />
+                <Graph expand="dynamic" icon="bi-align-end" />
+                <Graph expand="dynamic" icon="bi bi-align-middle" />
+                <Graph expand="dynamic" icon="bi-align-start" />
+                <Graph expand="dynamic" icon="bi-align-top" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-symmetry-vertical" />
+                <Graph expand="dynamic" icon="bi-align-bottom" />
+                <Graph expand="dynamic" icon="bi-align-center" />
+                <Graph expand="dynamic" icon="bi-align-end" />
+                <Graph expand="dynamic" icon="bi bi-align-middle" />
+                <Graph expand="dynamic" icon="bi-align-start" />
+                <Graph expand="dynamic" icon="bi-align-top" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-binoculars-fill" />
+                <Graph expand="dynamic" icon="bi-distribute-horizontal" />
+                <Graph expand="dynamic" icon="bi-distribute-vertical" />
+            </Group>
+        </Container>
+        <!-- Style -->
         <Container id="tab-style">
             <Column>
                 <Group type="input" expand="dynamic">
@@ -246,6 +248,7 @@
                 </Input>
             </Group>
         </Container>
+        <!-- Event -->
         <Container id="tab-event" alignment-vertical="center" expand="horizontal">
             <Group type="accordion">
                 <!-- Window -->
