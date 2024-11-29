@@ -95,16 +95,19 @@
 .tree details[open] > summary::before {
   background-position: calc(-2 * var(--radius)) 0;
 }
-    
-.btn.active {
-        border: 1px solid transparent;
-        border-bottom: 1px solid #000;
-    }
 
-    .btn:active, .btn:focus {
-        border: 1px solid transparent !important;
-        border-bottom: 1px solid #000 !important;
-    }
+.btn {
+  --bs-btn-border-width:0px;
+  --bs-btn-hover-color:#2fcc76;
+  --bs-btn-active-color:#2fcc76;
+}
+
+.btn:focus::after,
+.btn:active::after,.btn.active {
+  border-bottom: 5px solid #2fcc76;
+}
+
+
 /* other */
     .nested {
         padding: 4px 0;
