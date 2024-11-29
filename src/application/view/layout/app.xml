@@ -18,13 +18,11 @@
                 <Action route="application/view/page/cubute/overview.xml" class="d-inline-flex"><Graph icon="bi-kanban-fill"/><Text padding="px-1">Planning</Text></Action>
             </Column>
             <Column padding="pe-4" content="end" alignment-horizontal="center" >
-                <Group type="nav" margin="m-0" padding="p-0" class="border-bottom">
-                    <Action  link="#tab-notifications" data-bs-toggle="tab" padding="p-0">
-                        <Graph icon="bi-inbox-fill" color="white"/> 
-                    </Action>
-                </Group>
                 <Action id="button3" size="sm" init="offcanvas(target:'button3',act:'open',id:'#profile')"  padding="p-0">
                     <Column alignment-vertical="center" >
+                        <Action  link="#tab-notifications" data-bs-toggle="tab" padding="p-0">
+                            <Graph icon="bi-inbox-fill" color="white"/> 
+                        </Action>
                         <Graph icon="bi-question-circle-fill" color="white"/>
                         <Graph src="{{ user.avatar or 'static/logo.svg' }}" margin="mx-2" width="40px" height="40px" class="rounded-2 border" />
                         <Text>{{ user.username or 'NaM' }}</Text>
@@ -43,10 +41,10 @@
                     <Container class="border-top" padding="p-0">
                         <!-- TabNav -->
                         <Group type="nav" margin="m-0" padding="p-0" class="border-bottom">
-                            <Column content="center"><Action link="#contracts" data-bs-toggle="tab"><Graph icon="bi-person-fill-gear"/><Text class="text-uppercase">Profile</Text></Action></Column>
-                            <Column content="center"><Action link="#credit-notes" data-bs-toggle="tab"><Graph icon="bi-wallet-fill"/><Text class="text-uppercase">Wallet</Text></Action></Column>
-                            <Column content="center"><Action link="#invoices" data-bs-toggle="tab"><Graph icon="bi-key-fill"/><Text class="text-uppercase">API</Text></Action></Column>
-                            <Column content="center"><Action link="#tab-notifications" data-bs-toggle="tab"><Graph icon="bi-inbox-fill"/><Text class="text-uppercase">Box</Text></Action></Column>
+                            <Action link="#contracts" data-bs-toggle="tab"><Graph icon="bi-person-fill-gear"/><Text class="text-uppercase">Profile</Text></Action>
+                            <Action link="#credit-notes" data-bs-toggle="tab"><Graph icon="bi-wallet-fill"/><Text class="text-uppercase">Wallet</Text></Action>
+                            <Action link="#invoices" data-bs-toggle="tab"><Graph icon="bi-key-fill"/><Text class="text-uppercase">API</Text></Action>
+                            <Action link="#tab-notifications" data-bs-toggle="tab"><Graph icon="bi-inbox-fill"/><Text class="text-uppercase">Box</Text></Action>
                         </Group>
                         <!-- Tab -->
                         <Group type="tab">

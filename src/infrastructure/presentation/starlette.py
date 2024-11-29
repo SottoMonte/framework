@@ -475,6 +475,8 @@ class adapter():
                         return tab
                     case 'nav':
                         new = []
+                        if len(inner) != 0:
+                            self.att(inner[0],{'class':'active','aria-selected':'true'})   
                         for item in inner:
                             li = self.code('li',{'class':'nav-item'},[item])
                             new.append(li)
@@ -501,9 +503,8 @@ class adapter():
                                 new.append(li)
                             else:
                                 self.att(item,{'class':'rounded-0'})
-                                new.append(item)
-                                
-                                
+                                new.append(item)           
+                               
                         tab = self.code('div',{'class':'input-group'},new)
                         self.att(tab,att)
                         return tab
