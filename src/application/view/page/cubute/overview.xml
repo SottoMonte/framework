@@ -74,7 +74,9 @@
 {% endblock %}
 {% block center %}
 <Container expand="full">
-    <Text>3</Text>
+    <Table>
+    
+    </Table>
 </Container>
 <Row expand="dynamic" class="overflow-auto" collapse="full">
     <Column>

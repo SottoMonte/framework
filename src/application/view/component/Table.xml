@@ -1,106 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Container color="light" id="{{ component.id }}" size="true" margin="m-0" padding="p-0" >
-    <Row size="full">
-        <Column size="auto">
-            <Container class="input-group input-group-sm mb-3 p-0" width="auto">
-                <Input />
-                <Mark class="input-group-text"><Icon icon="bi-funnel"/></Mark>
-                <Select color="light">
+<Container color="light" id="{{ component.id }}" margin="m-0" padding="p-0" >
+    {% set component = dict({'id':component.id,'model':'ttt','selected':[],'pageCurrent':1,'pageRow':10,'sortField':'CardName','sortAsc':True}) %}
+    <Row expand="full">
+        <Column expand="auto">
+            <Group type="input">
+                <Input width="150px" />
+                <Graph icon="bi-funnel"/>
+                <Input type="select" color="light" width="150px">
                     <Text>Città</Text>
                     <Text>Roma</Text>
                     <Text>Milano</Text>
                     <Text>Napoli</Text>
-                </Select>
-            </Container>
-            <Column size="elastic"/>
-            <Container class="input-group input-group-sm mb-3 p-0 text-white" width="auto">
-                <Button size="sm" color="success" target="#window-create" ><Icon icon="bi-plus-circle-dotted"/>Create</Button>
-                <Button size="sm" color="warning" target="#window-update" ><Icon icon="bi-pencil"/>Update</Button>
-                <Button  size="sm" color="danger" target="#window-delete"><Icon icon="bi-trash"/>Delete</Button>
-                <Mark class="input-group-text"><Icon icon="bi-command"/></Mark>
-                <Select color="light">
+                </Input>
+            </Group>
+            <Group type="input">
+                <Action size="sm" background="success" target="#window-create" ><Graph icon="bi-plus-circle-dotted"/>Create</Action>
+                <Action size="sm" background="warning" target="#window-update" ><Graph icon="bi-pencil"/>Update</Action>
+                <Action  size="sm" background="danger" target="#window-delete"><Graph icon="bi-trash"/>Delete</Action>
+                <Graph icon="bi-command"/>
+                <Input type="select" color="light" width="150px">
                     <Text>Select action</Text>
-                </Select>
+                </Input>
                 <Window id="window-create" position="centered" size="xl" title="Create" action="Create">
                     <View url="application/view/content/wizard/client.xml" />
                 </Window>
                 <Window id="window-update" position="centered" size="xl" title="Update" action="Update">
-                    <Nav class="nav-tabs" margin="m-0" padding="p-0">
-                        {% for x in component.selected %}
-                        <Route href="#wizard-{{x}}" data-bs-toggle="tab"><Text>{{x}}</Text></Route>
-                        {% endfor %}
-                    </Nav>
-                    <Tab>
-                    {% for x in component.selected %}
-                    <C-Wizard id="wizard-{{x}}" args="{{x}}" ></C-Wizard>
-                    {% endfor %}
-                    </Tab>
+                    
                 </Window>
                 <Window id="window-delete" position="centered" size="xl" title="Delete" action="Delete">
                     {% for x in component.selected %}
                     <Text color="dark">{{x}}</Text>
                     {% endfor %}
                 </Window>
-            </Container>
+            </Group>
         </Column>
         <Column>
-                <Table>
-                    <Row>
-                        <Input type="checkbox" click="uncheck" data-bs-target="{{ component.id }}" />
-                        <Text><Icon icon="bi-sort-numeric-down"/>ID</Text>
-                        <Text>Name</Text>
-                        <Text>cell</Text>
-                        <Text>email</Text>
-                        <Text>add</Text>
-                        <Text>city</Text>
-                        <Text>province</Text>
-                        <Text>action</Text>
-                    </Row>
-                    {% for x in data['result']['identifier'] %}
-                    <Row>
-                        {% if data['result']['identifier'][loop.index - 1 ] in component.selected %}
-                        <Input identifier="identifier[]" type="checkbox" click="include" data-bs-target="{{ component.id }}" data-bs-toggle="{{ data['result']['identifier'][loop.index - 1 ] }}" selected="checked"/>
-                        {% else %}
-                        <Input identifier="identifier[]" type="checkbox" click="include" data-bs-target="{{ component.id }}" data-bs-toggle="{{ data['result']['identifier'][loop.index - 1 ] }}" />
-                        {% endif %}
-                        <Text data-bind="" var="data.result.identifier.{{ loop.index - 1 }}" />
-                        <Text var="data.result.name.{{ loop.index - 1 }}"/>
-                        <Text var="data.result.person.contact.cellular.{{ loop.index - 1 }}"></Text>
-                        <Text var="data.result.person.contact.email.{{ loop.index - 1 }}"></Text>
-                        <Text var="data.result.person.contact.location.address.{{ loop.index - 1 }}"></Text>
-                        <Text var="data.result.person.contact.location.city.{{ loop.index - 1 }}"></Text>
-                        <Text var="data.result.person.contact.location.province.{{ loop.index - 1 }}"></Text>
-                        <Route url="application/view/page/orakom/client.xml" href="#{{ data['result']['identifier'][loop.index - 1 ] }}" ><Text><Icon icon="bi-receipt" color="white"/>client</Text></Route>
-                    </Row>
-                    {% endfor %}
-                </Table>
+
         </Column>
         <Column>
-            <Column class="input-group input-group-sm mb-3 p-0" content="center">
-                <Button click="pagination({{ component.pageCurrent - 1 }})" data-bs-target="{{ component.id }}" color="light"><Icon icon="bi-chevron-double-left"/></Button>
+            <Group type="input">
+                <Action click="pagination({{ component.pageCurrent - 1 }})" data-bs-target="{{ component.id }}" color="light"><Graph icon="bi-chevron-double-left"/></Action>
                 {% for x in [1,2,3,4,5] %}
                 {% if component.pageCurrent == x %}
-                <Button click="pagination({{x}})" data-bs-target="{{ component.id }}" color="light" class="active">{{x}}</Button>
+                <Action click="pagination({{x}})" data-bs-target="{{ component.id }}" color="light" class="active"><Text>{{x}}</Text></Action>
                 {% else %}
-                <Button click="pagination({{x}})" data-bs-target="{{ component.id }}" color="light">{{x}}</Button>
+                <Action click="pagination({{x}})" data-bs-target="{{ component.id }}" color="light"><Text>{{x}}</Text></Action>
                 {% endif %}
                 {% endfor %}
-                <Button click="pagination({{ component.pageCurrent + 1 }})" data-bs-target="{{ component.id }}" color="light"><Icon icon="bi-chevron-double-right"/></Button>
-            </Column>
-            
-            <Column class="input-group input-group-sm mb-3 p-0" content="end" width="380px" >
+                <Action click="pagination({{ component.pageCurrent + 1 }})" data-bs-target="{{ component.id }}" color="light"><Graph icon="bi-chevron-double-right"/></Action>
+            </Group>
+            <Group type="input">
                 {% set from = 1 if ((component.pageCurrent - 1) * component.pageRow) == 0 else ((component.pageCurrent - 1) * component.pageRow) %}
-                {% set row = data['result']['identifier']|length %}
-                <Mark class="input-group-text">{{ from }} - {{ ((component.pageCurrent - 1) * component.pageRow) + row }} of 100 {{ component.model + 's' }}</Mark>
-                <Select color="light">
+                {% set row = 100 %}
+                <Text>{{ from }} - {{ ((component.pageCurrent - 1) * component.pageRow) + row }} of 100 {{ component.model + 's' }}</Text>
+                <Input type="select" color="light">
                     <Text>5</Text>
                     <Text>10</Text>
                     <Text>15</Text>
                     <Text>20</Text>
                     <Text>25</Text>
-                </Select>
-                <Mark class="input-group-text">rows per page</Mark>
-            </Column>
+                </Input>
+                <Text>rows per page</Text>
+            </Group>
         </Column> 
     </Row>
 </Container>

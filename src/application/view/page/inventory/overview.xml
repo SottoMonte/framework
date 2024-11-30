@@ -27,6 +27,10 @@
     <Text>Volumes</Text>
 </Action>
 <Action route="application/view/page/orakom/invoices.xml">
+    <Graph icon="bi-bookmarks" />
+    <Text>Repository</Text>
+</Action>
+<Action route="application/view/page/orakom/invoices.xml">
     <Graph icon="bi-braces-asterisk" />
     <Text>Software</Text>
 </Action>
