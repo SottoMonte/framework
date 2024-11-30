@@ -466,6 +466,15 @@ class adapter():
             case 'Group':
                 tipo = att['type'] if 'type' in att else 'None'
                 match tipo:
+                    case 'breadcrumb':
+                        new = []
+                        for item in inner:
+                            li = self.code('li',{'class':'breadcrumb-item'},[item])
+                            new.append(li)
+                        ol = self.code('ol',{'class':'breadcrumb'},new)
+                        nav = self.code('nav',{'aria-label':'breadcrumb'},[ol])
+                        self.att(nav,att)
+                        return nav
                     case 'tab':
                         self.att(inner[0],{'class':'active show'})
                         for item in inner:

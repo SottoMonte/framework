@@ -1,6 +1,6 @@
 {% extends "cardinal.xml" %}
 {% block west %}
-<Column expand="vertical">
+<Column expand="vertical" collapse="full">
     <!-- TabNav -->
     <Row expand="vertical">
         <Group type="nav" margin="m-0" padding="p-0" alignment-content="vertical" expand="vertical">
@@ -65,13 +65,18 @@
 </Column>
 {% endblock %}
 {% block north %}
-<Input type="select" class="form-select-sm">
-    <Text>Colosso</Text>
-    <Text>Colosso</Text>
-</Input>
+<Row>
+    <Breadcrumb>
+        <Text>Repository</Text>
+        <Text>Framework</Text>
+    </Breadcrumb>
+</Row>
 {% endblock %}
 {% block center %}
-<Row expand="dynamic" class="overflow-auto">
+<Container expand="full">
+    <Text>3</Text>
+</Container>
+<Row expand="dynamic" class="overflow-auto" collapse="full">
     <Column>
         <Group type="nav" margin="m-0" padding="p-0" background="#ededed" expand="dynamic" border="bottom">
             <Action id="nav-1" link="#framework" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-pass"/><Text padding="ps-1">framework</Text><Action padding="p-0" click="close(target:'framework')|close(target:'nav-1')"><Graph icon="bi-x"/></Action></Action>
@@ -95,7 +100,7 @@
 </Row>
 {% endblock %}
 {% block south %}
-<Container>
+<Container collapse="full">
     <!-- TabNav -->
     <Group type="nav" margin="m-0" padding="p-0" border="bottom" >
         <Action link="#tab-code" data-bs-toggle="tab"><Graph icon="bi-code-slash"/><Text>Code</Text></Action>
@@ -122,10 +127,12 @@
 </Container>
 {% endblock %}
 {% block east %}
-<Tree expand="dynamic">
+<Row collapse="full">
+    <Tree expand="dynamic">
     
-</Tree>
-<Editor expand="dynamic">
+    </Tree>
+    <Editor expand="dynamic">
 
-</Editor>
+    </Editor>
+</Row>
 {% endblock %}
