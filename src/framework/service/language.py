@@ -53,6 +53,31 @@ async def get_module(path,lang):
     except Exception as e:
         print(f"error load 'infrastructure module'",str(e))
 
+def get_module_os(path, lang):
+    try:
+        # Apriamo il file per la lettura
+        with open(path, 'r') as file:
+            aa = file.read()  # Leggi il contenuto del file
+
+        # Rimuoviamo l'estensione .py
+        nettt = path.split('/')
+        module_name = last(nettt).replace('.py','')
+        # Otteniamo il nome del modulo dall'ultima parte del percorso
+
+        # Creiamo il modulo dinamicamente
+        spec = importlib.util.spec_from_loader(module_name, loader=None)
+        module = importlib.util.module_from_spec(spec)
+
+        # Aggiungiamo l'attributo 'language' al modulo
+        setattr(module, 'language', lang)
+
+        # Eseguiamo il codice Python contenuto nel file
+        exec(aa, module.__dict__)
+
+        return module
+    except Exception as e:
+        print(f"Error loading 'infrastructure module': {str(e)}")
+
 async def loader_module(self,act):
     response = js.fetch(f'application/action/{act}.py',{'method':'GET'})
     file = await response

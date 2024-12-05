@@ -42,8 +42,10 @@ class adapter(starlette.adapter):
           self.document = js.document
           self.cash = dict()         
 
-        def loader(self, *services, **constants):
+        @flow.function(ports=('storekeeper',))
+        def loader(self, storekeeper, **constants):
           code = asyncio.create_task(self.async_loader(),name="loader")
+          
           #js.document.body.prepend(mount_view(code))
 
         @flow.async_function(ports=('storekeeper',))
@@ -67,8 +69,6 @@ class adapter(starlette.adapter):
           token = self.cookies['session_token'] if 'session_token' in self.cookies else 'None'
           
           transaction = await storekeeper.get(model="user",token=token)
-
-          print(transaction)
 
           if transaction['state']:
             user = transaction['result']

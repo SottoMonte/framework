@@ -41,6 +41,7 @@
 {% endblock %}
 {% block content %}
 <Container background="#fafafa" size="fluid" padding="p-4" expand="True" class="border-top border-bottom">
+    <Input disabled="True"></Input>
     <Table>
     
     </Table>

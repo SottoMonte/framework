@@ -60,11 +60,11 @@ port = "2525"
 id = "{{ GITHUB_APP_ID }}"
 secret = "{{ GITHUB_APP_SECRET }}"
 
-[persistence.repo]
+[persistence.repository]
 adapter = "jwt"
 url = "https://api.github.com"
-header_key = "Authorization"
-header_value = "token "
-autologin = "false"
-expiry = "86400"
+app_id = "1057329"
+installation_id = "57923539"
+key = "public/colosso-cloud.2024-11-24.private-key.pem"
+autologin = "true"
 

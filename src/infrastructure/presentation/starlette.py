@@ -330,6 +330,30 @@ class adapter():
                         img = self.code('img',{'src':src})
                         self.att(img,att)
                         return img
+                    case 'table':
+                        table = self.code('table',{'class':'table'},inner)
+                        self.att(table,att)
+                        return table
+                    case 'table.head':
+                        row = []
+                        for x in inner:
+                            th = self.code('th',{},[x])
+                            row.append(th)
+                        tr = self.code('tr',{},row)
+                        thead = self.code('thead',{},[tr])
+                        return thead
+                    case 'table.body':
+                        tbody = self.code('tbody',{},inner)
+                        self.att(tbody,att)
+                        return tbody
+                    case 'table.row':
+                        row = []
+                        for x in inner:
+                            th = self.code('td',{},[x])
+                            row.append(th)
+                        tr = self.code('tr',{},row)
+                        self.att(tr,att)
+                        return tr
                     case 'carousel':
                         ind = []
                         for item in inner:

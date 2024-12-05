@@ -2,7 +2,8 @@
 <Container color="light" id="{{ component.id }}" margin="m-0" padding="p-0" >
     {% set component = dict({'id':component.id,'model':'ttt','selected':[],'pageCurrent':1,'pageRow':10,'sortField':'CardName','sortAsc':True}) %}
     <Row expand="full">
-        <Column expand="auto">
+        <Column expand="auto" padding="py-2">
+            <Column expand="dynamic">
             <Group type="input">
                 <Input width="150px" />
                 <Graph icon="bi-funnel"/>
@@ -13,6 +14,8 @@
                     <Text>Napoli</Text>
                 </Input>
             </Group>
+            </Column>
+            <Column>
             <Group type="input">
                 <Action size="sm" background="success" target="#window-create" ><Graph icon="bi-plus-circle-dotted"/>Create</Action>
                 <Action size="sm" background="warning" target="#window-update" ><Graph icon="bi-pencil"/>Update</Action>
@@ -33,35 +36,58 @@
                     {% endfor %}
                 </Window>
             </Group>
+            </Column>
         </Column>
         <Column>
-
+            <Graph type="table" class="table-striped">
+                <Graph type="table.head">
+                    <Text>1</Text>
+                    <Text>2</Text>
+                    <Text>3</Text>
+                </Graph>
+                <Graph type="table.body">
+                    <Graph type="table.row">
+                        <Text>A</Text>
+                        <Text>B</Text>
+                        <Text>C</Text>
+                    </Graph>
+                    <Graph type="table.row">
+                        <Text>A</Text>
+                        <Text>B</Text>
+                        <Text>C</Text>
+                    </Graph>
+                </Graph>
+            </Graph>
         </Column>
         <Column>
-            <Group type="input">
-                <Action click="pagination({{ component.pageCurrent - 1 }})" data-bs-target="{{ component.id }}" color="light"><Graph icon="bi-chevron-double-left"/></Action>
-                {% for x in [1,2,3,4,5] %}
-                {% if component.pageCurrent == x %}
-                <Action click="pagination({{x}})" data-bs-target="{{ component.id }}" color="light" class="active"><Text>{{x}}</Text></Action>
-                {% else %}
-                <Action click="pagination({{x}})" data-bs-target="{{ component.id }}" color="light"><Text>{{x}}</Text></Action>
-                {% endif %}
-                {% endfor %}
-                <Action click="pagination({{ component.pageCurrent + 1 }})" data-bs-target="{{ component.id }}" color="light"><Graph icon="bi-chevron-double-right"/></Action>
-            </Group>
-            <Group type="input">
-                {% set from = 1 if ((component.pageCurrent - 1) * component.pageRow) == 0 else ((component.pageCurrent - 1) * component.pageRow) %}
-                {% set row = 100 %}
-                <Text>{{ from }} - {{ ((component.pageCurrent - 1) * component.pageRow) + row }} of 100 {{ component.model + 's' }}</Text>
-                <Input type="select" color="light">
-                    <Text>5</Text>
-                    <Text>10</Text>
-                    <Text>15</Text>
-                    <Text>20</Text>
-                    <Text>25</Text>
-                </Input>
-                <Text>rows per page</Text>
-            </Group>
+            <Column expand="dynamic" >
+                <Group type="input" alignment-horizontal="center">
+                    <Action click="pagination({{ component.pageCurrent - 1 }})" data-bs-target="{{ component.id }}" color="light"><Graph icon="bi-chevron-double-left"/></Action>
+                    {% for x in [1,2,3,4,5] %}
+                    {% if component.pageCurrent == x %}
+                    <Action click="pagination({{x}})" data-bs-target="{{ component.id }}" color="light" class="active"><Text>{{x}}</Text></Action>
+                    {% else %}
+                    <Action click="pagination({{x}})" data-bs-target="{{ component.id }}" color="light"><Text>{{x}}</Text></Action>
+                    {% endif %}
+                    {% endfor %}
+                    <Action click="pagination({{ component.pageCurrent + 1 }})" data-bs-target="{{ component.id }}" color="light"><Graph icon="bi-chevron-double-right"/></Action>
+                </Group>
+            </Column>
+            <Column>
+                <Group type="input">
+                    {% set from = 1 if ((component.pageCurrent - 1) * component.pageRow) == 0 else ((component.pageCurrent - 1) * component.pageRow) %}
+                    {% set row = 100 %}
+                    <Text>{{ from }} - {{ ((component.pageCurrent - 1) * component.pageRow) + row }} of 100 {{ component.model + 's' }}</Text>
+                    <Input type="select" color="light" width="140px">
+                        <Text>5</Text>
+                        <Text>10</Text>
+                        <Text>15</Text>
+                        <Text>20</Text>
+                        <Text>25</Text>
+                    </Input>
+                    <Text>rows per page</Text>
+                </Group>
+            </Column>
         </Column> 
     </Row>
 </Container>

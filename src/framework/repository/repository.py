@@ -1,7 +1,3 @@
-values = {
-    
-}
-
 location = {'GITHUB':'user'}
 
 keys_test = (
