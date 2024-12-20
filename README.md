@@ -1,18 +1,18 @@
-<div align="center">
-  <a href="https://koyeb.com">
-    <img src="https://www.koyeb.com/static/images/icons/koyeb.svg" alt="Logo" width="80" height="80">
-  </a>
-  <h3 align="center">Koyeb Serverless Platform</h3>
-  <p align="center">
+
+  
+    
+  
+  Koyeb Serverless Platform
+  
     Deploy a Django application on Koyeb
-    <br />
-    <a href="https://koyeb.com">Learn more about Koyeb</a>
+    
+    Learn more about Koyeb
     ·
-    <a href="https://koyeb.com/docs">Explore the documentation</a>
+    Explore the documentation
     ·
-    <a href="https://koyeb.com/tutorials">Discover our tutorials</a>
-  </p>
-</div>
+    Discover our tutorials
+  
+
 
 
 ## About Koyeb and the Django example application
@@ -52,10 +52,10 @@ On the [Koyeb Control Panel](https://app.koyeb.com/), on the **Overview** tab, c
 1. Select **GitHub** as the deployment method.
 2. In the repositories list, select the repository you just forked.
 3. Towards the bottom, choose a name for your App, i.e. `django-on-koyeb`.
-4. Expand the **Environment variables** section .  Click **Add variable** to create a `DJANGO_ALLOWED_HOSTS` variable set to `<YOUR_APP_NAME>-<YOUR_ORG_NAME>.koyeb.app`, changing `<YOUR_APP_NAME>` and `<YOUR_ORG_NAME>` to match your information.
+4. Expand the **Environment variables** section .  Click **Add variable** to create a `DJANGO_ALLOWED_HOSTS` variable set to `-.koyeb.app`, changing `` and `` to match your information.
 5. Click **Deploy**.
 
-You land on the deployment page where you can follow the build of your Django application. Once the build is completed, your application is being deployed and you will be able to access it via `<YOUR_APP_NAME>-<YOUR_ORG_NAME>.koyeb.app`.
+You land on the deployment page where you can follow the build of your Django application. Once the build is completed, your application is being deployed and you will be able to access it via `-.koyeb.app`.
 
 ## Contributing
 
