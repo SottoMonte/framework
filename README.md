@@ -61,9 +61,6 @@ You land on the deployment page where you can follow the build of your Django ap
 
 If you have any questions, ideas or suggestions regarding this application sample, feel free to open an [issue](//github.com/koyeb/example-django/issues) or fork this repository and open a [pull request](//github.com/koyeb/example-django/pulls).
 
-## Test
-colosso test funziona pleseee
-
 ## Contact
 
 [Koyeb](https://www.koyeb.com) - [@gokoyeb](https://twitter.com/gokoyeb) - [Slack](http://slack.koyeb.com/)
