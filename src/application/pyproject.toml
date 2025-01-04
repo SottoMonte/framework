@@ -45,7 +45,7 @@ url_login = "https://github.com/login/oauth/authorize?client_id=Ov23lidpWleO0KCH
 id = "{{ GITHUB_OAUTH_ID }}"
 secret = "{{ GITHUB_OAUTH_SECRET }}"
 
-[persistence.bot]
+[apersistence.bot]
 adapter = "jwt"
 url = "https://api.github.com"
 app_id = "{{ GITHUB_COLOSSO_ID }}"
