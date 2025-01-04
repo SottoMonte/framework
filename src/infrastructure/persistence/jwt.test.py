@@ -11,8 +11,11 @@ from unittest import IsolatedAsyncioTestCase
 class AdapterTest(IsolatedAsyncioTestCase):
     def __init__(self, *args,**kwargs):
         super(AdapterTest, self).__init__(*args, **kwargs)  # Chiamata al costruttore di unittest.TestCase
-        config = {'adapter':"jwt",'url':"https://api.github.com",'app_id': "1057329",'installation_id':"57923539",'key':"public/colosso-cloud.2024-11-24.private-key.pem",'autologin':"true"}
-        self.test = adapter(config=config)  # Inizializza il tuo adapter qui
+        try:
+            config = {'adapter':"jwt",'url':"https://api.github.com",'app_id': "1057329",'installation_id':"57923539",'key':"public/colosso-cloud.2024-11-24.private-key.pem",'autologin':"true"}
+            self.test = adapter(config=config)  # Inizializza il tuo adapter qui
+        except Exception as e:
+            print(e)
 
     async def test_query(self, *services, **constants):
         """
