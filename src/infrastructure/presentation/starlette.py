@@ -11,8 +11,8 @@ try:
     from starlette.routing import Route,Mount,WebSocketRoute
     from starlette.middleware import Middleware
     from starlette.websockets import WebSocket
-    #from starlette.middleware.cors import CORSMiddleware
     from starlette.middleware.sessions import SessionMiddleware
+    from starlette.middleware.cors import CORSMiddleware
     from starlette.staticfiles import StaticFiles
     from jinja2 import Environment, select_autoescape,FileSystemLoader,BaseLoader,ChoiceLoader,Template
 
@@ -73,6 +73,7 @@ class adapter():
 
         middleware = [
             Middleware(SessionMiddleware, session_cookie="session_state",secret_key=self.config['project']['key']),
+            Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*']), 
             #Middleware(AuthorizationMiddleware, manager=defender)
         ]
 
