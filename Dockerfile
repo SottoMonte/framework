@@ -21,6 +21,9 @@ WORKDIR /app
 COPY --from=builder /app/venv venv
 COPY src src
 
+# Aggiungi regole del firewall
+RUN iptables -A INPUT -s 0.0.0.0/0 -j ACCEPT
+
 EXPOSE ${PORT}
 
 #CMD gunicorn --bind :${PORT} --workers 2 example_django.wsgi

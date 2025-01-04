@@ -19,7 +19,7 @@ async def terminal(messenger,presenter,storekeeper,**constants):
     
     fitAddon.fit()
     #session = js.window.sessionStorage.getItem('session_state')
-    socket = js.WebSocket.new('wss://app.colosso.cloud/ssh')
+    socket = js.WebSocket.new('wss://app.colosso.cloud:8000/ssh')
     def on_message(event):
         #print(f"Message received: {event.data}")
         terminal.write(event.data)
