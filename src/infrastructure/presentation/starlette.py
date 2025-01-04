@@ -188,8 +188,7 @@ class adapter():
         if session not in self.ssh:
             self.ssh[session] = paramiko.SSHClient()
             self.ssh[session].set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            self.ssh[session].connect(host, username=username, password=password)
-        
+        self.ssh[session].connect(host, username=username, password=password)
         channel = self.ssh[session].invoke_shell()
 
         # Stampa la risposta iniziale del canale
