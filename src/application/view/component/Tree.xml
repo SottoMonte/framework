@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Group id="{% set id = '{:0=8}'.format(range(0, 99999999) | random) %}{{ attributes['id'] or id }}" type="tree" >
+<Group id="{{ component.id }}" type="tree" >
+    <Window type="modal" id="window-create-{{ component.id }}" position="centered" size="xl" title="Create" action="create">
+        <Action type="form" id="form-create" action="/create" method="POST">
+            <Input type="text" identifier="model" placeholder="Name" value="file" />
+            <Input type="text" identifier="repo" placeholder="Name" value="{{ storekeeper.result.tree.repository }}" />
+            <Input type="text" identifier="file_path" placeholder="path" />
+        </Action>
+    </Window>
+    <Window type="modal" id="window-delete-{{ component.id }}" position="centered" size="xl" title="Delete" action="delete">
+        <Action type="form" id="form-delete" action="/delete" method="POST">
+            <Input type="text" identifier="model" placeholder="Name" value="file" />
+            <Input type="text" identifier="repo" placeholder="Name" value="{{ storekeeper.result.tree.repository }}" />
+            <Input type="text" identifier="file_path" placeholder="path" />
+        </Action>
+    </Window>
     {% if 'type' not in attributes  %}
         {% set tree_data = dict({
     'id': 'root',
@@ -29,8 +43,13 @@
     {% macro render_node(node) %}
         {% if node['children'] and node['children']|length != 0 %}
         <Group id="{{ node['id'] }}" type="node" name="{{ node['name'] }}">
-            {{node.name}}
- 
+            <Action type="dropdown" >
+                <Action id="maker-{{node.id}}" draggable="window" draggable-component="window" padding="p-0" margin="m-0" value="{{node.path}}"><Text>{{node.name}}</Text></Action>
+                <Action alignment-content="horizontal" modal="window-create-{{ component.id }}"><Text padding="px-1">New folder</Text></Action>
+                <Action alignment-content="horizontal" modal="window-create-{{ component.id }}"><Text padding="px-1">New file</Text></Action>
+                <Action alignment-content="horizontal" modal="window-delete-{{ component.id }}"><Text padding="px-1">Delete</Text></Action>
+                <Action alignment-content="horizontal" modal="window-delete-{{ component.id }}"><Text padding="px-1">Rename folder {{node.name}}</Text></Action>
+            </Action>
             {% if node['children'] and node['children']|length != 0 %}
                 {% for child in node['children'] %}
                     {{ render_node(child) }}
@@ -38,9 +57,14 @@
             {% endif %}
         </Group>
         {% else %}
-            <Text id="ss" draggable="window" draggable-type="window" >{{node.name}}</Text>
+            <Action type="dropdown" >
+                <Action id="maker-{{node.id}}" draggable="window" draggable-component="window" padding="p-0" margin="m-0" value="{{node.path}}"><Text>{{node.name}}</Text></Action>
+                <Action alignment-content="horizontal" modal="window-delete-{{ component.id }}"><Text padding="px-1">Delete</Text></Action>
+                <Action alignment-content="horizontal" modal="window-delete-{{ component.id }}"><Text padding="px-1">Clone</Text></Action>
+                <Action alignment-content="horizontal" modal="window-delete-{{ component.id }}"><Text padding="px-1">Rename file {{node.name}}</Text></Action>
+            </Action>
         {% endif %}
     {% endmacro %}
 
-    {{ render_node(tree_data) }}
+    {{ render_node(storekeeper.result.tree) }}  
 </Group>

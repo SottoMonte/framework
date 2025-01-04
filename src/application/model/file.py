@@ -6,4 +6,5 @@ import application.model.integer as integer
 
 file = (
     {'name':'file','type':identifier.identifier},
+    {'name':'file','type':identifier.identifier},
 )

@@ -6,17 +6,7 @@ version = "0.0.1"
 readme = "README.md"
 requires-python = ">=3.8"
 
-dependencies = [
-    "kink",
-    "flet",
-    "redis",
-    "aiofiles",
-    "aiohttp",
-    "toml",
-    "jinja2",
-    "sqlalchemy",
-    "starlette",
-]
+dependencies = []
 
 [presentation.app]
 adapter = "wasm"
@@ -32,39 +22,52 @@ port = "8001"
 view = "src/domain/view/layout/page.xml"
 routes = "src/application/route/api.xml"
 
-
-[apersistence.cache]
-adapter = "redis"
-host = "127.0.0.1"
-port = "6379"
-expiry = "86400"
-
-[persistence.github]
-adapter = "api"
-url = "https://api.github.com"
-header_key = "Authorization"
-header_value = "token "
-autologin = "false"
-expiry = "86400"
-
-[amessage.notice]
+[message.log]
 adapter = "logging"
 host = "127.0.0.1"
 port = "2525"
 persistence = "local"
 
-[authentication.github]
+[message.ui]
+adapter = "websocket"
+url = "ws://localhost:8000/messenger"
+
+[aauthentication.github]
 adapter = "api"
 host = "127.0.0.1"
 port = "2525"
 id = "{{ GITHUB_APP_ID }}"
 secret = "{{ GITHUB_APP_SECRET }}"
 
-[persistence.repository]
+[authentication.github]
+adapter = "api"
+url_login = "https://github.com/login/oauth/authorize?client_id=Ov23lidpWleO0KCHQVm0&scope=repo,user&state=xyz987"
+id = "{{ GITHUB_OAUTH_ID }}"
+secret = "{{ GITHUB_OAUTH_SECRET }}"
+
+[persistence.bot]
 adapter = "jwt"
 url = "https://api.github.com"
-app_id = "1057329"
-installation_id = "57923539"
+app_id = "{{ GITHUB_COLOSSO_ID }}"
+installation_id = "{{ GITHUB_COLOSSO_APP }}"
 key = "public/colosso-cloud.2024-11-24.private-key.pem"
 autologin = "true"
 
+[persistence.github]
+adapter = "api"
+url = "https://api.github.com"
+authorization = "token "
+accept = "application/vnd.github+json"
+token = "{{ GITHUB_APP_IPE }}"
+autologin = "false"
+expiry = "86400"
+
+[persistence.repository]
+adapter = "api"
+url = "https://api.github.com"
+authorization = "Bearer "
+accept = "application/vnd.github+json"
+token = "{{ session_token or 'none' }}"
+
+[persistence.workspace]
+adapter = "fs"

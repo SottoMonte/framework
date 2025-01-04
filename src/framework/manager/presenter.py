@@ -10,15 +10,22 @@ class presenter():
         pass
 
     async def builder(self,**constants):
+        print('qui',constants)
         b = language.last(self.providers)
         out = await b.builder(**constants)
         return out
+
+    def info(self,**constants):
+        print('ok')
 
     async def description(self,**constants):
         b = language.last(self.providers)
         out = await b.host(constants)
         return out
 
+    async def component(self,**constants):
+        name = constants.get('name','')
+        return self.providers[0].components[name]
 
     async def benchmark(self,**constants):
         if 'module' in constants:

@@ -1,19 +1,25 @@
-import framework.port.persistence as persistence
-import framework.service.flow as flow
+
 import os
 import aiofiles
+import sys
 
 # File System (FS)
+if sys.platform == 'emscripten':
+    import pyodide
+else:
+    import framework.service.flow as flow
 
-class adapter(persistence.port):
+class adapter():
 
     def __init__(self,**constants):
         self.config = constants['config']
+        if sys.platform == 'emscripten':
+            self.fs = pyodide.mountNativeFS("/mnt")
 
     async def query(self,**constants):
         pass
 
-    @flow.async_function(ports=('storekeeper',))
+    #@flow.asynchronous(ports=('storekeeper',))
     async def read(self,storekeeper,**constants):
         try:
             async with aiofiles.open(constants['file'], mode="r") as file:
@@ -22,16 +28,16 @@ class adapter(persistence.port):
         except FileNotFoundError:
             return storekeeper.builder('transaction',{'state': False,'action':'read'})
 
-    @flow.async_function(ports=('storekeeper',))
+    #@flow.asynchronous(ports=('storekeeper',))
     async def create(self,**constants):
         pass
 
-    @flow.async_function(ports=('storekeeper',))
+    #@flow.asynchronous(ports=('storekeeper',))
     async def delete(self,**constants):
         pass
 
-    @flow.async_function(ports=('storekeeper',))
-    async def write(self,**constants):
+    #@flow.asynchronous(ports=('storekeeper',))
+    async def update(self,**constants):
         try:
             async with aiofiles.open(constants['file'], mode="r") as file:
                 content = await file.read()
@@ -39,7 +45,7 @@ class adapter(persistence.port):
         except FileNotFoundError:
             return "File non trovato."
 
-    async def tree(self,**constants):
+    async def view(self,**constants):
         # restituisci 
         albero = []
         for elemento in os.listdir(constants['path']):

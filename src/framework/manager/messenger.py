@@ -30,9 +30,14 @@ else:
 class messenger():
 
     def __init__(self,**constants):
-        self.providers = [] 
+        self.providers = constants['providers']
 
-    @flow.async_function(args=('model','value'))
+    
+    def post_sync(self,**constants):
+        print(constants)
+        #asyncio.create_task(self.post(**constants))
+
+    @flow.asynchronous(args=('model','value'))
     async def post(self,**constants):
         prohibited = constants['prohibited'] if 'prohibited' in constants else []
         allowed = constants['allowed'] if 'allowed' in constants else []
@@ -45,10 +50,10 @@ class messenger():
         # Adds operation if profile matches
         for provider in self.providers:
             profile = provider.config['profile'].upper()
-            can = await provider.can(**constants)
-            if can or profile in allowed:
-                operations.append(provider.post(location=profile, **constants))
-                map_tasks[len(operations)-1] = profile
+            #can = await provider.can(**constants)
+            #if can or profile in allowed:
+            operations.append(provider.post(location=profile, **constants))
+            map_tasks[len(operations)-1] = profile
 
         # Commit all operations at the same time   
         transactions = await asyncio.gather(*operations)
@@ -65,8 +70,8 @@ class messenger():
             #return self.builder('transaction',{'state': False,'action':'post','result':result[0],'parameter':constants,'transaction':transactions})
             return state'''
 
-    @flow.async_function(args=('model','value'))
-    async def get(self,**constants):
+    @flow.asynchronous(args=('model','value'))
+    async def read(self,**constants):
         prohibited = constants['prohibited'] if 'prohibited' in constants else []
         allowed = constants['allowed'] if 'allowed' in constants else ['FAST']
         operations = []

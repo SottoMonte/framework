@@ -18,7 +18,7 @@ class adapter(message.port):
         return r.from_url(f"redis://{self.config['host']}:{self.config['port']}")
 
     # Used for talk with other Workers
-    @flow.async_function(args=('policy','name','value','identifier'),ports=('storekeeper',))
+    @flow.asynchronous(args=('policy','name','value','identifier'),ports=('storekeeper',))
     async def post(self,storekeeper,**constants):
         #async with worker.app.broker.pubsub() as pubsub:
             #await worker.app.broker.publish(key, value)
@@ -38,7 +38,7 @@ class adapter(message.port):
         #b = await worker.app.broker.xlen(key)
         #print(b)
 
-    @flow.async_function(ports=('storekeeper',))
+    @flow.asynchronous(ports=('storekeeper',))
     async def get(self,storekeeper,**constants):
         '''async def reader(channel):
             while True:
@@ -93,7 +93,7 @@ class adapter(message.port):
             return True
         except ImportError:return False
 
-    @flow.async_function(ports=('storekeeper','messenger'))
+    @flow.asynchronous(ports=('storekeeper','messenger'))
     async def react(self, storekeeper,messenger, **constants):
         while True:
             await asyncio.sleep(1.1)

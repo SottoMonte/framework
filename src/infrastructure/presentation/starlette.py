@@ -1,5 +1,6 @@
-
-
+import uuid
+import html
+import json
 try:
     #import framework.port.presentation as presentation
     import framework.service.flow as flow
@@ -14,8 +15,6 @@ try:
     from starlette.middleware.sessions import SessionMiddleware
     from starlette.staticfiles import StaticFiles
     from jinja2 import Environment, select_autoescape,FileSystemLoader,BaseLoader,ChoiceLoader,Template
-
-    import untangle
 
     import os
     import uuid
@@ -36,21 +35,29 @@ try:
     import http.cookies
     import markupsafe
     from bs4 import BeautifulSoup
+    import paramiko
+    import asyncio
+    import xml.etree.ElementTree as ET
+    from xml.sax.saxutils import escape
+    import untangle
 except Exception as e:
+    import untangle
     import markupsafe
     from bs4 import BeautifulSoup
     flow = language.load_module(area="framework",service='service',adapter='flow')
     starlette = None
-    import untangle
+    import xml.etree.ElementTree as ET
+    from xml.sax.saxutils import escape
     print("errore generico",e)
 
 #presentation.presentation
 class adapter():
 
-    @flow.function(ports=('defender',))
+    @flow.synchronous(managers=('defender',))
     def __init__(self,defender,**constants):
         self.config = constants['config']
         self.views = dict({})
+        self.ssh = {}
         cwd = os.getcwd()
 
         routes=[
@@ -58,7 +65,8 @@ class adapter():
             Mount('/framework', app=StaticFiles(directory=f'{cwd}/src/framework'), name="y"),
             Mount('/application', app=StaticFiles(directory=f'{cwd}/src/application'), name="z"),
             Mount('/infrastructure', app=StaticFiles(directory=f'{cwd}/src/infrastructure'), name="x"),
-            #WebSocketRoute("/ws", self.websocket, name="ws"),
+            WebSocketRoute("/messenger", self.websocket, name="messenger"),
+            WebSocketRoute("/ssh", self.websocketssh, name="ssh"),
         ]
 
         self.mount_route(routes,self.config['routes'])
@@ -84,19 +92,25 @@ class adapter():
             print("errore generico",e)
 
     async def host(self,constants):
-        f = open('src/'+constants['url'], "r")
-        text = f.read()
-        return text
+        with open('src/'+constants['url'], 'r', encoding='utf-8') as file:
+            text = file.read()
+            return text
 
     async def builder(self,**constants):
-        text = await self.host(constants)
-        template = self.env.from_string(text)
-        content = template.render(constants)
-        xml = untangle.parse(content)
-        view = await self.mount_view(xml.children[0],constants)
-        return view
+        try:
+            if 'text' in constants:
+                text = constants['text']
+            else:
+                text = await self.host(constants)
+            template = self.env.from_string(text)
+            content = template.render(constants)
+            xml = ET.fromstring(content)
+            view = await self.mount_view(xml,constants)
+            return view
+        except Exception as e:
+            print("errore generico",e)
         
-    @flow.async_function(ports=('defender',))
+    @flow.asynchronous(managers=('defender',))
     async def logout(self,request,defender) -> None:
         assert request.scope.get("app") is not None, "Invalid Starlette app"
         request.session.clear()
@@ -104,16 +118,17 @@ class adapter():
         response.delete_cookie("session_token")
         return response
 
-    @flow.async_function(ports=('storekeeper','defender',))
+    @flow.asynchronous(managers=('storekeeper','defender',))
     async def login(self,request, storekeeper, defender) -> None:
+        client_ip = request.client.host
         match request.method:
             case 'GET':
                 query = dict(request.query_params)
                 session_identifier = request.cookies.get('session_identifier', secrets.token_urlsafe(16))
                 #session_token = request.cookies.get('session_token', 'Cookie not found')
-                token = await defender.authenticate(identifier=session_identifier,**query)
+                token = await defender.authenticate(ip=client_ip,identifier=session_identifier,**query)
                 
-                transaction = await storekeeper.get(model="user",token=token)
+                transaction = await storekeeper.gather(model="user",token=token)
                 if transaction['state']:
                     request.session.update(transaction['result'])
                 
@@ -127,9 +142,8 @@ class adapter():
                 credential = dict(credential)
                 session_identifier = request.cookies.get('session_identifier', secrets.token_urlsafe(16))
                 #session_token = request.cookies.get('session_token', 'Cookie not found')
-                token = await defender.authenticate(identifier=session_identifier,**credential)
-                
-                transaction = await storekeeper.get(model="user",token=token)
+                token = await defender.authenticate(ip=client_ip,identifier=session_identifier,**credential)
+                transaction = await storekeeper.gather(model="user",token=token)
                 
                 if transaction['state']:
                     request.session.update(transaction['result'])
@@ -147,10 +161,57 @@ class adapter():
         while True:
             mesg = await websocket.receive_text()
             await websocket.send_text(mesg.replace("Client", "Server"))
-        await websocket.close()
-    
+        #await websocket.close() 
 
-    @flow.async_function(ports=('storekeeper',))
+    @flow.asynchronous(managers=('defender',))
+    async def websocketssh(self, websocket,defender):
+        ip = websocket.client.host
+        accept = await defender.authorize(ip=ip)
+        if not accept:
+            print(f"Connessione rifiutata per IP non autorizzato: {ip}")
+            await websocket.close()  # Chiudi con un codice di errore personalizzato
+
+        session = await defender.whoami(ip=ip)
+        
+        await websocket.accept()
+        
+        initial_message = await websocket.receive_text()  
+
+        print(f"Sessione {session} con messaggio iniziale: {initial_message}")
+        params = json.loads(initial_message)  # Decodifica il JSON
+        username = params.get("username")
+        password = params.get("password")
+        host = params.get("host")
+
+        if session not in self.ssh:
+            self.ssh[session] = paramiko.SSHClient()
+            self.ssh[session].set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            self.ssh[session].connect(host, username=username, password=password)
+        
+        channel = self.ssh[session].invoke_shell()
+
+        # Stampa la risposta iniziale del canale
+        if channel.recv_ready():
+            initial_response = channel.recv(1024).decode('utf-8')
+            await websocket.send_text(initial_response)
+
+        async def read_from_channel():
+            while True:
+                if channel.recv_ready():
+                    await websocket.send_text(channel.recv(1024).decode('utf-8'))
+                await asyncio.sleep(0.01)
+
+        async def read_from_websocket():
+            while True:
+                data = await websocket.receive_text()
+                if data:
+                    channel.send(data)
+
+        await asyncio.gather(read_from_channel(), read_from_websocket())
+
+        await websocket.close()
+
+    @flow.asynchronous(managers=('storekeeper',))
     async def model(self,request,storekeeper,**constants):
         print(request.url.path)
         #form = await request.form()
@@ -160,7 +221,7 @@ class adapter():
         a = await storekeeper.get(name='router',model='router',identifier='04B4FE83486D',value={'model': 'router','anno':400})
         return JSONResponse(a)
     
-    @flow.async_function(ports=('storekeeper','messenger'))
+    @flow.asynchronous(managers=('storekeeper','messenger'))
     async def action(self, request, storekeeper, messenger, **constants):
         #print(request.cookies.get('user'))
         match request.method:
@@ -284,30 +345,47 @@ class adapter():
             return soup.prettify()
             
 
-    
-    async def mount_view(self,root,data=dict()):
-        tags = ['Messenger','Storekeeper']
+    @flow.asynchronous(managers=('storekeeper','messenger'))
+    async def mount_view(self,root,data,storekeeper,messenger):
+        tags = ['Messenger','Graph','Message','Input','Action','Window','Text','Group','Layout']
         inner = []
-        tag = root._name
-        att = root._attributes
-        text = root.cdata
-        elements = root.get_elements()
-        if len(elements) > 0:
+
+        tag = root.tag
+        att = root.attrib
+        text = root.text
+        elements = list(root)
+
+        if len(elements) > 0 and tag in tags:
             for element in elements:
-                mounted = await self.mount_view(element,data)
+                mounted = await self.mount_view(element, data)
                 inner.append(mounted)
                     
         match tag:
             case 'Messenger':
+                model = att['type'] if 'type' in att else 'flesh'
+                title = att['title'] if 'title' in att else ''
+                #msg = await messenger.read()
                 html = ''
                 for item in inner:
                     html += item
                 return html
             case 'Storekeeper':
-                html = ''
-                for item in inner:
-                    html += item
-                return html
+                method = att['method'] if 'method' in att else 'overview'
+                new = []
+                print(att)
+                match method:
+                    case 'overview':
+                        transaction = await storekeeper.overview(**att)
+                    case 'gather':
+                        transaction = await storekeeper.gather(**att)
+                    case _:
+                        print('Method not found')
+                for y in elements:
+                    built = await self.mount_view(y,{'storekeeper':transaction}|data)
+                    new.append(built)
+                table = self.code('div',{'class':'w-100 h-100'},new)
+                self.att(table,att)
+                return table
             case 'Graph':
                 if 'type' in att:
                     tipo = att['type']
@@ -343,8 +421,20 @@ class adapter():
                         thead = self.code('thead',{},[tr])
                         return thead
                     case 'table.body':
-                        tbody = self.code('tbody',{},inner)
-                        self.att(tbody,att)
+                        new = []
+                        storekeeper = data.get('storekeeper', {})
+                        mmm = storekeeper.get('result', {})
+                        keys = list(mmm.keys())
+
+                        if keys and mmm.get(keys[0], []):
+                            for i in range(0, len(mmm[keys[0]])):
+                                passare = {}
+                                for key in keys:
+                                    passare[key] = mmm[key][i]
+                                built = await self.mount_view(elements[0],{'storekeeper': passare})
+                                new.append(built)
+                        tbody = self.code('tbody', {}, new)
+                        self.att(tbody, att)
                         return tbody
                     case 'table.row':
                         row = []
@@ -374,9 +464,9 @@ class adapter():
                         self.att(out,att)
                         return out
             case 'View':
-                copy = data.copy()
-                view = await self.builder(**copy|att)
-                return self.code('div',{'class':'container-fluid d-flex flex-row col p-0 m-0'},[view])
+                view = await self.builder(**data|att)
+                a = self.code('div',{'class':'container-fluid d-flex flex-row col p-0 m-0'},[view])
+                return a.firstElementChild
             case 'Message':
                 model = att['type'] if 'type' in att else 'flesh'
                 title = att['title'] if 'title' in att else ''
@@ -398,7 +488,10 @@ class adapter():
                     case 'select':
                         options = []
                         for x in inner:
-                            option = self.code('option',{},[x])
+                            if 'selected' in x.className:
+                                option = self.code('option',{'selected':'selected'},[x])
+                            else:
+                                option = self.code('option',{},[x])
                             options.append(option)
                         input = self.code('select',{'class':'form-select'},options)
                         self.att(input,att)
@@ -433,8 +526,8 @@ class adapter():
                 valor = att['value'] if 'value' in att else ''
                 match model:
                     case 'form':
-                        act = att['act'] if 'act' in att else '#'
-                        form = self.code('form',{'action':act,'method':'POST'},inner)
+                        action = att['action'] if 'action' in att else '#'
+                        form = self.code('form',{'action':action,'method':'POST'},inner)
                         self.att(form,att)
                         return form
                     case 'button':
@@ -443,12 +536,14 @@ class adapter():
                         return button
                     case 'dropdown':
                         new = []
+                        id = att.get('id','None')
                         for item in inner[1:]:
                             li = self.code('li',{'class':'dropdown-item'},[item])
                             new.append(li)
-                        ul = self.code('ul',{'class':'dropdown-menu','id':f"{att['id']}-ul"},new)
-                        btn = self.code('button',{'class':'btn p-0 m-0 d-inline-flex align-items-center dropdown-toggle','type':'button','data-bs-toggle':'dropdown','id':f"{att['id']}-btn"},[inner[0]])
-                        button = self.code('a',{'class':'px-2','value':valor},[btn,ul])
+                        ul = self.code('ul',{'class':'dropdown-menu','id':f"{id}-ul"},new)
+                        btn = self.code('div',{'class':'d-inline-flex','id':f"{id}-btn"},[inner[0]])
+                        button = self.code('a',{'class':'p-0 m-0','value':valor,'oncontextmenu':'return false;'},[btn,ul])
+                        self.att(btn,{'ddd':'dropdown()'})
                         self.att(button,att)
                         return button
                     case _:
@@ -459,18 +554,25 @@ class adapter():
                 tipo = att['type'] if 'type' in att else 'None'
                 id = att['id'] if 'id' in att else 'None'
                 action = att['action'] if 'action' in att else 'action'
+                size = att['size'] if 'size' in att else 'lg'
                 match tipo:
                     case 'canvas':
                         return self.code('div',{'data-bs-backdrop':'false','id':id,'class':'offcanvas offcanvas-end'},[
                             self.code('div',{'class':'offcanvas-body p-0 m-0'},inner),
                         ])
                     case 'modal':
+                        btn_act = self.code('button',{'class':'btn btn-success'},[action.capitalize()])
+                        self.att(btn_act,{'click':f"form(id:'form-{action}',action:'{action}')"})
+                        # 'onclick':f'document.getElementById(\'form-{action}\').submit();'
                         return self.code('div',{'id':id,'class':'modal','data-bs-backdrop':'false'},[
-                            self.code('div',{'class':'modal-dialog modal-dialog-centered modal-dialog-scrollable'},[
+                            self.code('div',{'class':f'modal-dialog modal-{size} modal-dialog-centered modal-dialog-scrollable'},[
                                 self.code('div',{'class':'modal-content'},[
                                     self.code('div',{'class':'modal-header'}),
                                     self.code('div',{'class':'modal-body'},inner),
-                                    self.code('div',{'class':'modal-footer'},f'<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> <button type="button" onclick="document.getElementById(\'form-{action}\').submit();" class="btn btn-success">{action.capitalize()}</button>')
+                                    self.code('div',{'class':'modal-footer'},[
+                                        self.code('button',{'class':'btn btn-secondary','data-bs-dismiss':'modal'},['Close']),
+                                        btn_act
+                                    ])
                                 ]),
                             ]),
                         ])
@@ -478,15 +580,18 @@ class adapter():
                         return self.code('div',{'class':'container-fluid d-flex h-100 p-0 m-0'},inner)
             case 'Text':
                 tipo = att['type'] if 'type' in att else 'None'
+                if 'storekeeper' in data and 'storekeeper' in att:
+                    text = language.get(att['storekeeper'],data['storekeeper'])
+                    #print(att['storekeeper'],'text',data['storekeeper'])
                 match tipo:
                     case 'editable':
                         text = self.code('div',{'contenteditable':'true'},text)
                         self.att(text,att)
                         return text
-                    case _:
-                        text = self.code('p',{'class':'text-truncate fw-lighter p-0 m-0','type':'data'},text)
-                        self.att(text,att)
-                        return text
+                    case _:         
+                        obj = self.code('p',{'class':'text-truncate fw-lighter p-0 m-0','type':'data'},text)
+                        self.att(obj,att)
+                        return obj
             case 'Group':
                 tipo = att['type'] if 'type' in att else 'None'
                 match tipo:
@@ -518,7 +623,7 @@ class adapter():
                         return tab
                     case 'tree':
                         tab = self.code('ul',{'class':'tree p-0'},[
-                            self.code('li',{'class':''},inner),
+                            self.code('li',{'class':'pe-4'},inner),
                         ])
                         self.att(tab,att)
                         return tab
@@ -543,12 +648,12 @@ class adapter():
                         return tab
                     case 'node':
                         new = [] 
-                        for item in inner:
+                        for item in inner[1:]:
                             li = self.code('li',{'class':''},[item])
                             new.append(li)
 
                         tab = self.code('details',{'class':''},[
-                            self.code('summary',{'class':''},text),
+                            self.code('summary',{'class':''},[inner[0]]),
                             self.code('ul',{'class':''},new)
                         ])
                         
@@ -580,46 +685,54 @@ class adapter():
                 self.att(tt,att)
                 return tt
             case _:
-                id = att['id'] if 'id' in att else 'None'
+                def elements_to_xml_string(elements):
+                    # Crea un elemento root temporaneo
+                    root = ET.Element('root')
+                    
+                    # Aggiungi tutti gli elementi alla root temporanea
+                    for element in elements:
+                        root.append(element)
+                    
+                    # Converti l'elemento root temporaneo in una stringa XML
+                    xml_string = ET.tostring(root, encoding='unicode', method='xml')
+                    
+                    # Rimuovi il tag root temporaneo
+                    xml_string = xml_string.replace('<root>', '').replace('</root>', '').replace('<root />','').strip()
+                    
+                    return xml_string
+                if 'text' in data:
+                    data.pop('text')
+                xml_string = elements_to_xml_string(elements)
+                url = f'application/view/component/{tag}.xml'
+                #attrii = ''.join(x.outerHTML for x in att)
+                id = att['id'] if 'id' in att else str(uuid.uuid1())
                 if id not in self.components:
                     self.components[id] = {'id': id}
+                    self.components[id]['view'] = f'application/view/component/{tag}.xml'
+                    self.components[id]['inner'] = f"<{tag} id='{id}' model='repository'>{markupsafe.Markup(xml_string)}</{tag}>"
+                    self.components[id]['attributes'] = att
 
-                # Funzione per convertire ricorsivamente gli elementi in XML
-                def untangle_to_xml(untangle_element):
-                    attributes = ' '.join(f'{key}="{value}"' for key, value in untangle_element._attributes.items())
-                    attributes = f' {attributes}' if attributes else ''
+                inner = markupsafe.Markup(xml_string)
+                print(tag,'-',id)
+                argg = data|{
+                    'component':self.components[id],
+                    'url':url,
+                    'inner':inner,
+                }
 
-                    children_xml = ''.join(untangle_to_xml(child) for child in untangle_element.children)
-                    cdata = untangle_element.cdata or ''
-
-                    if children_xml or cdata:
-                        return f'<{untangle_element._name}{attributes}>{cdata}{children_xml}</{untangle_element._name}>'
-                    else:
-                        return f'<{untangle_element._name}{attributes} />'
-
-                # Convertiamo l'intera struttura in una stringa XML
-                xml_str = ''.join(untangle_to_xml(child) for child in root.children)
                 
-                url = f'application/view/component/{tag}.xml'
-                html = ''.join(x.outerHTML for x in inner)
-
-                # Creiamo la vista
-                view = await self.builder(
-                    component=self.components[id],
-                    attributes=att,
-                    url=url,
-                    inner=markupsafe.Markup(xml_str)
-                )
+                
+                # Creiamo la vista per il componente
+                view = await self.builder(**argg)
 
                 #view = await self.mount_view(root,data)
 
                 self.att(view, att|{'type':tag})
                 return view
-                
-                  
+                                 
     def mount_route(self,routes,url):
-        
         gg = untangle.parse(url)
+        print(gg)
         zz = gg.get_elements()[0]
         for setting in  zz.get_elements():
             

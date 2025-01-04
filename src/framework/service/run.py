@@ -1,64 +1,49 @@
 import asyncio
 import sys
-import unittest
-import os 
 
 flow = language.load_module(area="framework",service='service',adapter='flow')
 loader = language.load_module(area="framework",service='service',adapter='loader')
 
 loader.bootstrap_adapter()
 
-
-def discover_tests():
-    # Pattern personalizzato per i test
-    test_dir = './src'
-    test_suite = unittest.TestSuite()
-    
-    # Scorri tutte le sottocartelle e i file
-    for root, dirs, files in os.walk(test_dir):
-        for file in files:
-            if file.endswith('.test.py'):
-                # Crea il nome del modulo di test per ciascun file trovato
-                module_name = os.path.splitext(file)[0]
-                module_path = os.path.join(root, file)
-                
-                # Importa il modulo di test dinamicamente
-                try:
-                    module = language.get_module_os(module_path,language)
-                    # Aggiungi i test dal modulo
-                    test_suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(module))
-                except ImportError as e:
-                    print(f"Errore nell'importazione del modulo: {module_path}, {e}")
-    return test_suite
-
-@flow.function(ports=('presentation',))
-def test(presentation=[],**constants):
-    
-    try:
-        print("run test")
-        #unittest.main()
-        suite = discover_tests()
-        runner = unittest.TextTestRunner()
-        runner.run(suite)
-    except Exception as e:
-        print("errore generico",e)
-    except KeyboardInterrupt:
-        print("Ctrl + C")
-
-@flow.function(ports=('presentation',))
-def application(presentation=[],**constants):
-    app = constants
-    
-    eventloop = asyncio.new_event_loop()
-    asyncio.set_event_loop(eventloop)
-    
-    try:
-        test()
-        for x in presentation:
-            x.loader(loop=eventloop)
+@flow.asynchronous(managers=('presentation','messenger'))
+async def main(presentation=None,messenger=None, **constants):
+    event_loop = asyncio.get_event_loop()
+    await messenger.post(msg="Caricamento degli elementi della presentazione.")
+    for item in presentation:
+        await messenger.post(msg=f"Caricamento dell'elemento: {item}")
+        if hasattr(item, "loader"):
+            item.loader(loop=event_loop)
+        else:
+            await messenger.post(msg=f"L'elemento {item} non ha un metodo 'loader'.")
         
-        eventloop.run_forever()
-    except Exception as e:
-        print("errore generico",e)
+
+@flow.synchronous(managers=('tester',))
+def application(tester=None, **constants):
+    try:
+        if tester:
+            tester.run()
+        event_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(event_loop)
+        event_loop.create_task(main())
+        event_loop.run_forever()
     except KeyboardInterrupt:
-        print("Ctrl + C")
+        # Interruzione manuale con Ctrl+C
+        #asyncio.create_task(messenger.post(msg="Interruzione da tastiera (Ctrl + C)."))
+        pass
+    except Exception as e:
+        # Gestione di altre eccezioni con nome file, modulo e numero di riga
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        last_frame = exc_traceback.tb_frame
+        filename = last_frame.f_code.co_filename
+        module = last_frame.f_code.co_name
+        line_number = exc_traceback.tb_lineno
+        print(f"Errore generico: {e}")
+        print(f"File: {filename}, Modulo: {module}, Linea: {line_number}")
+    finally:
+        # Chiusura del loop
+        '''if event_loop.is_running():
+            event_loop.stop()
+        event_loop.close()'''
+        #logging.info(msg="Event loop chiuso.")
+        pass

@@ -1,10 +1,7 @@
-import application.service.flow as flow
+flow = language.load_module(area="framework",service='service',adapter='flow')
 
-@flow.async_function(ports=('messenger','storekeeper'))
+@flow.asynchronous(managers=('messenger','storekeeper'))
 async def create(messenger,storekeeper,**constants):
-    payload = constants['payload']
-    model = payload['model']
-    value = payload['value']
-    response = await storekeeper.put(model=model, identifier=value['identifier'], value=value)
-    return response
-    #print(constants,response)
+    print(constants)
+    response = await storekeeper.make(**constants)
+    #return response

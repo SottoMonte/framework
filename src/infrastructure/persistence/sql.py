@@ -81,7 +81,7 @@ class adapter(port.port):
 
         return stmt,model
     
-    @flow.async_function(ports=('storekeeper',))
+    @flow.asyn(ports=('storekeeper',))
     async def read(self, storekeeper, **constants):
         query,model = await self.query(**constants)
 
@@ -110,7 +110,7 @@ class adapter(port.port):
         else:
             return storekeeper.builder('transaction',{'state': False,'action':'read','remark':'not found data'})
 
-    @flow.async_function(ports=('storekeeper',))
+    @flow.asyn(ports=('storekeeper',))
     async def create(self, storekeeper, **constants):
         storekeeper = constants['storekeeper']
         model = await self.query(**constants)
@@ -127,7 +127,7 @@ class adapter(port.port):
             return storekeeper.builder('transaction',{'state': False,'remark':f"{error}"})
 
     # delete
-    @flow.async_function(ports=('storekeeper',))
+    @flow.asyn(ports=('storekeeper',))
     async def delete(self, storekeeper, **constants):
         storekeeper = constants['storekeeper']
         model = await self.query(**constants)

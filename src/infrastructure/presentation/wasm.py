@@ -41,49 +41,69 @@ class adapter(starlette.adapter):
           self.env = Environment(loader=http_loader,autoescape=select_autoescape(["html", "xml"]))
           self.document = js.document
           self.cash = dict()         
+          self.cookies = {}
 
-        @flow.function(ports=('storekeeper',))
+        @flow.synchronous(managers=('storekeeper',))
         def loader(self, storekeeper, **constants):
           code = asyncio.create_task(self.async_loader(),name="loader")
-          
           #js.document.body.prepend(mount_view(code))
 
-        @flow.async_function(ports=('storekeeper',))
+        @flow.asynchronous(managers=('storekeeper',))
         async def async_loader(self, storekeeper, **constants):
-          #session = js.window.sessionStorage.getItem('session_state')
-          #socket = js.WebSocket.new('ws://localhost:8000/ws')
-          #def on_message(event):
-          #  print(f"Message received: {event.data}")
-          #socket.onmessage = on_message
-          #pyodide.create_proxy(self.route)
-          #socket.addEventListener('message', pyodide.create_proxy(on_message))
-          #cookies = {cookie.split('=')[0].strip():cookie.split('=')[1] for cookie in js.document.cookie.split(';')}
-          self.cookies = {}
+          
           for cookie in js.document.cookie.split(';'):
               if '=' in cookie:
                   key, value = cookie.split('=', 1)
                   self.cookies[key.strip()] = value
-          #print(js.document.cookie,"<-----",session,cookies)
-
-          model = 'user'
+          print(js.document.cookie,"<-----")
+          print(self.cookies)
           token = self.cookies['session_token'] if 'session_token' in self.cookies else 'None'
+          print(token)
           
-          transaction = await storekeeper.get(model="user",token=token)
-
+          transaction = await storekeeper.gather(model="user",token=token)
+          
+          print(transaction)
           if transaction['state']:
             user = transaction['result']
           else:
-            user = dict()
+            user = {}
+          
+          # Build the HTML content based on user data
           try:
             html = await self.builder(user=user)
+
+            # Update the DOM by removing the loading element and prepending new content
+            loading_element = self.document.getElementById('loading')
+            if loading_element:
+              loading_element.remove()
+            self.document.body.prepend(html)
           except Exception as e:
-            print("errore generico",e)
-          print(html)
-          js.document.getElementById('loading').remove()
-          js.document.body.prepend(html)
+            print(f"Error in async_loader: {e}")
         
         def info(self):
           return ('front-end')
+
+        async def open_dropdown(self,event,**constants):
+          
+          if event.button == 2:  # Click sinistro del mouse
+            # Ottieni l'elemento dropdown
+            currentElement = event.target
+            dropdown_button = None
+
+            while not dropdown_button and currentElement:
+              cerca = currentElement.querySelector('.dropdown-menu')
+              if cerca:
+                dropdown_button = currentElement
+              currentElement = currentElement.parentElement
+
+            if dropdown_button:
+              # Ottieni le coordinate del click del mouse
+              # Mostra il dropdown
+              dropdown = js.bootstrap.Dropdown.getOrCreateInstance(dropdown_button)
+              dropdown.toggle()       
+            else:
+                print("Elemento dropdown non trovato")
+          
 
         async def route(self,event,**constants):
           currentElement = event.target
@@ -374,6 +394,11 @@ class adapter(starlette.adapter):
                   case 'right': element.className += " rounded-start"
                   case 'left': element.className += " rounded-end"
               # Event
+              case 'modal':
+                element.setAttribute('data-bs-target','#'+value)
+                element.setAttribute('data-bs-toggle','modal')
+              case 'ddd':
+                element.addEventListener('contextmenu',pyodide.create_proxy(self.open_dropdown))
               case 'link':
                 element.setAttribute('href',value)
                 element.setAttribute('data-bs-toggle','tab')
@@ -383,6 +408,9 @@ class adapter(starlette.adapter):
               case 'click':
                 element.setAttribute(key,value)
                 element.addEventListener('click',pyodide.create_proxy(self.event))
+              case 'onchange':
+                element.setAttribute(key,value)
+                element.addEventListener('onchange',pyodide.create_proxy(self.event))
               case 'init':
                 element.setAttribute(key,value)
                 asyncio.create_task(self.act(value=value))

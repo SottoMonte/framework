@@ -1,89 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Container color="light" id="{{ component.id }}" margin="m-0" padding="p-0" >
-    {% set component = dict({'id':component.id,'model':'ttt','selected':[],'pageCurrent':1,'pageRow':10,'sortField':'CardName','sortAsc':True}) %}
     <Row expand="full">
+        <Window id="window-create" position="centered" size="xl" title="Create" action="Create">
+            <View url="application/view/content/wizard/client.xml" />
+        </Window>
+        <Window id="window-update" position="centered" size="xl" title="Update" action="Update">
+                    
+        </Window>
+        <Window id="window-delete" position="centered" size="xl" title="Delete" action="Delete">
+            {% for x in component.selected %}
+            <Text color="dark">{{x}}</Text>
+            {% endfor %}
+        </Window>
         <Column expand="auto" padding="py-2">
             <Column expand="dynamic">
             <Group type="input">
                 <Input width="150px" />
                 <Graph icon="bi-funnel"/>
                 <Input type="select" color="light" width="150px">
-                    <Text>Città</Text>
-                    <Text>Roma</Text>
-                    <Text>Milano</Text>
-                    <Text>Napoli</Text>
+                    <Text>Type</Text>
+                    <Text>all</Text>
+                    <Text>owner</Text>
+                    <Text>member</Text>
                 </Input>
             </Group>
             </Column>
             <Column>
             <Group type="input">
-                <Action size="sm" background="success" target="#window-create" ><Graph icon="bi-plus-circle-dotted"/>Create</Action>
+                <Action size="sm" background="success" target="#window-create" ><Graph icon="bi-plus-square"/>Create</Action>
                 <Action size="sm" background="warning" target="#window-update" ><Graph icon="bi-pencil"/>Update</Action>
                 <Action  size="sm" background="danger" target="#window-delete"><Graph icon="bi-trash"/>Delete</Action>
                 <Graph icon="bi-command"/>
                 <Input type="select" color="light" width="150px">
                     <Text>Select action</Text>
                 </Input>
-                <Window id="window-create" position="centered" size="xl" title="Create" action="Create">
-                    <View url="application/view/content/wizard/client.xml" />
-                </Window>
-                <Window id="window-update" position="centered" size="xl" title="Update" action="Update">
-                    
-                </Window>
-                <Window id="window-delete" position="centered" size="xl" title="Delete" action="Delete">
-                    {% for x in component.selected %}
-                    <Text color="dark">{{x}}</Text>
-                    {% endfor %}
-                </Window>
             </Group>
             </Column>
         </Column>
         <Column>
-            <Graph type="table" class="table-striped">
-                <Graph type="table.head">
-                    <Text>1</Text>
-                    <Text>2</Text>
-                    <Text>3</Text>
-                </Graph>
-                <Graph type="table.body">
-                    <Graph type="table.row">
-                        <Text>A</Text>
-                        <Text>B</Text>
-                        <Text>C</Text>
+            {% if component.model %}
+                <Graph type="table" class="table-striped">
+                    <Graph type="table.head">
+                        {{ inner }}
                     </Graph>
-                    <Graph type="table.row">
-                        <Text>A</Text>
-                        <Text>B</Text>
-                        <Text>C</Text>
+                    <Graph type="table.body" id="{{ component.id }}-body">
+                        <View url="application/view/content/table/{{ component.attributes.model or component.model }}.xml" />
                     </Graph>
                 </Graph>
-            </Graph>
+            {% else %}
+                <Graph id="{{ component.id }}-table" init="table(id:'{{ component.id }}',model:'{{ component.attributes.model }}')" type="table" class="table-striped">
+                    <Graph type="table.head">
+                        {{ inner }}
+                    </Graph>
+                    <Graph type="table.body" id="{{ component.id }}-body">
+                        <View url="application/view/content/table/{{ component.attributes.model or component.model }}.xml" />
+                    </Graph>
+                </Graph>
+                <Action  />
+            {% endif %}
         </Column>
         <Column>
             <Column expand="dynamic" >
                 <Group type="input" alignment-horizontal="center">
-                    <Action click="pagination({{ component.pageCurrent - 1 }})" data-bs-target="{{ component.id }}" color="light"><Graph icon="bi-chevron-double-left"/></Action>
+                    <Action click="table(id:'{{ component.id }}',pageCurrent:'5')" color="light"><Graph icon="bi-chevron-double-left"/></Action>
                     {% for x in [1,2,3,4,5] %}
-                    {% if component.pageCurrent == x %}
-                    <Action click="pagination({{x}})" data-bs-target="{{ component.id }}" color="light" class="active"><Text>{{x}}</Text></Action>
+                    {% if component.pageCurrent|string == x|string %}
+                    <Action color="light" class="active"><Text>{{x}}</Text></Action>
                     {% else %}
-                    <Action click="pagination({{x}})" data-bs-target="{{ component.id }}" color="light"><Text>{{x}}</Text></Action>
+                    <Action click="table(id:'{{ component.id }}',pageCurrent:'{{x}}')" color="light"><Text>{{x}}</Text></Action>
                     {% endif %}
                     {% endfor %}
-                    <Action click="pagination({{ component.pageCurrent + 1 }})" data-bs-target="{{ component.id }}" color="light"><Graph icon="bi-chevron-double-right"/></Action>
+                    <Action color="light"><Graph icon="bi-chevron-double-right"/></Action>
                 </Group>
             </Column>
             <Column>
                 <Group type="input">
-                    {% set from = 1 if ((component.pageCurrent - 1) * component.pageRow) == 0 else ((component.pageCurrent - 1) * component.pageRow) %}
-                    {% set row = 100 %}
-                    <Text>{{ from }} - {{ ((component.pageCurrent - 1) * component.pageRow) + row }} of 100 {{ component.model + 's' }}</Text>
-                    <Input type="select" color="light" width="140px">
-                        <Text>5</Text>
-                        <Text>10</Text>
-                        <Text>15</Text>
-                        <Text>20</Text>
-                        <Text>25</Text>
+                    {% set pageCurrent = component.pageCurrent if 'pageCurrent' in component else 1 %}
+                    {% set pageRows = component.pageRows if 'pageRows' in component else 10 %}
+                    {% set totalRows = component.totalRows if 'totalRows' in component else 100 %}
+                    {% set model = component.model if 'model' in component else 'none' %}
+                    {% set from = (pageCurrent|int - 1) * pageRows|int + 1 %}
+                    
+                    <Text>{{ from }} - {{ from + totalRows - 1 }} of 100 {{ model + 's' }}</Text>
+                    
+                    
+                    <Input type="select" color="light" width="140px" onchange="table(target:'{{ component.id }}',pageRows:'10')">
+                        {% for x in component.paginationOptions %}
+                            {% if component.pageRows|string == x|string %}
+                            <Text class="selected">{{x}}</Text>
+                            {% else %}
+                            <Text>{{x}}</Text>
+                            {% endif %}
+                        {% endfor %}
                     </Input>
                     <Text>rows per page</Text>
                 </Group>

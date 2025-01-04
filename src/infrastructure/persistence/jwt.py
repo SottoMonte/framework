@@ -171,7 +171,7 @@ class adapter(persistence.port):
         url = f"{self.api_url}/repos/{constants['repo']}/contents/{constants['file_path']}"
         return await self.query(method="GET",url=url,payload={})  
 
-    async def write(self, *services, **constants):
+    async def update(self, *services, **constants):
         """
         Metodo per scrivere risorse (ad esempio, aggiornare un file in un repository).
         """
@@ -192,7 +192,7 @@ class adapter(persistence.port):
         return await self.query(method="PUT",url=url,payload=payload)
             
 
-    async def tree(self, repo, branch):
+    async def view(self, repo, branch):
         """
         Ottieni l'albero di una repository specifica.
         """

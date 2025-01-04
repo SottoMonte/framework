@@ -69,7 +69,7 @@ class adapter(persistence.port):
             result[x] = aa[id]
         return result
 
-    @flow.async_function(ports=('storekeeper',))
+    @flow.asyn(ports=('storekeeper',))
     async def read(self, storekeeper, **constants):
         print(self.config,constants)
         self.driver.get(self.config['url']+constants['path'])
@@ -99,15 +99,15 @@ class adapter(persistence.port):
                         
                     return storekeeper.builder('transaction',{'state': True,'action':'read','result':result})'''
 
-    @flow.async_function(ports=('storekeeper',))
+    @flow.asyn(ports=('storekeeper',))
     async def create(self, storekeeper, **constants):
         return storekeeper.builder('transaction',{'state': True,'action':'read'})
 
-    @flow.async_function(ports=('storekeeper',))
+    @flow.asyn(ports=('storekeeper',))
     async def delete(self, storekeeper, **constants):
         return storekeeper.builder('transaction',{'state': True,'action':'read'})
 
-    @flow.async_function(ports=('storekeeper',))
+    @flow.asyn(ports=('storekeeper',))
     async def write(self, storekeeper, **constants):
         return storekeeper.builder('transaction',{'state': True,'action':'read'})
 

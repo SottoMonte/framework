@@ -1,0 +1,143 @@
+{% extends "cardinal.xml" %}
+{% set id = component.id %}
+{% block north %}
+{% if component.repository != '' %}
+<Row>
+    <Breadcrumb>
+        <Action click="ide(id:'{{component.id}}',repository:'')" padding="p-0;ps-3" ><Graph icon="bi-speedometer2"/></Action>
+        <Text>Repository</Text>
+        <Text>{{ component.repository }}</Text>
+    </Breadcrumb>
+</Row>
+{% endif %}
+{% endblock %}
+<!-- West -->
+{% block west %}
+{% if component.repository and component.repository != '' %}
+<Column expand="vertical" >
+    <!-- TabNav -->
+    <Row expand="vertical">
+        <Group type="nav" margin="m-0" padding="p-0" alignment-content="vertical" expand="vertical">
+            <Action width="75px" link="#tab-explore" data-bs-toggle="tab"><Graph icon="bi-archive-fill"/><Text>Explore</Text></Action>
+            <Action width="75px" link="#tab-tool" data-bs-toggle="tab"><Graph icon="bi-tools"/><Text>Tools</Text></Action>
+            <Action width="75px" link="#tab-copilot" data-bs-toggle="tab"><Graph icon="bi-stars"/><Text>Copilot</Text></Action>
+        </Group>
+        <Action link="#tab-code" data-bs-toggle="tab" border="top"><Graph icon="bi bi-plus-square"/></Action>
+    </Row>
+    <!-- Tab -->
+    <Group type="tab">
+        <!-- Explore -->
+        <Container id="tab-explore" expand="vertical" border="start">
+            <Storekeeper model="repository" repo='{{ component.repository or "SottoMonte/framework" }}'>
+                <Tree expand="dynamic">
+
+                </Tree>
+            </Storekeeper>
+        </Container>
+        <!-- Tool -->
+        <Container id="tab-tool" expand="vertical" width="200px" border="start" padding="p-0">
+            <!-- Layout -->
+            <Row id="box" style="font-size: 40px;" >
+                <Group type="accordion">
+                    <Action><Text>Layout</Text></Action>
+                    <Container>
+                        <Action id="maker-container" draggable="element" draggable-component="container" ><Graph icon="bi-crop" /></Action>
+                        <Action id="maker-column" draggable="element" draggable-component="column" ><Graph icon="bi-layout-three-columns" /></Action>
+                        <Action id="maker-row" draggable="element" draggable-component="row" ><Graph icon="bi-columns" /></Action>
+                        <Action id="maker-window" draggable="element" draggable-component="window" ><Graph icon="bi-window" /></Action>
+                    </Container>
+                    <Action><Text>Content</Text></Action>
+                    <Container>
+                        <Action id="maker-alert" draggable="element" draggable-component="image"  ><Graph icon="bi-image" /></Action>
+                        <Action id="maker-text" draggable="element" draggable-component="text" ><Graph icon="bi-textarea-t" /></Action>
+                    </Container>
+                    <Action><Text>Forms</Text></Action>
+                    <Container>
+                        <Action id="maker-block" draggable="element" draggable-component="input" ><Graph icon="bi-input-cursor" /></Action>
+                        <Action id="maker-button" draggable="element" draggable-component="button" ><Graph icon="bi-command" /></Action>
+                    </Container>
+                    <Action><Text>Components</Text></Action>
+                    <Container>
+                    </Container>
+                </Group>
+            </Row>
+        </Container>
+        <!-- AI -->
+        <Container id="tab-copilot" expand="vertical" border="start">
+            <Text width="200px">testo by ia</Text>
+            <Input>a</Input>
+            <Column><Graph icon="bi bi-file-plus" /><Graph icon="bi bi-at" /><Graph icon="bi bi-mic" /><Graph icon="bi bi-send"/></Column>
+        </Container>
+    </Group>
+</Column>
+{% endif %}
+{% endblock %}
+{% block center %}
+{% if component.repository and component.repository != '' %}
+<Row expand="dynamic" class="overflow-auto">
+    <Column>
+        <Group type="nav" margin="m-0" padding="p-0" background="#ededed" expand="dynamic" border="bottom">
+            <Action id="nav-1" link="#framework" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-pass"/><Text padding="ps-1">framework</Text><Action padding="p-0" click="close(target:'framework')|close(target:'nav-1')"><Graph icon="bi-x"/></Action></Action>
+            <Action id="nav-2" link="#infrastructure" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-receipt"/><Text padding="ps-1">infrastructure</Text><Action padding="p-0" click="close(target:'infrastructure')|close(target:'nav-2')"><Graph icon=" bi-x"/></Action></Action>
+        </Group>
+        <Action link="#tab-code" data-bs-toggle="tab" class="border-bottom border-start"><Graph icon="bi bi-plus-square"/></Action>
+    </Column>
+    <Group type="tab" expand="dynamic" class="overflow-auto">
+        <Column id="framework" class="overflow-auto" expand="full">
+            <Row droppable="window" class="col overflow-auto">
+                    
+            </Row>
+            <Row droppable="window" class="col overflow-auto">
+                
+            </Row>
+        </Column>
+        <Container id="infrastructure" expand="full">
+            <Text>3</Text>
+        </Container>
+    </Group>
+</Row>
+{% else %}
+<View url="application/view/page/inventory/repositories.xml" />
+{% endif %}
+{% endblock %}
+{% block south %}
+{% if component.repository and component.repository != '' %}
+<Container>
+    <!-- TabNav -->
+    <Group type="nav" margin="m-0" padding="p-0" border="bottom" >
+        <Action link="#tab-code" data-bs-toggle="tab"><Graph icon="bi-code-slash"/><Text>Code</Text></Action>
+        <Action link="#tab-build" data-bs-toggle="tab"><Graph icon="bi-tools"/><Text>Build</Text></Action>
+        <Action link="#tab-test" data-bs-toggle="tab"><Graph icon="bi-play-fill"/><Text>Test</Text></Action>
+        <Action link="#tab-release" data-bs-toggle="tab"><Graph icon="bi-box-seam-fill"/><Text>Package</Text></Action>
+    </Group>
+    <!-- Tab -->
+    <Group type="tab">
+        <Container id="tab-code">
+            <Text>1</Text>
+        </Container>
+        <Container id="tab-build">
+            <Text>2</Text>
+        </Container>
+        <Container id="tab-test">
+            <Text>3</Text>
+        </Container>
+    </Group>
+</Container>
+{% endif %}
+{% endblock %}
+{% block east %}
+{% if component.repository and component.repository != '' %}
+<Row>
+    {% if false %}
+    <Storekeeper model="file" repo='{{ component.repository or "SottoMonte/framework" }}' file_path="{{ component.selected or 'src/infrastructure/presentation/starlette.py' }}">
+        <Tree expand="dynamic">
+
+        </Tree>
+    </Storekeeper>
+    {% endif %}
+    <Editor expand="dynamic">
+
+    </Editor>
+</Row>
+{% endif %}
+{% endblock %}

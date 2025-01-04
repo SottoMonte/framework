@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Group id="{% set id = '{:0=8}'.format(range(0, 99999999) | random) %}{{ attributes['id'] or id }}" type="breadcrumb" alignment-vertical="center" >
-    <Action link="#tab-code" padding="p-0;ps-3" ><Graph icon="bi-speedometer2"/></Action>
+<Group id="{{ component.id }}" type="breadcrumb" alignment-vertical="center" >
     {{ inner }}
 </Group>

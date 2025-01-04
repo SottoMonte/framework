@@ -42,14 +42,17 @@ async def get_module(path,lang):
     response = js.fetch(path,{'method':'GET'})
     file = await response
     aa = await file.text()
+    
+    neepath = path.replace('.py','')
+    nettt = neepath.split('/')
+    spec = importlib.util.spec_from_loader(last(nettt), loader=None)
+    module = importlib.util.module_from_spec(spec)
+    setattr(module,'language',lang)
+    #print(aa,module.__dict__)
+    exec(aa, module.__dict__)
+    return module
     try:
-        neepath = path.replace('.py','')
-        nettt = neepath.split('/')
-        spec = importlib.util.spec_from_loader(last(nettt), loader=None)
-        module = importlib.util.module_from_spec(spec)
-        setattr(module,'language',lang)
-        exec(aa, module.__dict__)
-        return module
+        pass
     except Exception as e:
         print(f"error load 'infrastructure module'",str(e))
 
@@ -149,10 +152,12 @@ if sys.platform != 'emscripten':
 else:
     import js
     def loader_provider_test(**constants):
+
+        
         adapter = constants['adapter'] if 'adapter' in constants else ''
         service = constants['service'] if 'service' in constants else ''
         payload = constants['payload'] if 'payload' in constants else ''
-        area = constants['area'] if 'area' in constants else 'framework'
+        area = constants['area'] if 'area' in constants else 'application'
             
         req = js.XMLHttpRequest.new()
         req.open("GET", f"{area}/{service}/{adapter}.py", False)
@@ -331,7 +336,7 @@ def put(domain,value,data=dict()):
         
         return work
 
-def builder(schema,value=None,spread={}):
+def builderOld(schema,value=None,spread={},mode='full'):
         output = dict({})
         order = ['type','model','iterable','default','regex']
         if type(schema) == type(tuple()):
@@ -424,7 +429,60 @@ def builder(schema,value=None,spread={}):
             return output[next(iter(output))]
         else: return output
 
-def translation(constants,values,keys,input='MODEL',output='MODEL'):
+async def builder(schema, value=None, spread={},mode='full',lang=None):
+    def resolve_name(row):
+        if 'model' in row:
+            return row['model'][0].get('name', row.get('name', '@'))
+        return row.get('name', '@')
+
+    def import_model(path):
+        module_name, attr_name = (path.split(':') if ':' in path else (f"model.{path}", path))
+        model = importlib.import_module(f"application.{module_name}")
+        return getattr(model, attr_name)
+
+    if isinstance(schema, tuple):
+        return {resolve_name(row): await builder(row, value, spread) for row in schema if mode != 'filtered' or (value and resolve_name(row) in value)}
+
+    if isinstance(schema, str):
+        module = await get_module(path=f'application/model/{schema}.py',lang=lang)
+        model = getattr(module,schema)
+        return await builder(model, value,spread,mode,lang)
+
+    output = {}
+    name = schema.get('name', spread.get('name', ''))
+    if 'model' in schema:
+        name = schema['model'][0].get('name', name)
+
+    for field in ['type', 'model', 'iterable', 'default', 'regex']:
+        if field not in schema:
+            continue
+        value_to_use = schema[field]
+        match field:
+            case 'iterable':
+                output[name] = []
+            case 'model':
+                passa = value.get(name) if isinstance(value, dict) and name in value else value
+                output[name] = builder(value_to_use, passa, schema)
+            case 'type':
+                output[name] = {'string': '', 'integer': 0, 'model': {}}.get(value_to_use, None)
+            case 'default':
+                ccc = value.get(name, value_to_use) if isinstance(value, dict) else value
+                output[name] = ccc if isinstance(ccc, type(schema.get('type', None))) else value_to_use
+                '''if isinstance(ccc, (list, dict)) and not isinstance(ccc, type(schema['type'])):
+                    output[name] = [
+                        builder(schema['type'], x) if isinstance(x, dict) else x
+                        for x in ccc if isinstance(x, type(schema['type']))
+                    ]
+                else:
+                    output[name] = ccc if isinstance(ccc, type(schema.get('type', None))) else value_to_use'''
+            case 'regex':
+                if name in output and not re.match(value_to_use, str(output[name])):
+                    raise Exception(f"Regex not match {value_to_use}")
+
+    return output[next(iter(output))] if len(output) == 1 else output
+
+
+'''def translation(constants,values,keys,input='MODEL',output='MODEL'):
         
         out = dict()
         zwork = dict()
@@ -459,9 +517,79 @@ def translation(constants,values,keys,input='MODEL',output='MODEL'):
                             valor = x[output](valor)
                     #print(valor)
                 out |= put(name,valor,out)
-            #print(dd,valor)'''
+            
         
-        return out
+        return out'''
+
+def translation2(constants, values, mapper, input='MODEL', output='MODEL'):
+    try:
+        """ Trasforma un set di costanti in un output mappato. """
+        translated = {}
+        for key in mapper:
+            mapping = mapper[key]
+            key_input = mapping.get(input, key)
+            key_output = mapping.get(output, key)
+            #print(constants)
+            print(key,mapper,mapping,key_input,key_output,input,output)
+            if type(constants) == type([]):
+                lll = []
+                for item in constants:
+                    print(item)
+                    value = get(key_input,item)
+                    if key in values and output in values[key]:
+                        value = values[key][output](value)
+                        lll.append(value)
+                    else:
+                        lll.append(value)
+                translated |= put(key_output,lll,translated)
+            else:
+                
+                value = get(key_input,constants)
+                #print(mapper,mapping,key_input,key_output,input,output,value)
+                if key in values and output in values[key]:
+                    value = values[key][output](value)
+                translated |= put(key_output,value,translated)
+        
+    except Exception as e:
+        print(f"Errore translation: {type(e).__name__}",e)
+    return translated
+
+def translation(constants, values, mapper, input='MODEL', output='MODEL'):
+    try:
+        """ Trasforma un set di costanti in un output mappato. """
+        translated = {}
+        for key in mapper:
+            mapping = mapper[key]
+            key_input = mapping.get(input, key)
+            key_output = mapping.get(output, key)
+
+            if key_input is None or key_output is None:
+                raise ValueError(f"Invalid key mapping for key: {key}")
+
+            if isinstance(constants, list):
+                lll = []
+                for item in constants:
+                    value = get(key_input, item)
+                    if key in values and output in values[key]:
+                        if value is not None:
+                            value = values[key][output](value)
+                    else:
+                        pass
+                    lll.append(value)
+                translated |= put(key_output, lll, translated)
+            else:
+                value = get(key_input, constants)
+
+                if key in values and output in values[key]:
+                    if value is not None:
+                        value = values[key][output](value)           
+                else:
+                    pass
+                translated |= put(key_output, value, translated)
+
+    except Exception as e:
+        print(f"Errore translation: {type(e).__name__}: {e}")
+    return translated
 
 def filter(self):
         pass

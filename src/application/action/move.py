@@ -1,6 +1,6 @@
 flow = language.load_module(area="framework",service='service',adapter='flow')
 import js
-@flow.async_function(ports=('messenger','presenter'))
+@flow.asynchronous(managers=('messenger','presenter'))
 async def move(messenger,presenter,**constants):
     """
     Sposta `target` dentro `place` e il contenuto di `place` viene spostato

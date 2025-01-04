@@ -1,6 +1,6 @@
 import application.service.flow as flow
 
-@flow.async_function(ports=('messenger','storekeeper'))
+@flow.asynchronous(managers=('messenger','storekeeper'))
 async def update(messenger,storekeeper,**constants):
     payload = constants['payload']
     model = payload['model']

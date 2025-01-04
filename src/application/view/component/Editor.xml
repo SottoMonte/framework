@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Container id="{% set id = '{:0=8}'.format(range(0, 99999999) | random) %}{{ attributes['id'] or id }}">
+<Container id="{{ component.id }}">
     <!-- TabNav -->
     <Group type="nav" margin="m-0" padding="p-0" border="bottom">
         <Action link="#tab-property" data-bs-toggle="tab">

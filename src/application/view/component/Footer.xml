@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Row background="#f1f1f1" border="top">
+    <Window id="machineModal" type="modal" size="fullscreen" >
+        <Action click="terminal(target:'machineModal-terminal')" text-size="14px"><Graph icon="bi-terminal"/></Action>
+        <Container id="machineModal-terminal" height="100%" width="100%" padding="p-0"></Container>
+    </Window>
     <Column background="#ededed" height="200px" alignment-vertical="center" border="bottom" collapse="full" >
         <Column border="end" height="80%">
             <Graph src="static/logo.svg" height="60px" />
@@ -18,7 +22,7 @@
     </Column>
     <Column alignment-vertical="center">
         <Column>
-            <Action text-size="14px" alignment-content="horizontal" background="#2fcc76" ><Graph icon="bi-ubuntu"/><Text padding="px-1">VM-100</Text></Action>
+            <Action text-size="14px" alignment-content="horizontal" modal="machineModal" background="#2fcc76" ><Graph icon="bi-ubuntu"/><Text padding="px-1">VM-100</Text></Action>
             <Action text-size="14px" alignment-content="horizontal" ><Graph icon="bi-diagram-2-fill"/><Text padding="px-2" >main</Text><Graph icon="bi-arrow-repeat"/></Action>
             <Action text-size="14px"><Graph icon="bi-terminal"/></Action>
             <Action text-size="14px"><Graph icon="bi-x-octagon"/></Action>
@@ -36,10 +40,8 @@
                 <Text>Riga 45,Colonna 89 Spazi:4 UTF-8 LF XML</Text>
             </Column>
             <Action text-size="14px"><Graph icon="bi-translate"/></Action>
-            <Action text-size="14px"><Graph icon="bi-ethernet"/></Action>
             <Action text-size="14px"><Graph icon="bi-keyboard-fill"/></Action>
             <Action text-size="14px"><Graph icon="bi-mouse-fill"/></Action>
-            <Action text-size="14px"><Graph icon="bi-caret-up-square-fill"/></Action>
             <Action text-size="14px"><Graph icon="bi-layout-sidebar-inset-reverse"/></Action>
         </Column>
     </Column>

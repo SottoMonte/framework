@@ -3,6 +3,7 @@ import aiohttp
 class adapter:
     def __init__(self, **constants):
         self.config = constants['config']
+        
 
     async def authenticate(self,**data):
         """Obtain the request token from github.
@@ -30,9 +31,10 @@ class adapter:
         headers = {
             'accept': 'application/json'
         }
-
+        print(url)
         async with aiohttp.ClientSession() as session:
             async with session.post(url, headers=headers) as response:
+                print(response.status,response.json())
                 if response.status == 200:
                     data = await response.json()
                     return data['access_token']

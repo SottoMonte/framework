@@ -5,4 +5,5 @@
     <Route path="/" type="view" view="application/view/layout/app.xml" method="GET" />
     <Route path="/github/callback" type="login" method="GET" />
     <Route path="/gather" type="action" method="GET" policy="" />
+    <Route path="/create" type="action" method="POST" policy="" />
 </Routes>

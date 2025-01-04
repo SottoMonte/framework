@@ -13,7 +13,7 @@ class adapter(persistence.port):
     async def query(self, *services, **constants):
         pass
 
-    @flow.async_function(ports=('storekeeper','messenger'))
+    @flow.asynchronous(ports=('storekeeper','messenger'))
     async def read(self, storekeeper, messenger, **constants):
         identifier = constants['identifier'] if 'identifier' in constants else 'test'
         boolean = await self.conn.exists(identifier)
@@ -45,7 +45,7 @@ class adapter(persistence.port):
             typ = await self.conn.type(identifier)
             return storekeeper.builder('transaction',{'state': False,'action':'read','remark':'not found data'})
 
-    @flow.async_function(ports=('storekeeper','messenger'))
+    @flow.asynchronous(ports=('storekeeper','messenger'))
     async def create(self, storekeeper, messenger, **constants):
         data = constants['value']
         identifier = constants['identifier'] if 'identifier' in constants else '#'
@@ -84,7 +84,7 @@ class adapter(persistence.port):
         else:    
             return storekeeper.builder('transaction',{'state': False,'action':'create','remark':f"this identifier:{identifier} already exists"})
 
-    @flow.async_function(ports=('storekeeper',))
+    @flow.asynchronous(ports=('storekeeper',))
     async def delete(self, storekeeper, **constants):
         identifier = constants['identifier']
         typ = await self.conn.type(identifier)
@@ -127,7 +127,7 @@ class adapter(persistence.port):
                     except Exception as e:
                         return storekeeper.builder('transaction',{'state': False,'action':'delete','remark':f"{e}"})
 
-    @flow.async_function(ports=('storekeeper',))
+    @flow.asynchronous(ports=('storekeeper',))
     async def write(self, storekeeper, **constants):
         identifier = constants['identifier']
         value = constants['value']

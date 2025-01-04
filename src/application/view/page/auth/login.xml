@@ -10,6 +10,9 @@
             <Action link="https://github.com/login/oauth/authorize?client_id=Iv23li8IzmjxqtrCVomM">
                 <Text>GitHub Login</Text>
             </Action>
+            <Action link="https://github.com/login/oauth/authorize?client_id=Ov23lidpWleO0KCHQVm0&amp;scope=repo,user&amp;state=xyz987">
+                <Text>GitHub OAuth Login</Text>
+            </Action>
         </Action>
     </Row>
     <Row size="expanded" class="h-100 border-start" color="#444" >

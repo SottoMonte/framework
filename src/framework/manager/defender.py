@@ -20,8 +20,9 @@ class defender():
     async def authenticate(self,**constants):
         for backend in self.providers:
             token = await backend.authenticate(**constants)
+            print('token',token)
             if token != None:
-                self.sessions[constants['identifier']] = token
+                self.sessions[constants['identifier']] = {'token':token,'ip':constants.get('ip','')}
                 return token
         '''if constants['username'] in self.users and constants['password'] == self.users[constants['username']]:
             token = token_urlsafe(16)
@@ -38,5 +39,21 @@ class defender():
             return False
 
     async def authorize(self,**constants):
+        for key in self.sessions:
+            session = self.sessions[key]
+            if session.get('ip') == constants.get('ip',''):
+                return True
+        return False
+
+    async def whoami(self,**constants):
+        for key in self.sessions:
+            session = self.sessions[key]
+            if session.get('ip') == constants.get('ip',''):
+                return key
+        return None
+
+    async def detection(self,**constants):
         return True
     
+    async def protection(self,**constants):
+        return True

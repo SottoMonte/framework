@@ -41,9 +41,11 @@
 {% endblock %}
 {% block content %}
 <Container background="#fafafa" size="fluid" padding="p-4" expand="True" class="border-top border-bottom">
-    <Input disabled="True"></Input>
-    <Table>
-    
+    <Table model="repository" >
+        <Text>Repository</Text>
+        <Text>Description</Text>
+        <Text>Updated</Text>
+        <Text>Actions</Text>
     </Table>
 </Container>
 {% endblock %}

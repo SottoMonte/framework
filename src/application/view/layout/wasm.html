@@ -134,7 +134,7 @@
 {% block body_script %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.5/ace.js" type="text/javascript" charset="utf-8"></script>
 <script>
-  function updateDragula() {
+  /*function updateDragula() {
     // Seleziona tutti gli elementi con classe 'editor'
     var editors = document.querySelectorAll('.editor');
     
@@ -174,7 +174,7 @@
   var config = { childList: true, subtree: true };
 
   // Avvia l'osservazione del nodo radice
-  observer.observe(document.body, config);
+  observer.observe(document.body, config);*/
 </script>
 <script>
     /*// Inizializza Dragula
@@ -230,8 +230,20 @@
                 await micropip.install('tomli');
                 await micropip.install('jinja2');
                 await micropip.install('untangle');
+                await micropip.install('aiofiles');
                 await micropip.install('bs4');
-                
+
+                /*const dirHandle = await window.showDirectoryPicker();
+                const permissionStatus = await dirHandle.requestPermission({
+                  mode: "readwrite",
+                });
+
+                if (permissionStatus !== "granted") {
+                  throw new Error("readwrite access to directory not granted");
+                }
+
+                const nativefs = await pyodide.mountNativeFS("/mount_dir", dirHandle);*/
+
                 pyodide.runPython(await (await fetch("framework/service/language.py")).text());
                 pyodide.runPython(await (await fetch("static/app.py")).text());
                 

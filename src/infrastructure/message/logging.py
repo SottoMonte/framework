@@ -1,7 +1,6 @@
-import framework.port.message as port
 import logging
 
-class adapter(port.port):
+class adapter():
 
     def __init__(self,**constants):
         self.config = constants['config'] 
@@ -34,7 +33,7 @@ class adapter(port.port):
         
         type_msg = constants['type'] if 'type' in constants else 'None'
         #message =  f"{constants['value']:{" "}{'<'}{100}}"
-        message = constants['value']
+        message = constants['msg']
 
         match type_msg:
             case 'debug':
@@ -50,5 +49,5 @@ class adapter(port.port):
             case _:
                 self.logger.info(message)
 
-    async def get(self, *services, **constants):
+    async def read(self, *services, **constants):
         pass
