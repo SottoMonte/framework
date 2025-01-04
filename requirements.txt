@@ -2,10 +2,12 @@ kink>=0.8.0
 tomli>=2.0.2
 bs4>=0.0.2 
 pyodide-py>=0.25.1
+aiofiles>=24.1.0
 starlette>=0.39.2
 python-multipart>=0.0.12
 itsdangerous==2.2.0 
-websockets>=13.1 
+websockets>=13.1
+paramiko>=3.5.0
 Jinja2>=3.1.4
 PyJWT>=2.10.1
 untangle>=1.2.1
