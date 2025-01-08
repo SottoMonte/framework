@@ -1,5 +1,6 @@
 import uuid
-import html
+
+from html import escape
 import json
 try:
     #import framework.port.presentation as presentation
@@ -561,6 +562,11 @@ class adapter():
                         return self.code('div',{'data-bs-backdrop':'false','id':id,'class':'offcanvas offcanvas-end'},[
                             self.code('div',{'class':'offcanvas-body p-0 m-0'},inner),
                         ])
+                    case 'window':
+                        url = att['url'] if 'url' in att else ''
+                        obj =  self.code('iframe',{'src':url,'id':id,'style':'border:none;'},[])
+                        self.att(obj,att)
+                        return obj
                     case 'modal':
                         btn_act = self.code('button',{'class':'btn btn-success'},[action.capitalize()])
                         self.att(btn_act,{'click':f"form(id:'form-{action}',action:'{action}')"})
@@ -584,12 +590,17 @@ class adapter():
                 if 'storekeeper' in data and 'storekeeper' in att:
                     text = language.get(att['storekeeper'],data['storekeeper'])
                     #print(att['storekeeper'],'text',data['storekeeper'])
+                
                 match tipo:
                     case 'editable':
+                        if text:
+                            text = escape(text)
                         text = self.code('div',{'contenteditable':'true'},text)
                         self.att(text,att)
                         return text
-                    case _:         
+                    case _:
+                        if text:
+                            text = escape(text)
                         obj = self.code('p',{'class':'text-truncate fw-lighter p-0 m-0','type':'data'},text)
                         self.att(obj,att)
                         return obj

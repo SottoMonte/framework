@@ -16,7 +16,7 @@
                 </Row>
             </Column>
             <Container id="text-{{ id }}" expand="full" padding="p-0">
-                <Text id="block-editor-{{ id }}" init="editor(target:'block-editor-{{ id }}')" class="editor h-100 border" storekeeper="result.content" type="editable"></Text>
+                <Text id="block-editor-{{ id }}" init="editor(target:'block-editor-{{ id }}',identifier:'{{ storekeeper.result.name }}')" class="editor h-100 border" storekeeper="result.content" type="editable"></Text>
             </Container>
         </Group>
     </Row>

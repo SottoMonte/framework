@@ -27,7 +27,7 @@
     <!-- Tab -->
     <Group type="tab">
         <!-- Explore -->
-        <Container id="tab-explore" expand="vertical" border="start">
+        <Container id="tab-explore" expand="vertical" border="start" class="overflow-auto">
             <Storekeeper model="repository" repo='{{ component.repository or "SottoMonte/framework" }}'>
                 <Tree expand="dynamic">
 

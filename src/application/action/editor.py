@@ -6,20 +6,34 @@ import pyodide
 @flow.asynchronous(managers=('messenger','presenter'))
 async def editor(messenger,presenter,**constants):
     target = constants.get('target','')
-    
-    
+    file = constants.get('identifier','')
+    print('file',file)
+    # Mappatura delle estensioni ai moduli di modalità di ACE
+    mode_mapping = {
+        'py': 'ace/mode/python',
+        'xml': 'ace/mode/xml',
+        'js': 'ace/mode/javascript',
+        'html': 'ace/mode/html',
+        'css': 'ace/mode/css',
+        'json': 'ace/mode/json',
+        # Aggiungi altre estensioni se necessario
+    }
+
+    # Estrai l'estensione del file
+    file_extension = file.split('.')[-1].lower() if '.' in file else ''
+
+    # Determina la modalità in base all'estensione
+    mode = mode_mapping.get(file_extension, 'text')  # Usa 'text' come fallback
+
     # Inizializza l'editor ACE sull'elemento
     ace_editor = ace.edit(target, {
-        "mode": "ace/mode/python",
-        "theme": "ace/theme/github",
-        "autoScrollEditorIntoView": True,
-        "minLines": 10,
-        "maxLines": 30,
-        "wrap": True,
-        "useWorker": True
+        # Imposta la modalità dinamicamente
     })
+    print(mode)
+    ace_editor.setTheme("ace/theme/github")
+    ace_editor.session.setMode(mode)
 
-    component = await presenter.component(name=target.replace('block-editor-',''))
+    component = await presenter.component(name=target.replace('block-editor-', ''))
     component['editor'] = ace_editor
 
     
