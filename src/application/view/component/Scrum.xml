@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Column expand="full" id="{{ component.id }}">
+    <!-- Artefatti -->
+    <Row expand="2">
+        <Column alignment-horizontal="evenly">
+            <!-- Eventi -->
+            <Action type="dropdown" >
+                <Action ><Graph icon="bi-briefcase-fill"/><Text padding="px-1">Organize the backlog</Text></Action>
+            </Action>
+            <Action type="dropdown" >
+                <Action ><Graph icon="bi-pin-fill"/><Text padding="px-1">Sprint planning</Text></Action>
+            </Action>
+            <Action type="dropdown" >
+                <Action ><Graph icon="bi-backpack-fill"/><Text padding="px-1">Sprint retrospective</Text></Action>
+            </Action>
+        </Column>
+        <Column background="#3498DB">
+            <Text>Product Backlog</Text>
+            <!-- Membri -->
+            <Graph icon="bi-people-fill"/>
+            <Text>Product owner</Text>
+        </Column>
+        <Row droppable="scrum-item" expand="dynamic">
+            <Iscum title="Sistema di acquisto" desc="Consentire agli utenti di acquistare prodotti." color="A5D6A7">
+                <Iscum title="Creazione del carrello" desc="Come utente, voglio aggiungere prodotti a un carrello per acquistarli in un'unica operazione." color="A5D6A7"></Iscum>
+                <Iscum title="Pagamento" desc="Come utente, voglio pagare i prodotti nel carrello utilizzando vari metodi di pagamento." color="A5D6A7"></Iscum>
+                <Iscum title="Integrazione con gateway di pagamento" desc="Collegare la piattaforma a un sistema di pagamento esterno (es. Stripe, PayPal).	" color="A5D6A7"></Iscum>
+            </Iscum>
+        </Row>
+    </Row>
+    <Row expand="8">
+        <Column alignment-horizontal="evenly">
+            <Action type="dropdown" >
+                <Action ><Graph icon="bi-calendar-week"/><Text padding="px-1">Sprint</Text></Action>
+            </Action>
+            <Action type="dropdown" >
+                <Action ><Graph icon="bi-brightness-high-fill"/><Text padding="px-1">Daily Scrum</Text></Action>
+            </Action>
+        </Column>
+        <Column background="#3498DB">
+            <Text>Sprint Backlog</Text>
+            <Graph icon="bi-people-fill"/>
+            <Text>Development team</Text>
+        </Column>
+        <Column expand="full">
+            <Row border="1" expand="3"><Text background="#FF851B">Pianificazione</Text><Row expand="dynamic" droppable="scrum-item">
+                <Iscum title="Registrazione utente" desc="Come utente, voglio registrarmi con email e password per accedere al mio account." color="FF6D00"></Iscum>
+                <Iscum title="Login" desc="Come utente registrato, voglio effettuare il login per accedere ai miei dati personali e ordini." color="FF6D00"></Iscum>
+                <Iscum title="Validazione del form di login" desc="Verificare che le credenziali siano corrette e visualizzare messaggi di errore in caso contrario." color="FF6D00"></Iscum>
+            </Row></Row>
+            <Row border="1" expand="3"><Text background="#2ECC40">Sviluppo</Text><Row expand="dynamic" droppable="scrum-item">
+                <Iscum title="Aggiunta di nuovi prodotti" desc="Come amministratore, voglio aggiungere nuovi prodotti al catalogo per renderli disponibili alla vendita." color="E1BEE7"></Iscum>
+            </Row></Row>
+            <Row border="1" expand="3"><Text background="#F1C40F">Test</Text><Row expand="dynamic" droppable="scrum-item">
+                <Iscum title="Modifica prodotti esistenti" desc="Come amministratore, voglio modificare i prodotti esistenti per aggiornare descrizioni o prezzi." color="E1BEE7"></Iscum>
+                <Iscum title="Implementare l’interfaccia di aggiunta prodotti" desc="Creare un form per l'inserimento di nuovi prodotti (nome, prezzo, descrizione, immagine)." color="E1BEE7"></Iscum>
+                
+            </Row></Row>
+            <Row border="1" expand="3"><Text background="#FF4136">Rilascio</Text><Row expand="dynamic" droppable="scrum-item">
+                <Iscum title="Validazione dei dati" desc="Aggiungere controlli per garantire che i dati dei prodotti siano corretti (es. prezzo > 0)." color="E1BEE7"></Iscum>
+            </Row></Row>
+        </Column>
+    </Row>
+    <Row expand="2" droppable="scrum-item">
+        <Column alignment-horizontal="evenly">
+            <Action type="dropdown" >
+                <Action ><Graph icon="bi bi-briefcase-fill"/><Text padding="px-1">Sprint review</Text></Action>
+            </Action>
+        </Column>
+        <Column background="#3498DB">
+            <Text>Increment Buildup</Text>
+            <Graph icon="bi-people-fill"/>
+            <Text>All team</Text>
+        </Column>
+        <Row expand="dynamic" droppable="scrum-item">
+            <Iscum title="Sistema di gestione prodotti" desc="Permettere l'inserimento, modifica e visualizzazione dei prodotti nel catalogo." color="E1BEE7"></Iscum>
+            <Iscum title="Sistema di acquisto" desc="Consentire agli utenti di acquistare prodotti." color="FF5252"></Iscum>
+            <Iscum title="Sistema di account utente" desc="Creare un sistema per registrare e autenticare gli utenti." color="FF6D00"></Iscum>
+        </Row>
+    </Row>
+</Column>

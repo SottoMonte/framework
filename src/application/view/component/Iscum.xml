@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Container id="{{ component.id }}" padding="p-2" background="#{{ component.attributes.color }}" draggable-component="Iscum" draggable="scrum-item">
+    <Column>
+        <Text>{{ component.attributes.title }}</Text>
+    </Column>
+    <Text>{{ component.attributes.desc }}</Text>
+    <Container droppable="scrum-item" expand="dynamic" padding="p-2" border=" border" >
+        {{ inner }}
+    </Container>
+</Container>

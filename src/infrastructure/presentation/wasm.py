@@ -127,11 +127,11 @@ class adapter(starlette.adapter):
           event.preventDefault()
           draggable_element = js.document.getElementById(self.drag)
           if self.drag in self.components:
-            name = self.components[self.drag]
+            print(self.components[self.drag])
+            name = self.components[self.drag].get('id')
             component = js.document.getElementById(name)
             component.className = component.className.replace(' opacity-25','')
             #component.className = component.className.replace('highlight','')
-            self.components[name] = name
           
           if 'maker' in self.drag and self.drag in self.components:
             self.components.pop(self.drag)
@@ -163,14 +163,17 @@ class adapter(starlette.adapter):
                   attr[i.name] = i.value
                 view = await self.builder(url=url,**attr)
                 view.className += ' opacity-25'
-                self.components[identifier] = view.getAttribute('id')
+                self.components[identifier] = {'id':view.getAttribute('id')}
                   #self.components[identifier]['id'] = view.getAttribute('id')
                 view.className += ' highlight'
                 event.target.appendChild(view)
+                print("BOOOOOM")
                 
             else:
               if identifier in self.components and self.components[identifier] != '':
-                component = js.document.getElementById(self.components[identifier])
+                #component = js.document.getElementById(self.components[identifier])
+                component = js.document.getElementById(self.components[identifier]['id'])
+                print(component)
                 if 'opacity-25' not in event.target.className:
                   component.className += ' opacity-25'
                 if event.target != component and component.parentNode != event.target:

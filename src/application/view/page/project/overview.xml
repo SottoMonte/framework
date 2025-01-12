@@ -1,0 +1,4 @@
+{% extends "mono.xml" %}
+{% block mono %}
+<Scrum></Scrum>
+{% endblock %}
