@@ -16,7 +16,7 @@ format = "%(asctime)s | %(levelname)-8s | %(process)d | %(message)s"
 
 [message.client]
 adapter = "websocket"
-url = "ws://localhost:8000/messenger"
+url = "wss://localhost:8000/messenger"
 
 [amessage.backend]
 adapter = "redis"
