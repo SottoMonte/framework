@@ -1,5 +1,4 @@
-#gather()
-flow = language.load_module(area="framework",service='service',adapter='flow')
+modules = {'flow':'framework.service.flow'}
 
 @flow.asynchronous(managers=('messenger','storekeeper'))
 async def gather(messenger,storekeeper,**constants):

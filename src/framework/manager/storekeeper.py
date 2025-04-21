@@ -1,263 +1,86 @@
 import asyncio
 import importlib
-import re
 
+modules = {'flow': 'framework.service.flow'}
 
-import sys
-if sys.platform == 'emscripten':
-    #language = language.load_module(area="framework",service='service',adapter='language')
-    flow = language.load_module(area="framework",service='service',adapter='flow')
-    #port = language.load_module(area="application",service='port',adapter='storekeeper')
-else:
-    import framework.service.flow as flow
-    import framework.service.language as language
-
-#port.storekeeper
 class storekeeper():
 
     def __init__(self,**constants):
         self.providers = constants['providers']
+
+    async def preparation(self, **constants):
+        operations = []
+        operation = constants.get('operation', 'read')
+        repository_name = constants.get('repository', '')
+
+        try:
+            repository_module = await language.load_module(
+                language,
+                area="application",
+                service='repository',
+                adapter=repository_name,
+                path=f"application.repository.{repository_name}"
+            )
+            repository = repository_module.repository
+        except Exception as e:
+            print(f"Errore durante il caricamento del modulo repository '{repository_name}': {e}")
+            return None, []
+
+        for provider in self.providers:
+            try:
+                profile = provider.config.get('profile', '').upper()
+                if not profile:
+                    print(f"Provider {provider} non ha un profilo configurato.")
+                    continue
+
+                if profile in repository.location:
+                    try:
+                        task_args = await repository.parameters(operation, profile, **constants)
+                    except Exception as e:
+                        print(f"Errore durante l'ottenimento dei parametri per {profile}: {e}")
+                        continue
+
+                    # Controllo che il metodo esista nel provider
+                    method = getattr(provider, operation, None)
+                    if not callable(method):
+                        print(f"Il metodo '{operation}' non è disponibile per il provider {profile}.")
+                        continue
+
+                    task = asyncio.create_task(method(**task_args), name=profile)
+                    operations.append(task)
+            except Exception as e:
+                print(f"Errore imprevisto durante la preparazione per il provider {provider}: {e}")
+
+        return repository, operations
     
     # overview/view/get
-    @flow.asynchronous(args=('model','identifier'),managers=('messenger',))
-    async def overview(self, messenger, **constants):
-        """
-        Effettua una richiesta API generica.
-        
-        :param model: modello dati di ritorno
-        :param identifier: key
-        :return transaction: trasazione
-        """
-        operations = [] 
-        repository = language.load_module(area="application",service='repository',adapter=constants['model'])
-        mappa = dict()
-        miss = []
-        
-        for provider in self.providers:
-            profile = provider.config['profile'].upper()
-            
-            if profile in repository.location:
-                #translated = language.translation(constants,repository.values,repository.mapper,profile)
-                translated = {}
-                payload = repository.payloads.get('view',{})
-                #print(constants|translated)
-                task = asyncio.create_task(provider.view(location=profile,fields=repository.mapper,path=repository.location[profile],payload=payload,**constants|translated))
-                operations.append(task)
-                mappa[task] = profile
-        
-        while operations:
-            
-            finished, unfinished = await asyncio.wait(operations, return_when=asyncio.FIRST_COMPLETED)
-            
-            for operation in finished:
-                transaction = operation.result()
-                if transaction != None and transaction['state']:
-                    profile = [x.config['profile'].upper() for x in self.providers if mappa[operation] == x.config['profile'].upper()][0] #mappa[operation].config['profile'].upper()
-                    result = transaction['result']
-                    
-                    translated = language.translation(result,repository.values,repository.mapper,profile)
-
-                    if len(miss) != 0:
-                        #translated_in = language.translation(result,repository.values,repository.keys_test,profile)
-                        #print(translated)
-                        vv = await self.put(prohibited=[profile],value=translated,**constants)
-                        #print(vv,miss)
-
-                    for task in unfinished:
-                        task.cancel()
-                    
-                    #if unfinished:
-                    #    await asyncio.wait(unfinished)
-                    #await messenger.post(name="log",value=f"success get miss {miss}")
-                    
-                    return {'state': True,'action':'tree','result':translated}
-                else:
-                    miss.append(mappa[operation])
-                    if len(operations) == 1:
-                        #await messenger.post(name="log",value=f"failed get  miss {miss}")
-                        return {'state': False,'action':'tree','parameter':constants,'remark':'not found data'}
-
-            operations = unfinished
+    @flow.asynchronous(inputs='storekeeper',outputs='transaction',managers=('executor',))
+    async def overview(self, executor, **constants):
+        repository,operations = await self.preparation(**constants|{'operation':'view'})
+        return await executor.first_completed(operations=operations,success=repository.results)
 
     # gather/read/get
-    @flow.asynchronous(args=('model','identifier'),managers=('messenger',))
-    async def gather(self, messenger, **constants):
-        """
-        Effettua una richiesta API generica.
-        
-        :param model: modello dati di ritorno
-        :param identifier: key
-        :return transaction: trasazione
-        """
-        operations = [] 
-        repository = language.load_module(area="application",service='repository',adapter=constants['model'])
-        mappa = dict()
-        miss = []
-        
-        for provider in self.providers:
-            profile = provider.config['profile'].upper()
-            
-            if profile in repository.location:
-                #translated = language.translation(constants,repository.values,repository.mapper,profile)
-                translated = {}
-                payload = repository.payloads.get('read',None)
-                #print(constants|translated)
-                task = asyncio.create_task(provider.read(location=profile,fields=repository.mapper,path=repository.location[profile],payload=payload,**constants|translated))
-                operations.append(task)
-                mappa[task] = profile
-        
-        while operations:
-            
-            finished, unfinished = await asyncio.wait(operations, return_when=asyncio.FIRST_COMPLETED)
-            
-            for operation in finished:
-                transaction = operation.result()
-                if transaction != None and transaction['state']:
-                    profile = [x.config['profile'].upper() for x in self.providers if mappa[operation] == x.config['profile'].upper()][0] #mappa[operation].config['profile'].upper()
-                    result = transaction['result']
-                    
-                    translated = language.translation(result,repository.values,repository.mapper,profile)
-
-                    if len(miss) != 0:
-                        #translated_in = language.translation(result,repository.values,repository.keys_test,profile)
-                        #print(translated)
-                        vv = await self.put(prohibited=[profile],value=translated,**constants)
-                        #print(vv,miss)
-
-                    for task in unfinished:
-                        task.cancel()
-                    
-                    #if unfinished:
-                    #    await asyncio.wait(unfinished)
-                    #await messenger.post(name="log",value=f"success get miss {miss}")
-                    
-                    return {'state': True,'action':'get','result':translated}
-                else:
-                    miss.append(mappa[operation])
-                    if len(operations) == 1:
-                        #await messenger.post(name="log",value=f"failed get  miss {miss}")
-                        return {'state': False,'action':'get','parameter':constants,'remark':'not found data'}
-
-            operations = unfinished
+    @flow.asynchronous(inputs='storekeeper',outputs='transaction',managers=('executor',))
+    async def gather(self, executor, **constants):
+        print("BOOOOM#",constants)
+        repository,operations = await self.preparation(**constants|{'operation':'read'})
+        print("BOOOOM#",repository,operations)
+        return await executor.first_completed(operations=operations,success=repository.results)
     
-    # make/create/put
-    @flow.asynchronous(args=('model','value'),managers=('messenger',))
-    async def make(self, messenger, **constants):
-        repository = language.load_module(area="application",service='repository',adapter=constants['model'])
-        prohibited = constants['prohibited'] if 'prohibited' in constants else []
-        allowed = constants['allowed'] if 'allowed' in constants else []
-        operations = []
-        map_tasks = dict()
-        # Adds operation if profile matches
-        for provider in self.providers:
-            profile = provider.config['profile'].upper()
-            #print(profile,allowed)
-            if profile not in prohibited and profile in repository.location:
-                #if constants['value'] != None:
-                #    constants['value'] = language.translation(constants['value'],repository.values,repository.mapper,'MODEL',profile)
-                payload = repository.payloads.get('create',None)
-                operations.append(provider.create(location=profile,payload=payload, path=repository.location[profile],**constants))
-                map_tasks[len(operations)-1] = profile
-
-        # Commit all operations at the same time   
-        transactions = await asyncio.gather(*operations)
-        if len(transactions) == 0:
-            return self.builder('transaction',{'state': False,'action':'put','parameter':constants})
-        
-        state = all([transaction['state'] for transaction in transactions])
-        result = [transaction['result'] for transaction in transactions if not transaction['state']]
-        failed = [map_tasks[key] for key,transaction in enumerate(transactions) if not transaction['state']]
- 
-        # Rollback and return transaction based on the state
-        if state:
-            #await messenger.post(name="log",value=f"success put miss {failed}") 
-            return {'state': True,'action':'put','remark':f"succeeded put "}
-        else:
-            #await messenger.post(name="log",value=f"failed put miss {failed}")
-            if len(failed) != len(transactions) and len(failed) != 0:
-                transaction = await self.pull(prohibited=failed,**constants)
-                return self.builder('transaction',{'state': False,'action':'put','result':result[0],'parameter':constants,'transaction':transactions+[transaction]})
-            else:
-                return self.builder('transaction',{'state': False,'action':'put','result':result[0],'parameter':constants,'transaction':transactions})
-            
-    # has
-    @flow.asynchronous(args=('model','identifier'))
-    async def has(self,**constants):
-        repository = importlib.import_module(f"framework.repository.{constants['model']}", package=None)
-        prohibited = constants['prohibited'] if 'prohibited' in constants else [] 
-        operations = []  
-        # Adds operation if profile matches
-        for provider in self.providers:
-            profile = provider.config['profile'].upper()
-            if profile in repository.location and profile not in prohibited:
-                operations.append(provider.delete(path=repository.location[profile],location=profile,**constants))
-        
-        # Commit all operations at the same time  
-        transactions = await asyncio.gather(*operations)
-
-        state = all([transaction['state'] for transaction in transactions])
-        # Construct and return a transaction based on the state
-        if state:
-            return self.builder('transaction',{'state': True,'action':'pull','remark':"",'parameter':constants})
-        else:
-            return self.builder('transaction',{'state': False,'action':'pull','parameter':constants,'transaction':transactions[0],'remark':f"error"})
+    # store/create/put
+    @flow.asynchronous(inputs='storekeeper',outputs='transaction',managers=('executor',))
+    async def store(self, executor, **constants):
+        repository,operations = await self.preparation(**constants|{'operation':'create'})
+        return await executor.first_completed(operations=operations,success=repository.results)
     
     # pull/delete/delete
-    @flow.asynchronous(args=('model','identifier'),managers=('messenger',))
-    async def erase(self, messenger, **constants):
-        repository = language.load_module(area="application",service='repository',adapter=constants['model'])
-        prohibited = constants['prohibited'] if 'prohibited' in constants else [] 
-        operations = []  
-        # Adds operation if profile matches
-        for provider in self.providers:
-            profile = provider.config['profile'].upper()
-            if profile in repository.location and profile not in prohibited:
-                payload = repository.payloads.get('delete',None)
-                operations.append(provider.delete(path=repository.location[profile],payload=payload,location=profile,**constants))
-        
-        # Commit all operations at the same time  
-        transactions = await asyncio.gather(*operations)
-
-        state = all([transaction['state'] for transaction in transactions if transaction != None])
-        
-        # Construct and return a transaction based on the state
-        if state:
-            #await messenger.post(name="log",value=f"success delete {constants['identifier']}")
-            return {'state': True,'action':'pull','remark':"",'parameter':constants}
-        else:
-            
-            return {'state': False,'action':'pull','parameter':constants,'transaction':transactions[0],'remark':f"error"}
+    @flow.asynchronous(inputs='storekeeper',outputs='transaction',managers=('executor',))
+    async def erase(self, executor, **constants):
+        repository,operations = await self.preparation(**constants|{'operation':'delete'})
+        return await executor.first_completed(operations=operations,success=repository.results)
     
     # change/update/patch
-    @flow.asynchronous(args=('model','value','identifier'))
-    async def change(self,**constants):
-        repository = language.load_module(area="application",service='repository',adapter=constants['model'])
-        prohibited = constants['prohibited'] if 'prohibited' in constants else []
-        operations = []
-        map_tasks = dict()
-        # Adds operation if profile matches
-        for provider in self.providers:
-            profile = provider.config['profile'].upper()
-            if profile in repository.location and profile not in prohibited:
-                payload = repository.payloads.get('update',None)
-                #vv = language.translation(constants,repository.values,repository.mapper,'MODEL',profile)
-                operations.append(provider.update(location=profile,payload=payload, path=repository.location[profile], **constants))
-                map_tasks[len(operations)-1] = profile
-
-        # Commit all operations at the same time   
-        transactions = await asyncio.gather(*operations)
-        
-        state = all([transaction['state'] for transaction in transactions])
-        #result = [transaction['result'] for transaction in transactions if not transaction['state']]
-        #failed = [map_tasks[key] for key,transaction in enumerate(transactions) if not transaction['state']]
-
-        # Rollback and return transaction based on the state
-        if state:
-            return {'state': True,'action':'put','remark':f"succeeded put"}
-        else:
-            return {'state': False,'action':'put','remark':f"error"}
-            '''if len(failed) != len(transactions) and len(failed) != 0:
-                transaction = await self.pull(prohibited=failed,**constants)
-                return self.builder('transaction',{'state': False,'action':'put','result':result[0],'parameter':constants,'transaction':transactions+[transaction]})
-            else:
-                return self.builder('transaction',{'state': False,'action':'put','result':result[0],'parameter':constants,'transaction':transactions})'''
+    @flow.asynchronous(inputs='storekeeper',outputs='transaction',managers=('executor',))
+    async def change(self,executor,**constants):
+        repository,operations = await self.preparation(**constants|{'operation':'update'})
+        return await executor.first_completed(operations=operations,success=repository.results)

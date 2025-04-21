@@ -1,0 +1,104 @@
+{% extends "sidebar.xml" %}
+{% block title %}Volume{% endblock %}
+{% block subtitle %}volume #vol-data01{% endblock %}
+{% block bar %}
+<SideBar selected="application/view/page/inventory/volumes.xml"/>
+{% endblock %}
+{% block action %}
+<Group type="button">
+    <Action type="button" route="tab:mount" class="d-inline-flex btn-outline-success"><Graph icon="bi-link"/><Text class="text-uppercase">Mount</Text></Action>
+    <Action type="button" route="tab:backup" class="d-inline-flex btn-outline-primary"><Graph icon="bi-cloud-upload"/><Text class="text-uppercase">Backup</Text></Action>
+    <Action type="button" route="tab:settings" class="d-inline-flex btn-outline-danger"><Graph icon="bi-trash3"/><Text class="text-uppercase">Delete</Text></Action>
+</Group>
+{% endblock %}
+{% block content %}
+<Container class="card-group" padding="p-4">
+
+    <Container class="card">
+        <Container class="card-header">
+            <Text>Informazioni Generali</Text>
+        </Container>
+        <Group type="list" class="list-group-flush" expand="vertical">
+            <Text>ID: vol-data01</Text>
+            <Text>Name: Volume dati principale</Text>
+            <Text>Description: Archivio persistente per database</Text>
+            <Text>Status: 🟢 Attivo</Text>
+            <Text>Created: 2024-11-22</Text>
+            <Text>Mount Point: /data/db</Text>
+            <Text>Filesystem: ext4</Text>
+        </Group>
+        <Container class="card-footer">
+            <Text>Attached to: LXC-1000, VM-2001</Text>
+        </Container>
+    </Container>
+
+    <Container class="card">
+        <Container class="card-header">
+            <Text>Capacità  Utilizzo</Text>
+        </Container>
+        <Group type="list" class="list-group-flush" expand="vertical">
+            <Text>Size: 100 GB</Text>
+            <Text>Used: 45.3 GB</Text>
+            <Text>Available: 54.7 GB</Text>
+            <Text>Usage: 45%</Text>
+            <Text>Inodes: 15.2k / 100k</Text>
+            <Text>Compression: zstd</Text>
+        </Group>
+        <Container class="card-footer">
+            <Text>Last Check: 2025-04-10 08:22</Text>
+        </Container>
+    </Container>
+
+    <Container class="card">
+        <Container class="card-header">
+            <Text>Snapshot  Backup</Text>
+        </Container>
+        <Group type="list" class="list-group-flush" expand="vertical">
+            <Text>Snapshots: 3 (daily)</Text>
+            <Text>Last Snapshot: 2025-04-15 02:00</Text>
+            <Text>Backups: Enabled</Text>
+            <Text>Backup Location: /mnt/backup/volumes</Text>
+            <Text>Encryption: AES-256</Text>
+        </Group>
+        <Container class="card-footer">
+            <Text>Next Backup: 2025-04-17 02:00</Text>
+        </Container>
+    </Container>
+
+    <Container class="card">
+        <Container class="card-header">
+            <Text>Policy Sicurezza</Text>
+        </Container>
+        <Group type="list" class="list-group-flush" expand="vertical">
+            <Text>Read-only: No</Text>
+            <Text>Access Control: Restricted</Text>
+            <Text>Replication: Enabled</Text>
+            <Text>Integrity Check: CRC</Text>
+            <Text>Audit Log: Active</Text>
+        </Group>
+        <Container class="card-footer">
+            <Text>Compliant ✅</Text>
+        </Container>
+    </Container>
+
+</Container>
+
+<Container background="#f8f9fa" size="fluid" padding="p-4" expand="True" class="border-top border-bottom">
+    <Group type="nav" class="border-bottom">
+        <Action route="tab:overview"><Graph icon="bi-info-circle"/><Text class="text-uppercase">Overview</Text></Action>
+        <Action route="tab:mount"><Graph icon="bi-link"/><Text class="text-uppercase">Mounts</Text></Action>
+        <Action route="tab:snapshots"><Graph icon="bi-camera"/><Text class="text-uppercase">Snapshots</Text></Action>
+        <Action route="tab:backup"><Graph icon="bi-hdd-network"/><Text class="text-uppercase">Backup</Text></Action>
+        <Action route="tab:log"><Graph icon="bi-journal-text"/><Text class="text-uppercase">Log</Text></Action>
+        <Action route="tab:settings"><Graph icon="bi-sliders"/><Text class="text-uppercase">Settings</Text></Action>
+    </Group>
+    <Group type="tab">
+        <Container id="overview"><Text>Dettagli generali del volume</Text></Container>
+        <Container id="mount"><Text>Volume montato su...</Text></Container>
+        <Container id="snapshots"><Text>Gestione snapshot</Text></Container>
+        <Container id="backup"><Text>Backup pianificati</Text></Container>
+        <Container id="log"><Text>Registro eventi volume</Text></Container>
+        <Container id="settings"><Text>Configurazione avanzata</Text></Container>
+    </Group>
+</Container>
+{% endblock %}

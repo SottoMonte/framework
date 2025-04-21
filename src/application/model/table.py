@@ -19,7 +19,9 @@
 
 table = (
     {'name':'id','type':'string','default':'None'},
+    {'name':'repository','type':'string','default':'None'},
     {'name':'model','type':'string','default':'None'},
+    {'name':'view','type':'string','default':'None'},
     {'name':'selected','type':'list','default':[]},
     {'name':'pageCurrent','type':'int','default':1},
     {'name':'pageRows','type':'int','default':5},

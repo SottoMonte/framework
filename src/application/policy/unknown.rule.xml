@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Rules role="unknown">
+    <Rule name="view" behavior="PERMISSIVE" action="view" />
+    <Rule name="save" behavior="PERMISSIVE" action="save">
+        <Repository name="github" />
+        <Model name="file"/>
+    </Rule>
+    <Rule name="delete" behavior="PERMISSIVE" action="delete" />
+    <Rule name="delete" behavior="PERMISSIVE" action="view" >
+        <Route name="" maxRequests="100" timeFrame="24h" />
+    </Rule>
+</Rules>

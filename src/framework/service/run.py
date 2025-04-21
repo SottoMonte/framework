@@ -1,31 +1,18 @@
 import asyncio
 import sys
 
-flow = language.load_module(area="framework",service='service',adapter='flow')
-loader = language.load_module(area="framework",service='service',adapter='loader')
+loader = language.load_main(language,area="framework",service='service',adapter='loader')
 
-loader.bootstrap_adapter()
+#modules = {'loader': 'framework.service.loader','language': 'framework.service.language'}
 
-@flow.asynchronous(managers=('presentation','messenger'))
-async def main(presentation=None,messenger=None, **constants):
-    event_loop = asyncio.get_event_loop()
-    await messenger.post(msg="Caricamento degli elementi della presentazione.")
-    for item in presentation:
-        await messenger.post(msg=f"Caricamento dell'elemento: {item}")
-        if hasattr(item, "loader"):
-            item.loader(loop=event_loop)
-        else:
-            await messenger.post(msg=f"L'elemento {item} non ha un metodo 'loader'.")
-        
-
-@flow.synchronous(managers=('tester',))
+#@flow.synchronous(managers=('tester',))
 def application(tester=None, **constants):
     try:
-        if tester:
+        if tester and '--test' in constants.get('args',[]):
             tester.run()
         event_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(event_loop)
-        event_loop.create_task(main())
+        event_loop.create_task(loader.bootstrap())
         event_loop.run_forever()
     except KeyboardInterrupt:
         # Interruzione manuale con Ctrl+C
@@ -38,7 +25,7 @@ def application(tester=None, **constants):
         filename = last_frame.f_code.co_filename
         module = last_frame.f_code.co_name
         line_number = exc_traceback.tb_lineno
-        print(f"Errore generico: {e}")
+        print(f"RUN -Errore generico: {e}")
         print(f"File: {filename}, Modulo: {module}, Linea: {line_number}")
     finally:
         # Chiusura del loop

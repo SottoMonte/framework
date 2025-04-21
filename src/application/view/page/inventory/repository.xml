@@ -1,0 +1,106 @@
+{% extends "sidebar.xml" %}
+{% block title %}Repository{% endblock %}
+{% block subtitle %}repository #git-321{% endblock %}
+{% block bar %}
+<SideBar selected="application/view/page/inventory/repositories.xml"/>
+{% endblock %}
+{% block action %}
+<Group type="button">
+    <Action type="button" route="tab:settings" class="d-inline-flex btn-outline-success"><Graph icon="bi-git"/><Text class="text-uppercase">Clone</Text></Action>
+    <Action type="button" route="tab:settings" class="d-inline-flex btn-outline-warning"><Graph icon="bi-arrow-repeat"/><Text class="text-uppercase">Sync</Text></Action>
+    <Action type="button" route="tab:settings" class="d-inline-flex btn-outline-danger"><Graph icon="bi-trash3"/><Text class="text-uppercase">Delete</Text></Action>
+</Group> 
+{% endblock %}
+{% block content %}
+<Container class="card-group" padding="p-4">
+    <Container class="card">
+        <Container class="card-header">
+            <Text>Generali</Text>
+        </Container>  
+        <Group type="list" class="list-group-flush" expand="vertical">
+            <Text>ID: git-321</Text>
+            <Text>Name: backend-api</Text>
+            <Text>Description: Microservizio API per autenticazione</Text>
+            <Text>Platform: GitHub</Text>
+            <Text>Language: Python</Text>
+            <Text>Tags: api, auth, fastapi</Text>
+            <Text>Owner: devops-team</Text>
+            <Text>Visibility: Private</Text>
+        </Group>
+        <Container class="card-footer">
+            <Text>Created: 2023-05-20 | Last Updated: 2025-04-10</Text>
+        </Container>   
+    </Container>
+
+    <Container class="card">
+        <Container class="card-header">
+            <Text>Repository Info</Text>
+        </Container>
+        <Group type="list" class="list-group-flush" expand="vertical">
+            <Text>Main Branch: main</Text>
+            <Text>Commits: 124</Text>
+            <Text>Releases: 5</Text>
+            <Text>Stars: 12 | Forks: 3</Text>
+            <Text>CI Status: ✅ Passing</Text>
+            <Text>Coverage: 89%</Text>
+        </Group>
+        <Container class="card-footer">
+            <Text>Last Commit: 2025-04-10T12:47</Text>
+        </Container>
+    </Container>
+
+    <Container class="card">
+        <Container class="card-header">
+            <Text>Collaborazione</Text>
+        </Container>
+        <Group type="list" class="list-group-flush" expand="vertical">
+            <Text>Maintainers: alice, marco</Text>
+            <Text>Collaboratori: 5</Text>
+            <Text>Access: read/write</Text>
+            <Text>Merge Policy: 1 approval required</Text>
+        </Group>
+        <Container class="card-footer">
+            <Text>Branch Protection: Active</Text>
+        </Container>
+    </Container>
+
+    <Container class="card">
+        <Container class="card-header">
+            <Text>Sicurezza CI/CD</Text>
+        </Container>
+        <Group type="list" class="list-group-flush" expand="vertical">
+            <Text>Secrets: GIT_TOKEN, API_KEY</Text>
+            <Text>Vulnerabilities: 0</Text>
+            <Text>Pipeline: GitHub Actions</Text>
+            <Text>Deploy: auto-prod.yml</Text>
+        </Group>
+        <Container class="card-footer">
+            <Text>Audit: Last scan 2025-04-09</Text>
+        </Container>
+    </Container>
+</Container>
+
+<Group type="nav" margin="m-0" padding="p-0" class="border-bottom">
+    <Action class="d-inline-flex" route="tab:overview"><Graph icon="bi-code"/><Text class="text-uppercase">Code</Text></Action>
+    <Action class="d-inline-flex" route="tab:issues"><Graph icon="bi-exclamation-circle"/><Text class="text-uppercase">Issues</Text></Action>
+    <Action class="d-inline-flex" route="tab:pulls"><Graph icon="bi-git"/><Text class="text-uppercase">Pull Requests</Text></Action>
+    <Action class="d-inline-flex" route="tab:actions"><Graph icon="bi-play-circle"/><Text class="text-uppercase">Actions</Text></Action>
+    <Action class="d-inline-flex" route="tab:project"><Graph icon="bi-kanban"/><Text class="text-uppercase">Project</Text></Action>
+    <Action class="d-inline-flex" route="tab:wiki"><Graph icon="bi-book"/><Text class="text-uppercase">Wiki</Text></Action>
+    <Action class="d-inline-flex" route="tab:security"><Graph icon="bi-shield-exclamation"/><Text class="text-uppercase">Security</Text></Action>
+    <Action class="d-inline-flex" route="tab:settings"><Graph icon="bi-gear"/><Text class="text-uppercase">Settings</Text></Action>
+    <Action class="d-inline-flex" route="tab:logs"><Graph icon="bi-clock-history"/><Text class="text-uppercase">Activity</Text></Action>
+</Group>
+
+<Group type="tab" background="#fafafa" padding="p-4" class=" border-bottom" >
+    <Container expand="dynamic" id="overview"><Text>Codice sorgente...</Text></Container>
+    <Container expand="dynamic" id="issues"><Text>Lista Issues</Text></Container>
+    <Container expand="dynamic" id="pulls"><Text>Lista Pull Requests</Text></Container>
+    <Container expand="dynamic" id="actions"><Text>Lista Pull Requests</Text></Container>
+    <Container expand="dynamic" id="project"><Text>Lista Pull Requests</Text></Container>
+    <Container expand="dynamic" id="security"><Text>Security</Text></Container>
+    <Container expand="dynamic" id="wiki"><Text>Security</Text></Container>
+    <Container expand="dynamic" id="settings"><Text>Configurazioni repo</Text></Container>
+    <Container expand="dynamic" id="logs"><Text>Storico attività</Text></Container>
+</Group>
+{% endblock %}

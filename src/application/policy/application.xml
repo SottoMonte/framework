@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Application BANDWIDTH="8.33 Mbit/s" >
-    <Connection BILLING_METHOD=""></Connection>
-    <Route path="/login" type="action" method="POST" />
-    <Route path="/logout" type="action" method="POST" />
-    <Route path="/" type="view" method="GET" />
-    <Route path="/gather" type="action" method="GET" policy="" />
-</Application>

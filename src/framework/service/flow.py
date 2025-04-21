@@ -2,27 +2,22 @@ import asyncio
 from kink import inject,di
 import sys
 
+
+
 def asynchronous(**constants):
-    inject = [] 
-    if 'managers' in constants:
-        for manager in  constants['managers']:
-            inject.append(di[manager])
-    
+    inject = [di[manager] for manager in constants.get('managers', [])]
+    output = constants.get('outputs', [])
+    input = constants.get('inputs', [])
     def decorator(function):
         async def wrapper(*args, **kwargs):
-            for key in constants.get('model',{}):
-                print(kwargs)
-                
-                kwargs = await language.builder(key,kwargs,{},'filtered',language)
-                print(kwargs)
-            # Arguments
-            test = list(args) + inject
+            args_inject = list(args) + inject
             if 'inputs' in constants:
-                output = await function(*test,**kwargs)
+                kwargs_builder = await language.builder(input,kwargs,{},'full',language)
+                outcome = await function(*args_inject,**kwargs_builder)
             else:
-                output = await function(*test,**kwargs)
-            if 'outputs' in constants:pass
-            else: return output
+                outcome = await function(*args_inject,**kwargs)
+            if 'outputs' in constants: return await language.builder(output,outcome,{},'filtered',language)
+            else: return outcome
         return wrapper
     return decorator
 
@@ -37,7 +32,10 @@ def synchronous(**constants):
 
     def decorator(function):
         def wrapper(*args, **kwargs):
-            try:
+            test = list(args) + inject
+            output = function(*test, **kwargs)
+            return output
+            '''try:
                 # Combina gli argomenti passati alla funzione con gli oggetti iniettati
                 test = list(args) + inject
                 output = function(*test, **kwargs)
@@ -51,13 +49,13 @@ def synchronous(**constants):
                 filename = tb.tb_frame.f_code.co_filename
                 module_name = tb.tb_frame.f_code.co_name
                 line_number = tb.tb_lineno
-
+                print(exc_traceback,exc_type,exc_value)
                 # Log dell'errore dettagliato
                 print(f"Errore generico: {e}")
                 print(f"File: {filename}")
                 print(f"Modulo: {module_name}")
                 print(f"Linea: {line_number}")
                 # Rilancia l'eccezione per ulteriori gestioni, se necessario
-                raise
+                raise'''
         return wrapper
     return decorator

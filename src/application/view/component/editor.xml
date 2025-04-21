@@ -3,10 +3,10 @@
     <Column style="background-color:#ccc;" alignment="center">
         <Text expand="dynamic" ></Text>
         <Group type="nav" margin="m-0" padding="p-0">
-            <Action id="nav-1" link="#visual-{{ id }}" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-binoculars"/></Action>
-            <Action id="nav-2" link="#text-{{ id }}" data-bs-toggle="tab" class="d-inline-flex"><Graph icon="bi-code-slash"/></Action>
+            <Action id="nav-1" route="tab:visual-{{ id }}" class="d-inline-flex"><Graph icon="bi-binoculars"/></Action>
+            <Action id="nav-2" route="tab:text-{{ id }}" class="d-inline-flex"><Graph icon="bi-code-slash"/></Action>
         </Group>
-        <Action link="#framework" click="save(model:'file',identifier:'{{ storekeeper.result.name }}',target:'block-editor-{{ id }}')" ><Graph icon="bi-floppy2-fill"/></Action>
+        <Action link="#framework" click="save(model:'file',path:'{{ storekeeper.result.0.path }}',target:'block-editor-{{ id }}')" ><Graph icon="bi-floppy2-fill"/></Action>
     </Column>
     <Row droppable="element" padding="p-0" expand="dynamic" >
         <Group type="tab" expand="dynamic" class="overflow-auto">
@@ -16,7 +16,7 @@
                 </Row>
             </Column>
             <Container id="text-{{ id }}" expand="full" padding="p-0">
-                <Text id="block-editor-{{ id }}" init="editor(target:'block-editor-{{ id }}',identifier:'{{ storekeeper.result.name }}')" class="editor h-100 border" storekeeper="result.content" type="editable"></Text>
+                <Text id="block-editor-{{ id }}" init="editor(target:'block-editor-{{ id }}',path:'{{ storekeeper.result.0.path }}')" class="editor h-100 border" storekeeper="result.0.content" type="editable"></Text>
             </Container>
         </Group>
     </Row>

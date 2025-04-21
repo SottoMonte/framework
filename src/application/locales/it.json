@@ -1,0 +1,11 @@
+{
+    "it": {
+      "greeting": "Ciao",
+      "farewell": "Addio",
+      "welcome_message": "Benvenuto nel nostro sito web!",
+      "error": {
+        "not_found": "Pagina non trovata",
+        "server_error": "Si è verificato un errore sul server"
+      }
+    }
+}

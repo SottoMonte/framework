@@ -27,6 +27,22 @@ class defender:
                 return token
         return None
 
+    async def registration(self, **constants) -> Any:
+        """
+        Autentica un utente utilizzando i provider configurati.
+
+        :param constants: Deve includere 'identifier', 'ip' e credenziali.
+        :return: Token di sessione se l'autenticazione ha successo, altrimenti None.
+        """
+        identifier = constants.get('identifier', '')
+        ip = constants.get('ip', '')
+        for backend in self.providers:
+            token = await backend.registration(**constants)
+            if token:
+                self.sessions[identifier] = {'token': token, 'ip': ip}
+                return token
+        return None
+
     async def authenticated(self, **constants) -> bool:
         """
         Verifica se una sessione è autenticata.
@@ -59,6 +75,12 @@ class defender:
             if session.get('ip') == ip:
                 return identifier
         return None
+    
+    async def whoami2(self, **constants) -> Any:
+        
+        for backend in self.providers:
+            identity = await backend.whoami(token=constants.get('token', ''))
+            return identity
 
     async def detection(self, **constants) -> bool:
         """
@@ -78,7 +100,7 @@ class defender:
         """
         return True
 
-    def logout(self, **constants) -> bool:
+    async def logout(self, **constants) -> bool:
         """
         Termina la sessione di un utente specificato.
 
@@ -86,10 +108,12 @@ class defender:
         :return: True se la sessione è stata terminata, False se l'utente non esiste.
         """
         identifier = constants.get('identifier', '')
+
+        for backend in self.providers:
+            await backend.logout()
+
         if identifier in self.sessions:
             del self.sessions[identifier]
-            return True
-        return False
 
     def cleanup_expired_sessions(self, **constants) -> None:
         """

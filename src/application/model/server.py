@@ -1,0 +1,15 @@
+server = (
+    {'name': 'id', 'type': 'uuid', 'default': 'gen_random_uuid()', 'required': True},
+    {'name': 'name', 'type': 'string', 'required': True},
+    {'name': 'description', 'type': 'string', 'default': 'None'},
+    {'name': 'os', 'type': 'string', 'required': True},
+    {'name': 'ip_address', 'type': 'string', 'unique': True, 'required': True},
+    {'name': 'status', 'type': 'string', 'default': 'inactive', 
+     'regex': r'^(active|inactive|maintenance)$'},
+    {'name': 'firewall_enabled', 'type': 'boolean', 'default': True},
+    {'name': 'backup_enabled', 'type': 'boolean', 'default': False},
+    {'name': 'actions', 'type': 'jsonb', 'default': '[]'},
+    {'name': 'owner_id', 'type': 'uuid', 'required': True},
+    {'name': 'created_at', 'type': 'timestamp', 'default': 'now()'},
+    {'name': 'updated_at', 'type': 'timestamp', 'default': 'now()'},
+)

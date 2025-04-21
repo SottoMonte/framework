@@ -1,17 +1,15 @@
 import sys
+
+modules = {'flow': 'framework.service.flow','persistence': 'framework.port.persistence'}
+
 if sys.platform == 'emscripten':
     import pyodide
     import json
-    flow = language.load_module(area="framework",service='service',adapter='flow')
-    persistence = language.load_module(area="framework",service='port',adapter='persistence')
 else:
     import aiohttp
     import time
     import jwt
     import json
-    import framework.port.persistence as persistence
-    import framework.service.flow as flow
-    import framework.service.language as language
     import base64
 
 class adapter(persistence.port):

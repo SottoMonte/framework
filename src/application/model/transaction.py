@@ -1,11 +1,3 @@
-import application.model.identifier as identifier
-import application.model.time as time
-import application.model.user as user
-import application.model.string as string
-import application.model.natural as natural
-import application.model.event as event
-import application.model.boolean as boolean
-import application.model.result as result
 
 '''
 ID della Transazione: Un identificatore unico per la transazione.
@@ -18,15 +10,16 @@ Log delle Modifiche: Un registro delle modifiche apportate ai dati durante la tr
 Durata: Il tempo totale impiegato per completare la transazione.'''
 
 transaction = (
-    {'model':identifier.uuid},
-    {'name':'state','model':boolean.boolean},
-    {'name':'action','model':string.string},
-    {'name':'time','model':time.time,'default':'yyyy-mm-dd hh:mm:ss'},
+    {'name':'identifier','type':'string'},
+    {'name':'state','type':'boolean','default':False},
+    {'name':'action','type':'string'},
+    {'name':'time','type':'string','default':'yyyy-mm-dd hh:mm:ss'},
     #{'name':'user','model':user.user},
-    {'name':'remark','model':string.string},
-    {'name':'worker','model':string.string},
+    {'name':'remark','type':'string'},
+    {'name':'worker','type':'string'},
+
     #{'name':'event','model':event.event},
-    {'name':'parameter','type':{},'default':{}},
-    {'name':'transaction','type':{},'default':[],'iterable':True},
-    {'name':'result','type':dict(),'iterable':True,'default':{}},
+    {'name':'parameter','type':'dict','default':{}},
+    #{'name':'transaction','type':'list','default':[],'iterable':True},
+    {'name':'result','type':'list','force_type':'dict','iterable':True,'default':[]},
 )

@@ -3,43 +3,17 @@
     <Window type="modal" id="window-create-{{ component.id }}" position="centered" size="xl" title="Create" action="create">
         <Action type="form" id="form-create" action="/create" method="POST">
             <Input type="text" identifier="model" placeholder="Name" value="file" />
-            <Input type="text" identifier="repo" placeholder="Name" value="{{ storekeeper.result.tree.repository }}" />
+            <Input type="text" identifier="repo" placeholder="Name" value="{{ storekeeper.result[0].tree.repository }}" />
             <Input type="text" identifier="file_path" placeholder="path" />
         </Action>
     </Window>
     <Window type="modal" id="window-delete-{{ component.id }}" position="centered" size="xl" title="Delete" action="delete">
         <Action type="form" id="form-delete" action="/delete" method="POST">
             <Input type="text" identifier="model" placeholder="Name" value="file" />
-            <Input type="text" identifier="repo" placeholder="Name" value="{{ storekeeper.result.tree.repository }}" />
+            <Input type="text" identifier="repo" placeholder="Name" value="{{ storekeeper.result[0].tree.repository }}" />
             <Input type="text" identifier="file_path" placeholder="path" />
         </Action>
     </Window>
-    {% if 'type' not in attributes  %}
-        {% set tree_data = dict({
-    'id': 'root',
-    'name': 'Root Node',
-    'children': [
-        {
-            'id': 'node1',
-            'name': 'Node 1',
-            'children': [
-                {'id': 'node1_1', 'name': 'Node 1.1', 'children': []},
-                {'id': 'node1_2', 'name': 'Node 1.2', 'children': []}
-            ]
-        },
-        {
-            'id': 'node2',
-            'name': 'Node 2',
-            'children': [
-                {'id': 'node2_1', 'name': 'Node 2.1', 'children': []}
-            ]
-        }
-    ]
-}) %}
-    {% else  %}
-        {% set another = dict({'tag':'#'}) %}
-    {% endif  %}
-
     {% macro render_node(node) %}
         {% if node['children'] and node['children']|length != 0 %}
         <Group id="{{ node['id'] }}" type="node" name="{{ node['name'] }}">
@@ -66,5 +40,6 @@
         {% endif %}
     {% endmacro %}
 
-    {{ render_node(storekeeper.result.tree) }}  
+    {{ render_node(storekeeper.result[0].tree) }}  
+    
 </Group>

@@ -1,60 +1,53 @@
-#import application.port.language as language
-from collections import OrderedDict
-
-
 from kink import di
 import importlib
 import tomli
 import sys
 import os
 from jinja2 import Environment
+import asyncio
+import ast
+import re
+import fnmatch
+from datetime import datetime, timezone
+import uuid
 
-def ttt(**constants):
-    adapter = constants['adapter'] if 'adapter' in constants else ''
-    service = constants['service'] if 'service' in constants else ''
-    area = constants['area'] if 'area' in constants else ''
-    payload = constants['payload'] if 'payload' in constants else ''
+def generate_identifier():
+    return str(uuid.uuid4())
 
-    spec=importlib.util.spec_from_file_location(adapter,f"src/{area}/{service}/{adapter}.py")
- 
-    # creates a new module based on spec
-    foo = importlib.util.module_from_spec(spec)
 
-    spec_lang=importlib.util.spec_from_file_location('language','src/framework/service/language.py')
-    foo_lang = importlib.util.module_from_spec(spec_lang)
-    spec_lang.loader.exec_module(foo_lang)
-    setattr(foo,'language',foo_lang)
+
+def time_now_utc():
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S.%f")
+
+def wildcard_match(check, pattern):
+    """
+    Restituisce il primo elemento in `check` che corrisponde al `pattern` con wildcard (*),
+    oppure None se non c'è corrispondenza.
+    """
     
-    # executes the module in its own namespace
-    # when a module is imported or reloaded.
-    spec.loader.exec_module(foo)
+    check = list(check)  # Conversione da dict_keys se necessario
+    r = []
+    for item in check:
+        if fnmatch.fnmatch(item, pattern):
+            r.append(item)
+    print(f"Wildcard match: {pattern} {check} -> {r}")
+    return r
 
-    return foo
-            
-def load_module(**c):
-    if sys.platform == 'emscripten':
-        return loader_provider_test(**c)
-    else:
-        return ttt(**c)
-
-async def get_module(path,lang):
-    #response = js.fetch(f'application/action/{act}.py',{'method':'GET'})
-    response = js.fetch(path,{'method':'GET'})
-    file = await response
-    aa = await file.text()
-    
-    neepath = path.replace('.py','')
-    nettt = neepath.split('/')
-    spec = importlib.util.spec_from_loader(last(nettt), loader=None)
-    module = importlib.util.module_from_spec(spec)
-    setattr(module,'language',lang)
-    #print(aa,module.__dict__)
-    exec(aa, module.__dict__)
-    return module
+async def extract_modules_from_code(code):
+    """Copia il contenuto della variabile 'modules' dal codice senza eseguire exec e lo restituisce."""
+    extracted_modules = None
     try:
-        pass
+        tree = ast.parse(code)
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name) and target.id == "modules":
+                        extracted_modules = ast.literal_eval(node.value)
+                        break
     except Exception as e:
-        print(f"error load 'infrastructure module'",str(e))
+        print(f"Errore durante l'analisi dei moduli richiesti: {e}")
+    return extracted_modules if extracted_modules is not None else {}
+
 
 def get_module_os(path, lang):
     try:
@@ -81,35 +74,6 @@ def get_module_os(path, lang):
     except Exception as e:
         print(f"Error loading 'infrastructure module': {str(e)}")
 
-async def loader_module(self,act):
-    response = js.fetch(f'application/action/{act}.py',{'method':'GET'})
-    file = await response
-    aa = await file.text()
-    try:
-        spec = importlib.util.spec_from_loader(act, loader=None)
-        module = importlib.util.module_from_spec(spec)
-        exec(aa, module.__dict__)
-        return module
-    except Exception as e:
-        print(f"error load 'infrastructure module'")
-
-def loader_provider(**constants):
-    adapter = constants['adapter'] if 'adapter' in constants else ''
-    service = constants['service'] if 'service' in constants else ''
-    payload = constants['payload'] if 'payload' in constants else ''
-    if service not in di:
-        di[service] = lambda di: list([])
-    req = js.XMLHttpRequest.new()
-    req.open("GET", f"infrastructure/{service}/{adapter}.py", False)
-    req.send()
-    try:
-        spec = importlib.util.spec_from_loader(adapter, loader=None)
-        module = importlib.util.module_from_spec(spec)
-        exec(req.response, module.__dict__)
-        provider = getattr(module,'adapter')
-        di[service].append(provider(config=payload))
-    except Exception as e:
-        print(f"error load 'infrastructure.{service}.{adapter}'")
 
 def get_var(accessor_string,input_dict):
           """Gets data from a dictionary using a dotted accessor-string"""
@@ -123,35 +87,101 @@ def get_var(accessor_string,input_dict):
 
 
 if sys.platform != 'emscripten':
-    def loader_provider_test(**constants):
-        pass
+    async def backend(**constants):
+        area, service, adapter = constants["path"].split(".")
+        f = open(f"src/{area}/{service}/{adapter}.py", "r")
+        ok = f.read()
+        f.close() 
+        return ok
+    
+else:
+    import js
 
-    def loader_manager(**constants):
-        driver = importlib.import_module(constants['path'], package=None)
-        provider = getattr(driver,constants['name'])
-        ser = constants['provider'] 
-        if ser not in di:
-            di[ser] = lambda di: list([])
-        di[constants['name']] = lambda _di: provider(providers=di[ser])
+    async def backend(**constants):
+        area, service, adapter = constants["path"].split(".")
 
-    def loader_driver(**constants):
-        driver = importlib.import_module(constants['path'], package=None)
-        provider = getattr(driver,constants['name'])
-        di[constants['name']] = lambda _di: provider()
+        module_url = f"{area}/{service}/{adapter}.py"
 
-    def loader_provider(**constants):
-        adapter = constants['adapter'] if 'adapter' in constants else ''
-        service = constants['service'] if 'service' in constants else ''
-        payload = constants['payload'] if 'payload' in constants else ''
+        """Effettua una richiesta HTTP asincrona e restituisce il contenuto della risposta."""
+        response = await js.fetch(module_url,{'method':'GET'})
+        a = await response.text()
+        return a
+    
+
+async def load_module(lang, **constants):
+    try:
+        # Estrae il nome del modulo
+        area, service, adapter = constants["path"].split(".")
+        
+        # Recupera il codice del modulo dal backend
+        module_code = await backend(**constants)
+        if not module_code or not isinstance(module_code, str):
+            raise ValueError(f"⚠️ Codice del modulo '{adapter}' non valido o vuoto.")
+
+        # Controlla le dipendenze del modulo
+        modules_to_install = await extract_modules_from_code(module_code)
+
+        # Crea un nuovo modulo dinamico
+        spec = importlib.util.spec_from_loader(adapter, loader=None)
+        module = importlib.util.module_from_spec(spec)
+        module.language = lang
+
+        # Carica i moduli richiesti ricorsivamente
+        for module_name, module_path in modules_to_install.items():
+            setattr(module, module_name, await load_module(lang, path=module_path))
+
+        # Esegue il codice nel contesto del modulo
+        exec(module_code, module.__dict__)
+
+        # Registra il modulo in sys.modules per permettere future importazioni
+        #sys.modules[adapter] = module
+
+        print(f"✅ Modulo '{adapter}' caricato con successo.")
+        return module
+
+    except Exception as e:
+        print(f"❌ Errore durante il caricamento del modulo '{adapter}': {e}")
+        return None
+
+async def load_provider(lang,**constants):
+        adapter = constants.get('adapter', '')
+        service = constants.get('service', '')
+        payload = constants.get('payload', '')
 
         if service not in di:
             di[service] = lambda di: list([])
-        driver = importlib.import_module(f"infrastructure.{service}.{adapter}", package=None)
-        provider = getattr(driver,'adapter')
-        di[service].append(provider(config=payload))
-else:
-    import js
-    def loader_provider_test(**constants):
+
+        try:
+            module = await load_module(lang,**constants)
+            # Ottiene il provider e lo registra
+            provider = getattr(module, 'adapter')
+            di[service].append(provider(config=payload))
+
+        except Exception as e:
+            print(f"❌ Error: loading 'infrastructure.{service}.{adapter}': {repr(e)}")
+
+async def load_manager(lang,**constants):
+        area, service, adapter = constants["path"].split(".")
+
+        if service not in di:
+            di[service] = lambda di: list([])
+
+        try:
+            module = await load_module(lang,**constants)
+
+            # Ottiene il provider e lo registra
+            provider = getattr(module, adapter)
+            
+            ser = constants["provider"]
+            if ser not in di:
+                di[ser] = lambda di: list([])
+
+            di[constants["name"]] = lambda _di: provider(providers=di[ser])
+        except Exception as e:
+            print(constants)
+            print(f"❌ Error: loading 'infrastructure.{service}.{adapter}': {repr(e)}")
+    
+def loader_provider_test(**constants):
 
         
         adapter = constants['adapter'] if 'adapter' in constants else ''
@@ -179,72 +209,93 @@ else:
         
 
         return module
+
+def ttt(**constants):
+    adapter = constants['adapter'] if 'adapter' in constants else ''
+    service = constants['service'] if 'service' in constants else ''
+    area = constants['area'] if 'area' in constants else ''
+    payload = constants['payload'] if 'payload' in constants else ''
+
+    spec=importlib.util.spec_from_file_location(adapter,f"src/{area}/{service}/{adapter}.py")
+ 
+    # creates a new module based on spec
+    foo = importlib.util.module_from_spec(spec)
+
+    spec_lang=importlib.util.spec_from_file_location('language','src/framework/service/language.py')
+    foo_lang = importlib.util.module_from_spec(spec_lang)
+    spec_lang.loader.exec_module(foo_lang)
+    setattr(foo,'language',foo_lang)
     
-    def loader_manager(**constants):
-        area,service,adapter = constants['path'].split('.')
+    # executes the module in its own namespace
+    # when a module is imported or reloaded.
+    spec.loader.exec_module(foo)
 
-        if service not in di:
-            di[service] = lambda di: list([])
-        try:
-            req = js.XMLHttpRequest.new()
-            req.open("GET", f"{area}/{service}/{adapter}.py", False)
-            req.send()
+    return foo
 
-            req2 = js.XMLHttpRequest.new()
-            req2.open("GET", f"framework/service/language.py", False)
-            req2.send()
+def load_main(lang,**c):
+    
+    if sys.platform == 'emscripten':
+        a = loader_provider_test(**c)
+        return a
+    else:
+        return ttt(**c)
 
-            spec2 = importlib.util.spec_from_loader('language', loader=None)
-            module2 = importlib.util.module_from_spec(spec2)
-            exec(req2.response, module2.__dict__)
-            
-            spec = importlib.util.spec_from_loader(adapter, loader=None)
-            module = importlib.util.module_from_spec(spec)
-            module.language = module2
-            exec(req.response, module.__dict__)
+# Definizione dei campi richiesti in base all'adapter
+ADAPTER_FIELDS = {
+    "wasm": ["host", "port", "view", "routes"],
+    "starlette": ["host", "port", "view", "routes"],
+    "logging": ["host", "port", "persistence"],
+    "websocket": ["url"],
+    "api": ["url",'authorization','accept',],
+    "mqtt": ["url", "port", "username", "password"],
+    'oauth': ['url','id','secret'],
+    "jwt": ["url", "app_id", "installation_id", "key", "autologin"],
+    "supabase": ["url", "key"],
+    "fs": [],
+    "ansible": ['playbook_path','inventory_file','extra_vars','timeout'],
+    "log": ['format','level','file'],
+    "console": ['format','level','file'],
+    "redis": ['host','port','database','password'],
+}
 
-            provider = getattr(module,adapter)
-            ser = constants['provider'] 
-            if ser not in di:
-                di[ser] = lambda di: list([])
-            
-            
-            di[constants['name']] = lambda _di: provider(providers=di[ser])
-        except Exception as e:
-            print(constants)
-            print(f"error load 'infrastructure.{service}.{adapter}' {repr(e)}")
+
+def validate_toml(content):
     
 
-    def loader_provider(**constants):
-        adapter = constants['adapter'] if 'adapter' in constants else ''
-        service = constants['service'] if 'service' in constants else ''
-        payload = constants['payload'] if 'payload' in constants else ''
-        area = constants['area'] if 'area' in constants else ''
-        if service not in di:
-            di[service] = lambda di: list([])
-        try:
-            req = js.XMLHttpRequest.new()
-            req.open("GET", f"{area}/{service}/{adapter}.py", False)
-            req.send()
+    # Caricare il TOML processato
+    config = tomli.loads(content)
 
-            req2 = js.XMLHttpRequest.new()
-            req2.open("GET", f"framework/service/language.py", False)
-            req2.send()
+    errors = []
+    for section, zone in config.items():
+        if section == "app":
+            continue
+        for name in zone:
+            fields = zone[name]
+            full_name = f"{section}.{name}"
+            if "adapter" not in fields:
+                errors.append(f"⚠️  Nessun adapter specificato nella sezione [{full_name}]")
+                continue  # Saltiamo la validazione se non c'è un adapter
 
-            spec2 = importlib.util.spec_from_loader('language', loader=None)
-            module2 = importlib.util.module_from_spec(spec2)
-            exec(req2.response, module2.__dict__)
-            
-            spec = importlib.util.spec_from_loader(adapter, loader=None)
-            module = importlib.util.module_from_spec(spec)
-            module.language = module2
-            exec(req.response, module.__dict__)
+            adapter = fields["adapter"]
+            required_fields = ADAPTER_FIELDS.get(adapter)
 
-            provider = getattr(module,'adapter')
-            di[service].append(provider(config=payload))
-        except Exception as e:
-            
-            print(f"error load 'infrastructure.{service}.{adapter}' {repr(e)}")
+            if required_fields is None:
+                errors.append(f"❌ Adapter sconosciuto '{adapter}' nella sezione [{full_name}]")
+                continue  # Se l'adapter non è riconosciuto, segnaliamo l'errore e saltiamo
+
+            # Verifica che tutti i campi richiesti dall'adapter siano presenti
+            for field in required_fields:
+                if field not in fields:
+                    errors.append(f"❌ Campo mancante in [{full_name}] per adapter '{adapter}': {field}")
+
+    # Output dei risultati della validazione
+    if errors:
+        print("⛔ Errore di validazione:")
+        for error in errors:
+            print(f"  - {error}")
+        exit(1)
+    else:
+        print("✅ Il file TOML è valido!")
 
 def get_confi(**constants):
     jinjaEnv = Environment()
@@ -254,6 +305,7 @@ def get_confi(**constants):
             template = jinjaEnv.from_string(text)
             content = template.render(constants)
             config = tomli.loads(content)
+            validate_toml(content)
             return config
     else:
         req = js.XMLHttpRequest.new()
@@ -262,6 +314,7 @@ def get_confi(**constants):
         text = str(req.response)
         template = jinjaEnv.from_string(text)
         content = template.render(constants)
+        validate_toml(content)
         config = tomli.loads(content)
         return config
 
@@ -298,6 +351,7 @@ def get(domain,dictionary={}):
             else:
                 if len(puntatore) != 0:
                     puntatore = puntatore[key]
+
 
 def put(domain,value,data=dict()):
         #print(domain)
@@ -336,260 +390,114 @@ def put(domain,value,data=dict()):
         
         return work
 
-def builderOld(schema,value=None,spread={},mode='full'):
-        output = dict({})
-        order = ['type','model','iterable','default','regex']
-        if type(schema) == type(tuple()):
-            for row in schema:
-                name = row['name'] if 'name' in row else '@'
-                
-                if 'model' in row:
-                    name = row['model'][0]['name'] if 'name' in row['model'][0] and 'name' not in row else name
-                a = builder(row,value,spread)
-                output[name] = a
-        elif type(schema) == type(''):
-            if ':' in schema:
-                splited = schema.split(':')
-                #print(splited)
-                model = importlib.import_module(f"application.{splited[0]}.{splited[1]}", package=None)
-                output |= builder(getattr(model,splited[1]),value)
-            else:
-                model = importlib.import_module(f"application.model.{schema}", package=None)
-                output |= builder(getattr(model,schema),value)
-        else:
-            for field in order:
-                if field in schema:
-                    
-                    valore = schema[field]
-                    #if 'model' in schema: schema.pop('model')
-                    #print(schema,spread)
-                    name = schema['name'] if 'name' in schema else ''
-                    if name == '' and 'name' in spread:
-                        name = spread['name']
-                    if 'model' in schema:
-                        name = schema['model'][0]['name'] if 'name' in schema['model'][0] and 'name' not in schema else name
-                    #print(field,valore,name)
-                    
-                    match field:
-                        case 'iterable':
-                            if valore:
-                                output[name] = []
-                        case 'model':
-                            #name = valore[0]['name'] if 'name' in valore[0] else ''
-                            #print('??',name,valore[0])  
-                            if type(dict()) != type(value):
-                                passa = value
-                            elif name in value:
-                                passa = value[name]
-                            else:
-                                passa = None
-
-                            output[name] = builder(valore,passa,schema)
-                        case 'type':
-                            if valore == 'string':
-                                output[name] = ''
-                            if valore == 'integer':
-                                output[name] = 0
-                            if valore == 'model':
-                                output[name] = dict()
-                        case 'default':
-                            if type(value) == type(dict()):
-                                if name in value:
-                                    ccc = value[name]
-                                else:
-                                    ccc = valore
-                            else:
-                                ccc = value
-                            
-                            if type(ccc) in [type(list()),type(dict())] and type(ccc) != type(schema['type']):
-                                for x in ccc:
-                                    if type(x) ==  type(schema['type']):
-                                         output[name].append(x)
-                                    if type(schema['type']) == type(tuple()) and type(x) == type(dict()):
-                                        a = builder(schema['type'],x)
-                                        if type(a) != type(dict()) :
-                                            output[name].append(a)
-                                        elif len(a) != 0:
-                                             output[name].append(a)
-                                        
-                            elif 'type' in schema and type(ccc) == type(schema['type']) :
-                                output[name] = ccc
-                            else:
-                                 output[name] = valore
-                        case 'regex':
-                            pattern = re.compile(valore)
-                            if name in output:
-                                check = output[name] if type(output[name]) != type(dict()) else ''
-                            else: check = ''
-                            if check != '' and not pattern.match(str(check)):
-                                #print(check)
-                                raise Exception(f"Regex not match {valore}")
-                                            
-        if len(output) == 1:
-            return output[next(iter(output))]
-        else: return output
-
-async def builder(schema, value=None, spread={},mode='full',lang=None):
-    def resolve_name(row):
-        if 'model' in row:
-            return row['model'][0].get('name', row.get('name', '@'))
-        return row.get('name', '@')
-
-    def import_model(path):
-        module_name, attr_name = (path.split(':') if ':' in path else (f"model.{path}", path))
-        model = importlib.import_module(f"application.{module_name}")
-        return getattr(model, attr_name)
-
+async def builder(schema, value=None, spread={}, mode='full', lang=None):
+    """Genera un dizionario basato sullo schema specificato, rispettando l'ordine delle operazioni."""
+    
+    value = value or {}  # Assicura che value sia un dizionario
+    
     if isinstance(schema, tuple):
-        return {resolve_name(row): await builder(row, value, spread) for row in schema if mode != 'filtered' or (value and resolve_name(row) in value)}
+        return {
+            row.get('name', '@'): await builder(row, value, spread)
+            for row in schema if mode != 'filtered' or (value and row.get('name', '@') in value)
+        }
 
     if isinstance(schema, str):
-        module = await get_module(path=f'application/model/{schema}.py',lang=lang)
-        model = getattr(module,schema)
-        return await builder(model, value,spread,mode,lang)
-
-    output = {}
-    name = schema.get('name', spread.get('name', ''))
-    if 'model' in schema:
-        name = schema['model'][0].get('name', name)
-
-    for field in ['type', 'model', 'iterable', 'default', 'regex']:
-        if field not in schema:
-            continue
-        value_to_use = schema[field]
-        match field:
-            case 'iterable':
-                output[name] = []
-            case 'model':
-                passa = value.get(name) if isinstance(value, dict) and name in value else value
-                output[name] = builder(value_to_use, passa, schema)
-            case 'type':
-                output[name] = {'string': '', 'integer': 0, 'model': {}}.get(value_to_use, None)
-            case 'default':
-                ccc = value.get(name, value_to_use) if isinstance(value, dict) else value
-                output[name] = ccc if isinstance(ccc, type(schema.get('type', None))) else value_to_use
-                '''if isinstance(ccc, (list, dict)) and not isinstance(ccc, type(schema['type'])):
-                    output[name] = [
-                        builder(schema['type'], x) if isinstance(x, dict) else x
-                        for x in ccc if isinstance(x, type(schema['type']))
-                    ]
-                else:
-                    output[name] = ccc if isinstance(ccc, type(schema.get('type', None))) else value_to_use'''
-            case 'regex':
-                if name in output and not re.match(value_to_use, str(output[name])):
-                    raise Exception(f"Regex not match {value_to_use}")
-
-    return output[next(iter(output))] if len(output) == 1 else output
-
-
-'''def translation(constants,values,keys,input='MODEL',output='MODEL'):
-        
-        out = dict()
-        zwork = dict()
-
-        for x in constants:
-            #print(x,constants)
-            zwork |= put(x,constants[x],zwork)
-        #print(input,output,constants)
-        for row in keys:
-            if not input in row: dd = row['MODEL']
-            else:dd = row[input]
-            if not output in row: name = row['MODEL']
-            else:name = row[output]
-
-            trat = row['MODEL'] if dd not in row else dd
-
-            if type(dd) == type([]):
-                for x in dd:
-                   valor = get(x,zwork)
-                   #valor = [1,2,3] 
-                   if valor != None:break
-            else:valor = get(dd,zwork)
-            #print(name,dd,valor,'<====')
-            if valor != None:
-                #print(input,output,row,dd,trat)
-                if trat in values:
-                    for x in values[trat]:
-                        #print(x)
-                        if type(x[output]) == type(""):
-                            pass
-                        else:
-                            valor = x[output](valor)
-                    #print(valor)
-                out |= put(name,valor,out)
+        try:
+            module = await load_module(lang, path=f'application.model.{schema}')
+            model = getattr(module, schema, None)
+            if not model:
+                raise AttributeError(f"⚠️ '{schema}' non trovato.")
+            return await builder(model, value, spread, mode, lang)
+        except Exception as e:
+            print(f"Errore durante il caricamento dello schema '{schema}': {e}")
             
-        
-        return out'''
 
-def translation2(constants, values, mapper, input='MODEL', output='MODEL'):
-    try:
-        """ Trasforma un set di costanti in un output mappato. """
-        translated = {}
-        for key in mapper:
+    name = schema.get('name', spread.get('name', ''))
+    output = {}
+
+    # Ordine di esecuzione delle operazioni
+    operation_order = ["required", "force_type","default","function", "type", "regex"]
+
+    for operation in operation_order:
+        if operation not in schema:
+            continue
+        
+        match operation:
+            case "force_type":
+                #print(f"⚠️ Forzando il tipo per '{name}'",str(type(value.get(name))), schema["force_type"])
+                if type(value.get(name)).__name__ == schema["force_type"]:
+                    #value[name] = [list(item.items()) if isinstance(item, dict) else item for item in value[name]]
+                    value[name] = [value[name]]
+            case "required":
+                if schema["required"] and name not in value:
+                    raise ValueError(f"⚠️ Campo obbligatorio mancante: {name}")
+
+            case "default":
+                if name not in value:
+                    value[name] = schema["default"]
+
+            case "function":
+                match schema["function"]:
+                    case 'generate_identifier':
+                        value[name] = generate_identifier()
+                    case 'time_now_utc':
+                        value[name] = time_now_utc()
+
+            case "type":
+                expected_types = {
+                    "string": str,
+                    "integer": int,
+                    "boolean": bool,
+                    "dict": dict,
+                    "list": list
+                }
+                expected_type = expected_types.get(schema.get("type"))
+                if expected_type and not isinstance(value.get(name), expected_type):
+                    raise TypeError(f"❌ Tipo non valido per '{name}': atteso {expected_type.__name__}, ricevuto {type(value.get(name)).__name__}")
+
+            case "regex":
+                if name in value and not re.match(schema["regex"], str(value[name])):
+                    raise ValueError(f"⚠️ Regex mismatch per '{name}': {value[name]}")
+
+    output[name] = value.get(name)
+    
+    return output[name] if len(output) == 1 else output
+
+
+def translation(data_dict, fields,mapper, values, input='MODEL', output='MODEL'):
+    
+    """ Trasforma un set di costanti in un output mappato. """
+    translated = {}
+    for key in fields:
+        if key in mapper:
             mapping = mapper[key]
             key_input = mapping.get(input, key)
             key_output = mapping.get(output, key)
-            #print(constants)
-            print(key,mapper,mapping,key_input,key_output,input,output)
-            if type(constants) == type([]):
-                lll = []
-                for item in constants:
-                    print(item)
-                    value = get(key_input,item)
-                    if key in values and output in values[key]:
-                        value = values[key][output](value)
-                        lll.append(value)
-                    else:
-                        lll.append(value)
-                translated |= put(key_output,lll,translated)
+        else:
+            key_input = key
+            key_output = key
+        #print("translation44",key_input,key_output)
+        value = get(key_input, data_dict)
+
+        if key in values and output in values[key]:
+            if value is not None:
+                    value = values[key][output](value)           
             else:
-                
-                value = get(key_input,constants)
-                #print(mapper,mapping,key_input,key_output,input,output,value)
-                if key in values and output in values[key]:
-                    value = values[key][output](value)
-                translated |= put(key_output,value,translated)
-        
-    except Exception as e:
-        print(f"Errore translation: {type(e).__name__}",e)
+                pass
+        #print("translation2",key_input,key_output,value,mapping)
+        translated |= put(key_output, value, translated)
+
     return translated
 
-def translation(constants, values, mapper, input='MODEL', output='MODEL'):
+def translationold2(data, values, mapper, input='MODEL', output='MODEL'):
     try:
-        """ Trasforma un set di costanti in un output mappato. """
-        translated = {}
-        for key in mapper:
-            mapping = mapper[key]
-            key_input = mapping.get(input, key)
-            key_output = mapping.get(output, key)
-
-            if key_input is None or key_output is None:
-                raise ValueError(f"Invalid key mapping for key: {key}")
-
-            if isinstance(constants, list):
-                lll = []
-                for item in constants:
-                    value = get(key_input, item)
-                    if key in values and output in values[key]:
-                        if value is not None:
-                            value = values[key][output](value)
-                    else:
-                        pass
-                    lll.append(value)
-                translated |= put(key_output, lll, translated)
-            else:
-                value = get(key_input, constants)
-
-                if key in values and output in values[key]:
-                    if value is not None:
-                        value = values[key][output](value)           
-                else:
-                    pass
-                translated |= put(key_output, value, translated)
-
+        lista = []
+        for deta in data:
+            lista.append(translation(deta, values, mapper, input, output))
+        return lista
     except Exception as e:
         print(f"Errore translation: {type(e).__name__}: {e}")
-    return translated
+    return []
 
 def filter(self):
         pass

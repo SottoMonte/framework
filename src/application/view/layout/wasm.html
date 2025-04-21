@@ -107,7 +107,6 @@
   border-bottom: 5px solid #2fcc76;
 }
 
-
 /* other */
     .nested {
         padding: 4px 0;
@@ -132,6 +131,24 @@
 </style>
 {% endblock %}
 {% block body_script %}
+<script>
+  const showNewToasts = () => {
+    const toasts = document.querySelectorAll('.toast:not(.shown)');
+
+    toasts.forEach(toastEl => {
+      toastEl.classList.add('shown'); // per evitare di mostrarlo due volte
+      const toast = new bootstrap.Toast(toastEl);
+      toast.show();
+    });
+  };
+
+  // Mostra quelli esistenti subito
+  document.addEventListener('DOMContentLoaded', showNewToasts);
+
+  // Osserva nuovi nodi nel DOM
+  const observer = new MutationObserver(showNewToasts);
+  observer.observe(document.body, { childList: true, subtree: true });
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.5/ace.js" type="text/javascript" charset="utf-8"></script>
 <script>
   /*function updateDragula() {
@@ -217,22 +234,27 @@
         ev.target.appendChild(document.getElementById('img'));
     }
 </script>
-<script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+</script>
 <script>
             // init pyodide and show sys.version when it's loaded successfully
             async function main() {
                 let pyodide = await loadPyodide({
-                    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/",
+                    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.27.0/full/",
                 });
                 await pyodide.loadPackage("micropip");
                 const micropip = pyodide.pyimport("micropip");
                 await micropip.install('kink');
+                
                 await micropip.install('tomli');
                 await micropip.install('jinja2');
                 await micropip.install('untangle');
                 await micropip.install('aiofiles');
                 await micropip.install('bs4');
-
+                
                 /*const dirHandle = await window.showDirectoryPicker();
                 const permissionStatus = await dirHandle.requestPermission({
                   mode: "readwrite",
@@ -245,6 +267,7 @@
                 const nativefs = await pyodide.mountNativeFS("/mount_dir", dirHandle);*/
 
                 pyodide.runPython(await (await fetch("framework/service/language.py")).text());
+                
                 pyodide.runPython(await (await fetch("static/app.py")).text());
                 
                 return pyodide;

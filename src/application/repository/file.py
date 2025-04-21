@@ -1,94 +1,6 @@
+modules = {'factory': 'framework.service.factory','flow': 'framework.service.flow'}
+
 import base64
-import ast
-
-def build_code_tree(file_path):
-    """
-    Analizza un file Python e costruisce un albero di funzioni, classi, metodi e variabili.
-
-    Args:
-        file_path (str): Percorso al file Python da analizzare.
-
-    Returns:
-        dict: Struttura ad albero del codice.
-    """
-    class CodeTreeBuilder(ast.NodeVisitor):
-        def __init__(self):
-            self.tree = {"type": "module", "name": "root", "children": []}
-            self.stack = [self.tree]
-
-        def visit_FunctionDef(self, node):
-            # Nodo funzione
-            function_node = {
-                "type": "function",
-                "name": node.name,
-                "lineno": node.lineno,
-                "children": []
-            }
-            self.stack[-1]["children"].append(function_node)
-            self.stack.append(function_node)
-            self.generic_visit(node)
-            self.stack.pop()
-
-        def visit_AsyncFunctionDef(self, node):
-            # Nodo funzione asincrona
-            async_function_node = {
-                "type": "async_function",
-                "name": node.name,
-                "lineno": node.lineno,
-                "children": []
-            }
-            self.stack[-1]["children"].append(async_function_node)
-            self.stack.append(async_function_node)
-            self.generic_visit(node)
-            self.stack.pop()
-
-        def visit_ClassDef(self, node):
-            # Nodo classe
-            class_node = {
-                "type": "class",
-                "name": node.name,
-                "lineno": node.lineno,
-                "children": []
-            }
-            self.stack[-1]["children"].append(class_node)
-            self.stack.append(class_node)
-            self.generic_visit(node)
-            self.stack.pop()
-
-        def visit_Assign(self, node):
-            # Nodo assegnazione variabile
-            for target in node.targets:
-                if isinstance(target, ast.Name):
-                    var_node = {
-                        "type": "variable",
-                        "name": target.id,
-                        "lineno": node.lineno
-                    }
-                    self.stack[-1]["children"].append(var_node)
-            self.generic_visit(node)
-
-        def visit_AnnAssign(self, node):
-            # Nodo assegnazione con annotazione
-            if isinstance(node.target, ast.Name):
-                var_node = {
-                    "type": "annotated_variable",
-                    "name": node.target.id,
-                    "lineno": node.lineno
-                }
-                self.stack[-1]["children"].append(var_node)
-            self.generic_visit(node)
-
-   
-    source_code = decode(file_path)
-    #print(source_code)
-    # Parsing del codice sorgente
-    parsed_tree = ast.parse(source_code)
-
-    # Costruzione dell'albero
-    builder = CodeTreeBuilder()
-    builder.visit(parsed_tree)
-
-    return builder.tree
 
 def decode(data):
     """
@@ -100,6 +12,9 @@ def decode(data):
     Returns:
         str: Testo decodificato.
     """
+    if not isinstance(data, str):
+        raise TypeError("Il dato da decodificare deve essere una stringa.")
+
     return base64.b64decode(data).decode('utf-8')
 
 def encode(data):
@@ -116,57 +31,65 @@ def encode(data):
         raise TypeError("Il dato da codificare deve essere una stringa.")
     return base64.b64encode(data.encode()).decode()
 
-location = {'REPOSITORY':["repos/{repo}/contents/{file_path}"]}
+def rimuovi_ultimo_slash(stringa):
+  """
+  Rimuove l'ultimo slash di una stringa se presente.
 
-values = {
-    'tree':{'MODEL':build_code_tree},
-    'content':{'REPOSITORY':encode,'MODEL':decode},
-}
+  Args:
+    stringa: La stringa da modificare.
 
-mapper = {
-    'identifier':{'REPOSITORY':'id'},
-    'name':{'REPOSITORY':'name'},
-    'owner':{'REPOSITORY':'owner.login'},
-    'location':{'REPOSITORY':'html_url'},
-    'type':{'REPOSITORY':'type'},
-    'content':{'REPOSITORY':'content'},
-    'tree':{'REPOSITORY':'content'},
-}
+  Returns:
+    La stringa modificata, con l'ultimo slash rimosso, o la stringa originale se non c'è slash finale.
+  """
+  if stringa.endswith("/"):
+    return stringa[:-1]
+  else:
+    return stringa
 
-async def create_repo(self,constants):
-    payload = {
+async def create_payload(**constants):
+    payload = constants.get('payload',{})
+    payload |= {
         "message": "Creating new file",
-        "content": encode(constants.get('content',''))  # Content should be base64-encoded
+        "content": encode(payload.get('content',''))  # Content should be base64-encoded
     }
     return payload
 
-async def delete(self,constants):
-    constants.pop('payload')
-    file = await self.read(**constants)
-    
-    sha = file['result']["sha"]
-    print('sha:',sha)
+@flow.asynchronous(managers=('storekeeper',))
+async def delete_payload(storekeeper,**constants):
+    branch_data = await storekeeper.gather(**constants)
+    sha = branch_data.get('result')[0].get('sha','')
     payload = {
         "message": "Deleting file",
         "sha": sha
     }
-    return payload
+    return constants.get('payload')|payload
 
-async def update(self,constants):
-    constants.pop('payload')
-    file = await self.read(**constants)
-    
-    sha = file['result']["sha"]
-    
+@flow.asynchronous(managers=('storekeeper',))
+async def write_payload(storekeeper,**constants):
+    branch_data = await storekeeper.gather(**constants)
+    sha = branch_data.get('result')[0].get('sha','')
     payload = {
         "message": "Updating file",
-        "content": encode(constants.get('content','')),
+        "content": base64.b64encode(constants.get('payload').get('content','').encode()).decode(),
         "sha": sha
     }
-    return payload
+    return constants.get('payload')|payload
 
-payloads = {
-    'create':create_repo,
-    'delete':delete,
-    'update':update,
-}
+repository = factory.repository(
+    location = {'GITHUB':["repos/{payload.location}/contents/{payload.path}"]},
+    model = 'file',
+    values = {
+        'content':{'GITHUB':encode,'MODEL':decode},
+        'path':{'GITHUB':rimuovi_ultimo_slash,'MODEL':rimuovi_ultimo_slash},
+    },
+    mapper = {
+        'name':{'GITHUB':'name'},
+        'type':{'GITHUB':'type'},
+        'content':{'GITHUB':'content'},
+    },
+    payloads = {
+        'create':create_payload,
+        'delete':delete_payload,
+        'update':write_payload,
+    }
+)

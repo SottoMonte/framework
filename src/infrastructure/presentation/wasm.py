@@ -1,7 +1,8 @@
-import sys  
+import sys
+
+modules = {'flow': 'framework.service.flow','starlette': 'infrastructure.presentation.starlette'}
+
 if sys.platform != 'emscripten':
-  import infrastructure.presentation.starlette as starlette
-  import framework.service.flow as flow
   import os
   from starlette.responses import JSONResponse,HTMLResponse,RedirectResponse
 else:
@@ -13,9 +14,6 @@ else:
   import importlib
   import uuid
   import re
-    
-  flow = language.load_module(area="framework",service='service',adapter='flow')
-  starlette = language.load_module(area="infrastructure",service='presentation',adapter='starlette')
 
   class MyLoader(BaseLoader):
       def get_source(self, environment, template):
@@ -34,54 +32,110 @@ class adapter(starlette.adapter):
         html = template.render()
         return HTMLResponse(html)
   else:
-        def __init__(self,**constants):
-          self.components = dict()
-          self.config = constants['config']
-          http_loader = MyLoader()
-          self.env = Environment(loader=http_loader,autoescape=select_autoescape(["html", "xml"]))
-          self.document = js.document
-          self.cash = dict()         
+        def __init__(self, **constants):
+          print("🚀 Inizializzazione del modulo WASM...")
+
+          # Inizializza le variabili di istanza
+          self.components = {}
+          self.config = constants.get('config', {})  # Evita KeyError con .get()
+          self.cash = {}
           self.cookies = {}
+          self.data = {}
+          # Configura il loader per i template
+          http_loader = MyLoader()
+          self.env = Environment(loader=http_loader, autoescape=select_autoescape(["html", "xml"]))
+
+          # Riferimento al documento JavaScript
+          self.document = js.document
+
+          print("✅ Modulo WASM inizializzato correttamente.")
 
         @flow.synchronous(managers=('storekeeper',))
         def loader(self, storekeeper, **constants):
+          z = asyncio.create_task(self.bond(),name="bond")
           code = asyncio.create_task(self.async_loader(),name="loader")
-          #js.document.body.prepend(mount_view(code))
-
-        @flow.asynchronous(managers=('storekeeper',))
-        async def async_loader(self, storekeeper, **constants):
           
-          for cookie in js.document.cookie.split(';'):
-              if '=' in cookie:
-                  key, value = cookie.split('=', 1)
-                  self.cookies[key.strip()] = value
-          print(js.document.cookie,"<-----")
-          print(self.cookies)
-          token = self.cookies['session_token'] if 'session_token' in self.cookies else 'None'
-          print(token)
-          
-          transaction = await storekeeper.gather(model="user",token=token)
-          
-          print(transaction)
-          if transaction['state']:
-            user = transaction['result']
-          else:
-            user = {}
-          
-          # Build the HTML content based on user data
-          try:
-            html = await self.builder(user=user)
-
-            # Update the DOM by removing the loading element and prepending new content
-            loading_element = self.document.getElementById('loading')
-            if loading_element:
-              loading_element.remove()
-            self.document.body.prepend(html)
-          except Exception as e:
-            print(f"Error in async_loader: {e}")
         
-        def info(self):
-          return ('front-end')
+        @flow.asynchronous(managers=('messenger','storekeeper','defender'))
+        async def async_loader(self, messenger,storekeeper,defender, **constants):
+          await messenger.post(domain="debug",message="🔄 Avvio async_loader...")
+
+          try:
+              # Estrai i cookie in modo più sicuro
+              self.cookies = {
+                  key.strip(): value
+                  for cookie in js.document.cookie.split(';') if '=' in cookie
+                  for key, value in [cookie.split('=', 1)]
+              }
+              
+              await messenger.post(domain="debug",message=f"📜 Cookies: {self.cookies}")
+              
+              # Recupera il token di sessione in modo più sicuro
+              token = self.cookies.get('session_token_supabase', 'None')
+              await messenger.post(domain="debug",message=f"🔑 Token recuperato: {token}")
+
+              # Recupera i dati dell'utente con il token
+              #transaction = await storekeeper.gather(model="user", token=token)
+              transaction = await defender.whoami2(token=token)
+              await messenger.post(domain="debug",message=f"📦 Transazione ricevuta: {transaction}")
+
+              # Verifica se la transazione è riuscita
+              transaction = {'state':False} if transaction == None else transaction
+              user = transaction.get('result', {})[0] if transaction.get('state') else {}
+              
+              
+
+              # Costruisce l'HTML con i dati dell'utente
+              html = await self.builder(user=user)
+
+              # Rimuove l'elemento di caricamento
+              loading_element = self.document.getElementById('loading')
+              if loading_element:
+                  loading_element.remove()
+                  await messenger.post(domain="debug",message="✅ Elemento di caricamento rimosso.")
+
+              # Aggiunge il contenuto alla pagina
+              self.document.body.prepend(html)
+
+              if transaction.get('state'):
+                await messenger.post(domain="debug",message=f"👤 Dati utente: {user}")
+                await messenger.post(domain="success",message="✅ Utente autenticato con successo.")
+              else:
+                await messenger.post(domain="error",message=transaction.get('error','Errore sconosciuto'))
+
+              await messenger.post(domain="debug",message="✅ Contenuto aggiornato con i dati utente.")
+
+          except KeyError as ke:
+              print(f"⚠️ Errore: Cookie non trovato - {ke}")
+
+          except Exception as e:
+              print(f"❌ Errore in async_loader: {e}")
+
+        @flow.asynchronous(managers=('messenger',))
+        async def bond(self,messenger,**constants):
+          print("🔗 Avvio bond...")
+          while True:
+            print("🔄 Esecuzione del ciclo di polling...")
+            msg = await messenger.read(domain="*")
+            domain = msg.get('domain','')
+            
+            '''ok = []
+            for x in self.data.keys():
+                
+                matching_domains = language.wildcard_match([domain], x)
+                if len(matching_domains) == 1:
+                    ok.append(x)
+            print(ok,self.data)'''
+
+            for id  in self.data.get(domain,[]):
+              self.components[id].setdefault('messenger',[]).append(msg)
+              await self.rebuild(id,self.components[id].get('view'),message=msg)
+
+            for id  in self.data.get('*',[]):
+              self.components[id].setdefault('messenger',[]).append(msg)
+              await self.rebuild(id,self.components[id].get('view'),message=msg)
+              
+
 
         async def open_dropdown(self,event,**constants):
           
@@ -201,22 +255,6 @@ class adapter(starlette.adapter):
             currentElement = currentElement.parentElement
 
           _ = await self.act(value=attributeValue)
-          '''# Divisione della stringa in base al separatore '|'
-          functions = attributeValue.split('|')
-
-          # Creazione del dizionario
-          result = {}
-
-          # Iterazione su ogni funzione per estrarre chiave e parametri
-          for func in functions:
-              key = re.match(r"(\w+)\(", func).group(1)
-              params = re.findall(r"'(.*?)'", func)
-              result[key] = params
-          
-          for name in result:
-            module = await language.get_module(f'application/action/{name}.py',language)
-            act = getattr(module,name)
-            _ = await act(args=result[name])'''
         
         async def act(self,**constants):
           # Divisione della stringa in base al separatore '|'
@@ -242,7 +280,8 @@ class adapter(starlette.adapter):
           
           for n in lista:
             for name in n:
-              module = await language.get_module(f'application/action/{name}.py',language)
+              #module = await language.get_module(f'application/action/{name}.py',language)
+              module = await language.load_module(language,path=f'application.action.{name}',area='application',service='action',adapter=name)
               act = getattr(module,name)
               _ = await act(**n[name])
         
@@ -397,57 +436,108 @@ class adapter(starlette.adapter):
                   case 'right': element.className += " rounded-start"
                   case 'left': element.className += " rounded-end"
               # Event
-              case 'modal':
-                element.setAttribute('data-bs-target','#'+value)
-                element.setAttribute('data-bs-toggle','modal')
+              case 'hide':
+                mode,target = value.split(':')
+                mode = mode.strip().lower()
+                target = target.strip()
+                element.setAttribute('data-bs-dismiss',mode)
+              case 'show':
+                mode,target = value.split(':')
+                mode = mode.strip().lower()
+                target = target.strip()
+                match mode:
+                  case 'modal':
+                    element.setAttribute('data-bs-target','#'+target)
+                    element.setAttribute('data-bs-toggle',mode)
+                  case 'offcanvas':
+                    element.setAttribute('data-bs-target','#'+target)
+                    element.setAttribute('data-bs-toggle',mode)
+                  
               case 'ddd':
-                element.addEventListener('contextmenu',pyodide.create_proxy(self.open_dropdown))
+                element.addEventListener('contextmenu',pyodide.ffi.create_proxy(self.open_dropdown))
               case 'link':
                 element.setAttribute('href',value)
-                element.setAttribute('data-bs-toggle','tab')
               case 'route':
-                element.setAttribute('url',value)
-                element.addEventListener('click',pyodide.create_proxy(self.route))
+                if ':' in value:
+                  mode,target = value.split(':',1)
+                  mode = mode.strip().lower()
+                  target = target.strip()
+                  match mode:
+                    case 'link':
+                      element.setAttribute('href',target)
+                    case _:
+                      element.setAttribute('data-bs-toggle',mode)
+                      element.setAttribute('href','#'+target)
+                else:
+                  element.setAttribute('url',value)
+                  element.addEventListener('click',pyodide.ffi.create_proxy(self.route))
               case 'click':
                 element.setAttribute(key,value)
-                element.addEventListener('click',pyodide.create_proxy(self.event))
+                element.addEventListener('click',pyodide.ffi.create_proxy(self.event))
               case 'onchange':
                 element.setAttribute(key,value)
-                element.addEventListener('onchange',pyodide.create_proxy(self.event))
+                element.addEventListener('onchange',pyodide.ffi.create_proxy(self.event))
               case 'init':
                 element.setAttribute(key,value)
                 asyncio.create_task(self.act(value=value))
               case 'droppable':
                 element.setAttribute('ondragover','allowDrop(event)')
                 element.setAttribute('draggable-domain',value)
-                element.addEventListener('drop',pyodide.create_proxy(self.on_drop))
-                element.addEventListener('dragover',pyodide.create_proxy(self.on_drag_over))
-                element.addEventListener('dragleave',pyodide.create_proxy(self.on_drag_leave))
+                element.addEventListener('drop',pyodide.ffi.create_proxy(self.on_drop))
+                element.addEventListener('dragover',pyodide.ffi.create_proxy(self.on_drag_over))
+                element.addEventListener('dragleave',pyodide.ffi.create_proxy(self.on_drag_leave))
               case 'draggable':
                 element.setAttribute(key,'true')
                 element.setAttribute('ondragstart','drag(event)')
                 element.setAttribute('draggable-domain',value)
-                element.addEventListener('dragstart',pyodide.create_proxy(self.on_drag_start))
+                element.addEventListener('dragstart',pyodide.ffi.create_proxy(self.on_drag_start))
               case 'draggable-component':
                 element.setAttribute(key,value)
               
-        async def rebuild(self,id,tag,**constants):
+        async def rebuild(self, id, tag, **data):
+          try:
+              await asyncio.sleep(1)
+
+              #url = f"application/view/component/{tag}.xml"
+              url = tag
+              new_component = await self.builder(url=url, component=self.components[id], **data)
+
+              old_component = self.document.getElementById(id)
+
+              if old_component is None:
+                  raise ValueError(f"Elemento con id '{id}' non trovato nel documento.")
+
+              parent = old_component.parentNode
+              if parent is None:
+                  raise ValueError(f"L'elemento con id '{id}' non ha un nodo genitore.")
+
+              # Sostituzione corretta
+              #for x in new_component.childNodes:
+              #  old_component.append(x)
+              parent.replaceChild(new_component, old_component)
+
+          except Exception as e:
+              print(f"Errore durante la ricostruzione del componente '{id}': {e}")
+        
+        async def rebuild3(self,id,tag,**data):
                   
           #response = js.fetch(f"gather?model={self.components[id]['model']}&row={self.components[id]['pageRow']}&page={self.components[id]['pageCurrent']}&order={self.components[id]['sortField']}",{'method':'GET'})
           #file = await response
           #aa = await file.text()
           #bb = json.loads(aa)
-
-          url = f'application/view/component/{tag.replace("C_","")}.xml'
+          await asyncio.sleep(1)
+          #url = f"application/view/component/{tag}.xml"
+          url = tag
                   
                   
-          test = await self.builder(url=url,component=self.components[id])
+          test = await self.builder(url=url,component=self.components[id],**data)
 
           cc = self.document.getElementById(id)
-          cc.innerHTML = ""
-          for x in test.childNodes:
+          cc.replaceChild(test,cc)
+          #cc.innerHTML = ""
+          #for x in test.childNodes:
             #print(dir(test))
-            cc.append(x)
+          #  cc.append(x)
           #cc.replaceChild(test,cc)
           #return test
 

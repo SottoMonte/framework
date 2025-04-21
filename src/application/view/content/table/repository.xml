@@ -5,8 +5,8 @@
     <Text>Github</Text>
     <Text storekeeper="language">language</Text>
     <Text storekeeper="updated">Updated</Text>
-    <Column>
-        <Action click="ide(id:'ide',repository:'SottoMonte/{{ storekeeper.name }}')" route="application/view/page/cubute/overview.xml" class="d-inline-flex"><Graph icon="bi-box-fill"/></Action>
-        <Action route="application/view/page/cubute/overview.xml" class="d-inline-flex"><Graph icon="bi-bookmark-fill"/></Action>
-    </Column>
+    <Group type="button">
+        <Action click="ide(id:'ide')" route="application/view/page/cubute/overview.xml" class="d-inline-flex"><Graph icon="bi-box-fill"/></Action>
+        <Action route="application/view/page/inventory/repository.xml" class="d-inline-flex"><Graph icon="bi-bookmark-fill"/></Action>
+    </Group>
 </Graph>

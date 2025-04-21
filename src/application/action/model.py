@@ -1,4 +1,5 @@
-flow = language.load_module(area="framework",service='service',adapter='flow')
+modules = {'flow':'framework.service.flow'}
+
 import js
 @flow.asynchronous(managers=('messenger','presenter','storekeeper'),model=('table',))
 async def model(messenger,presenter,storekeeper,**constants):

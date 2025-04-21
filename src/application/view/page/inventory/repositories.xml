@@ -2,42 +2,11 @@
 {% block title %}Overview{% endblock %}
 {% block subtitle %}Keep track of your inventory{% endblock %}
 {% block bar %}
-<Action route="application/view/page/inventory/overview.xml">
-    <Graph icon="bi-view-list" />
-    <Text>Overview</Text>
-</Action>
-<Action route="application/view/page/inventory/virtual-machines.xml">
-    <Graph icon="bi-pc-horizontal" />
-    <Text>Virtual machines</Text>
-</Action>
-<Action route="application/view/page/inventory/containers.xml">
-    <Graph icon="bi-box-seam" />
-    <Text>Containers</Text>
-</Action>
-<Action route="application/view/page/inventory/services.xml">
-    <Graph icon="bi-boxes" />
-    <Text>Services</Text>
-</Action>
-<Action route="application/view/page/inventory/domains.xml">
-    <Graph icon="bi-globe" />
-    <Text>Domains</Text>
-</Action>
-<Action route="application/view/page/inventory/volumes.xml">
-    <Graph icon="bi-database" />
-    <Text>Volumes</Text>
-</Action>
-<Action route="application/view/page/inventory/repositories.xml" class="active">
-    <Graph icon="bi-bookmarks" />
-    <Text>Repository</Text>
-</Action>
-<Action route="application/view/page/inventory/politics.xml">
-    <Graph icon="bi-file-ruled" />
-    <Text>Politics</Text>
-</Action>
+<SideBar selected="application/view/page/inventory/repositories.xml"/>
 {% endblock %}
 {% block content %}
 <Container background="#fafafa" size="fluid" padding="p-4" expand="True" class="border-top border-bottom">
-    <Table model="repository" >
+    <Table repository="repository" view="repository" >
         <Text click="table(id:'{{ component or '' }}',sortField:'name')">Repository</Text>
         <Text>Description</Text>
         <Text>Type</Text>

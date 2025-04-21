@@ -1,34 +1,88 @@
 import os
 import sys
+import asyncio
+from kink import di
 
-def bootstrap_adapter() -> None:
-        env = dict(os.environ)
+async def bootstrap() -> None:
+    env = dict(os.environ)
+
+    # Controlla se siamo in Pyodide (browser)
+    if sys.platform == "emscripten":
+        import js
+        import micropip
+
+        # Recupera i cookie dal documento
+        cookies = {}
+        for cookie in js.document.cookie.split(";"):
+            if "=" in cookie:
+                key, value = cookie.split("=", 1)
+                cookies[key.strip()] = value
         
-        if sys.platform == 'emscripten':
-            import js
-            cookies = {}
-            for cookie in js.document.cookie.split(';'):
-                if '=' in cookie:
-                    key, value = cookie.split('=', 1)
-                    cookies[key.strip()] = value
-            #print(js.document.cookie,"<-----",cookies)
-            config = language.get_confi(**env|cookies)
+        packages = [
+            "kink",
+            "tomli",
+            "jinja2",
+            "untangle",
+            "bs4",
+        ]
+        
+        #await micropip.install(packages)
+
+        # Unisce env e cookies
+        config = language.get_confi(**{**env, **cookies})
+    else:
+        config = language.get_confi(**env)
+
+    
+    await language.load_manager(language,provider="message", name="messenger", path="framework.manager.messenger")
+    await language.load_manager(language,provider="authentication", name="executor", path="framework.manager.executor")
+
+    executor = di["executor"]
+
+    # Carica i gestori principali
+    tasks = [
+        asyncio.create_task(language.load_manager(language,provider="presentation", name="presenter", path="framework.manager.presenter")),
+        asyncio.create_task(language.load_manager(language,provider="authentication", name="defender", path="framework.manager.defender")),
+        asyncio.create_task(language.load_manager(language,provider="persistence", name="storekeeper", path="framework.manager.storekeeper")),
+        asyncio.create_task(language.load_manager(language,provider="authentication", name="tester", path="framework.manager.tester")),
+    ]
+    
+    
+
+    # Attende il caricamento di tutti i manager in parallelo
+    await executor.all_completed(tasks=tasks)
+
+
+
+    # Carica i provider dai moduli di configurazione
+    tasks = []
+    for module in ["presentation", "persistence", "message", "authentication"]:
+        if module in config:
+            for driver, setting in config[module].items():
+                adapter = setting["adapter"]
+                payload = {**setting, "profile": driver, "project": config["app"]}
+                
+                tasks.append(asyncio.create_task(
+                    language.load_provider(language,path=f"infrastructure.{module}.{adapter}",area="infrastructure", service=module, adapter=adapter, payload=payload)
+                ))
+    
+    # Attende il caricamento dei provider in parallelo
+    await executor.all_completed(tasks=tasks)
+
+    messenger = di["messenger"]
+    presentation = di["presentation"]
+    
+    
+    event_loop = asyncio.get_event_loop()
+    await messenger.post(domain='debug',message="Caricamento degli elementi della presentazione.")
+    for item in presentation:
+        await messenger.post(domain='debug',message=f"Caricamento dell'elemento: {item}")
+        if hasattr(item, "loader"):
+            item.loader(loop=event_loop)
         else:
-            config = language.get_confi(**env)
+            await messenger.post(domain='debug',message=f"L'elemento {item} non ha un metodo 'loader'.")
 
-        language.loader_manager(provider="message",name='messenger',path='framework.manager.messenger')
-        language.loader_manager(provider="persistence",name='storekeeper',path='framework.manager.storekeeper')
-        language.loader_manager(provider="presentation",name='presenter',path='framework.manager.presenter')
-        language.loader_manager(provider="authentication",name='defender',path='framework.manager.defender')
-        language.loader_manager(provider="authentication",name='tester',path='framework.manager.tester')
-        language.loader_manager(provider="authentication",name='executor',path='framework.manager.executor')
-        
-        for module in ['presentation','persistence','message','authentication']:
-            if module in config:
-                for driver in config[module]:
-                    setting = config[module][driver]
-                    adapter = setting['adapter']
-                    language.loader_provider(area='infrastructure',service=module,adapter=adapter,payload=setting|{'profile':driver}|{'project':config['project']})
+
 
     
     

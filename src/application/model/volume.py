@@ -1,0 +1,17 @@
+volume = (
+    {'name': 'id', 'type': 'uuid', 'default': 'gen_random_uuid()', 'required': True, 'primary_key': True},
+    {'name': 'name', 'type': 'string', 'required': True},
+    {'name': 'description', 'type': 'string', 'default': None},
+    {'name': 'size_gb', 'type': 'integer', 'required': True, 'check': lambda x: x > 0},
+    {'name': 'type', 'type': 'string', 'required': True, 'check': ['SSD', 'HDD', 'NFS', 'Object Storage']},
+    {'name': 'mount_path', 'type': 'string', 'required': True},
+    {'name': 'status', 'type': 'string', 'default': 'detached', 'required': True, 'check': ['attached', 'detached', 'error']},
+    {'name': 'encrypted', 'type': 'boolean', 'default': False},
+    {'name': 'backup_enabled', 'type': 'boolean', 'default': False},
+    {'name': 'server', 'type': 'uuid', 'default': None, 'foreign_key': {'table': 'servers', 'column': 'id'}},
+    {'name': 'container', 'type': 'uuid', 'default': None, 'foreign_key': {'table': 'containers', 'column': 'id'}, 'on_delete': 'set null'},
+    {'name': 'service', 'type': 'uuid', 'default': None, 'foreign_key': {'table': 'services', 'column': 'id'}, 'on_delete': 'set null'},
+    {'name': 'created_at', 'type': 'timestamp', 'default': 'now()'},
+    {'name': 'updated_at', 'type': 'timestamp', 'default': 'now()'},
+    {'name': 'owner', 'type': 'uuid', 'default': 'gen_random_uuid()', 'foreign_key': {'table': 'auth.users', 'column': 'id'}},
+)

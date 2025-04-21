@@ -1,11 +1,14 @@
-flow = language.load_module(area="framework",service='service',adapter='flow')
+modules = {'flow':'framework.service.flow'}
+
 import js
 @flow.asynchronous(managers=('messenger','presenter','storekeeper'))
 async def load(messenger,presenter,storekeeper,**constants):
     url = f'application/view/component/editor.xml'
     #print(constants)
     component = await presenter.component(name='ide')
-    transaction = await storekeeper.gather(model="file",repo=component.get('repository'),file_path=constants.get('url',''))
+    payload = {'location':component.get('repository'),'path':constants.get('url','')}
+    print(payload,'##########3')
+    transaction = await storekeeper.gather(repository="file",payload=payload)
     print(component)
     print(transaction)
     #text = await presenter.description(url=constants['url'])

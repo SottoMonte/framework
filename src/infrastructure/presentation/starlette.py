@@ -1,10 +1,13 @@
 import uuid
-
+import asyncio
 from html import escape
 import json
+
+modules = {'flow': 'framework.service.flow'}
+
 try:
     #import framework.port.presentation as presentation
-    import framework.service.flow as flow
+    #import framework.service.flow as flow
 
     from starlette.applications import Starlette
     from starlette.requests import Request
@@ -42,14 +45,13 @@ try:
     from xml.sax.saxutils import escape
     import untangle
 except Exception as e:
+    #import starlette
     import untangle
     import markupsafe
     from bs4 import BeautifulSoup
-    flow = language.load_module(area="framework",service='service',adapter='flow')
-    starlette = None
+    
     import xml.etree.ElementTree as ET
     from xml.sax.saxutils import escape
-    print("errore generico",e)
 
 #presentation.presentation
 class adapter():
@@ -120,50 +122,196 @@ class adapter():
         response.delete_cookie("session_token")
         return response
 
-    @flow.asynchronous(managers=('storekeeper','defender',))
-    async def login(self,request, storekeeper, defender) -> None:
-        client_ip = request.client.host
-        match request.method:
-            case 'GET':
-                query = dict(request.query_params)
-                session_identifier = request.cookies.get('session_identifier', secrets.token_urlsafe(16))
-                #session_token = request.cookies.get('session_token', 'Cookie not found')
-                token = await defender.authenticate(ip=client_ip,identifier=session_identifier,**query)
-                
-                transaction = await storekeeper.gather(model="user",token=token)
-                if transaction['state']:
-                    request.session.update(transaction['result'])
-                
-                response = RedirectResponse('/', status_code=303)
-                if 'session_identifier' not in request.cookies:
-                    response.set_cookie(key='session_identifier', value=session_identifier, max_age=3600)
-                response.set_cookie(key='session_token', value=token, max_age=3600)
-                return response
-            case 'POST':
-                credential = await request.form()
-                credential = dict(credential)
-                session_identifier = request.cookies.get('session_identifier', secrets.token_urlsafe(16))
-                #session_token = request.cookies.get('session_token', 'Cookie not found')
-                token = await defender.authenticate(ip=client_ip,identifier=session_identifier,**credential)
-                transaction = await storekeeper.gather(model="user",token=token)
-                
-                if transaction['state']:
-                    request.session.update(transaction['result'])
-                
-                response = RedirectResponse('/', status_code=303)
-                if 'session_identifier' not in request.cookies:
-                    response.set_cookie(key='session_identifier', value=session_identifier, max_age=3600)
-                response.set_cookie(key='session_token', value=token, max_age=3600)
-                return response
-
-    async def websocket(self,websocket):
+    @flow.asynchronous(managers=('storekeeper', 'messenger','defender'))
+    async def login(self, request, storekeeper,messenger, defender):
+        """Gestisce il login dell'utente con autenticazione basata su IP e sessione."""
         
+        client_ip = request.client.host
+        session_identifier = request.cookies.get('session_identifier', secrets.token_urlsafe(16))
+        
+        # Determina le credenziali in base al metodo HTTP
+        if request.method == 'GET':
+            credentials = dict(request.query_params)
+        elif request.method == 'POST':
+            credentials = dict(await request.form())
+        else:
+            return RedirectResponse('/', status_code=400)  # Metodo non supportato
+
+        # Autenticazione tramite defender
+        token = await defender.authenticate(ip=client_ip, identifier=session_identifier, **credentials)
+        provider = credentials.get('provider', 'undefined')
+
+        '''
+        # Aggiorna la sessione se l'autenticazione ha avuto successo
+        if transaction.get('state'):
+            request.session.update(user_data)'''
+
+        # Crea la risposta di reindirizzamento
+        response = RedirectResponse('/', status_code=303)
+
+        # Imposta i cookie della sessione se non già presenti
+        if 'session_identifier' not in request.cookies:
+            response.set_cookie(key='session_identifier', value=session_identifier, max_age=3600)
+        
+        response.set_cookie(key='session_token_'+provider, value=token, max_age=3600)
+        
+        await messenger.post(domain=f"error.{client_ip}",message=f"🔑 Login completato per IP: {client_ip} | con provider: {provider} | Token: {token}")
+
+        return response
+
+    @flow.asynchronous(managers=('messenger',))
+    async def websocket2(self,websocket,messenger):
+        ip = websocket.client.host
         await websocket.accept()
         # Process incoming messages
         while True:
+            
             mesg = await websocket.receive_text()
-            await websocket.send_text(mesg.replace("Client", "Server"))
-        #await websocket.close() 
+            tra = json.loads(mesg)
+            domain = tra.get('domain','')
+            message = tra.get('message','')
+            
+            messages = await messenger.read(domain=domain,identity=ip)
+            messages = json.dumps(tra|{'messages':messages})
+            #await messenger.post(domain="error",message=mesg)
+            await websocket.send_text(messages)
+        #await websocket.close()
+    
+    @flow.asynchronous(managers=('messenger',))
+    async def websocket22(self, websocket, messenger):
+        ip = websocket.client.host
+        await websocket.accept()
+
+        queue = asyncio.Queue()
+
+        async def listen_for_updates():
+            """Listener per i nuovi messaggi di messenger."""
+            #async for update in messenger.subscribe():
+            #messages = await messenger.read(domain='error', identity=ip)
+            await asyncio.sleep(5)
+            await queue.put('test')
+
+        asyncio.create_task(listen_for_updates())
+
+        try:
+            while True:
+                # Aspetta sia un messaggio WebSocket che un nuovo aggiornamento da messenger
+                done, pending = await asyncio.wait(
+                    [websocket.receive_text(), queue.get()],
+                    return_when=asyncio.FIRST_COMPLETED
+                )
+
+                print(done)
+                await asyncio.sleep(5)
+                '''# Processa il messaggio dal client WebSocket
+                if websocket.receive_text in done:
+                    mesg = await websocket.receive_text()
+                    tra = json.loads(mesg)
+                    domain = tra.get('domain', '')
+                    message = tra.get('message', '')
+
+                    messages = await messenger.read(domain=domain, identity=ip)
+                    await websocket.send_text(json.dumps(tra | {'messages': messages}))'''
+
+                # Processa i nuovi messaggi di messenger
+                '''while not queue.empty():
+                    update = await queue.get()
+                    await websocket.send_text(json.dumps(update))'''
+
+        except Exception as e:
+            print(f"WebSocket error: {e}")
+        finally:
+            await websocket.close()
+
+    @flow.asynchronous(managers=('messenger',))
+    async def websocket4444(self, websocket, messenger):
+        ip = websocket.client.host
+        await websocket.accept()
+
+        ws_queue = asyncio.Queue()  # Coda per i messaggi WebSocket
+        messenger_queue = asyncio.Queue()  # Coda per i messaggi di Messenger
+
+        async def listen_websocket():
+            """Riceve messaggi dal WebSocket e li mette in coda."""
+            try:
+                
+                mesg = await websocket.receive_text()
+                await ws_queue.put(mesg)
+            except Exception:
+                pass  # Se il WebSocket si chiude, termina la funzione
+
+        async def listen_for_updates():
+            """Simula la ricezione di messaggi da Messenger e li mette in coda."""
+            
+            await asyncio.sleep(5)  # Simula un aggiornamento ogni 5 secondi
+            await messenger_queue.put("test")
+
+        # Avvia le task di ascolto
+        asyncio.create_task(listen_websocket())
+        asyncio.create_task(listen_for_updates())
+
+        try:
+            while True:
+                # Aspetta nuovi messaggi dal WebSocket o Messenger
+                done, _ = await asyncio.wait(
+                    [ws_queue.get(), messenger_queue.get()],
+                    return_when=asyncio.FIRST_COMPLETED
+                )
+
+                print(done)
+
+        except Exception as e:
+            print(f"WebSocket error: {e}")
+        finally:
+            await websocket.close()
+
+    @flow.asynchronous(managers=('messenger',))
+    async def websocket(self, websocket, messenger):
+        ip = websocket.client.host
+        await websocket.accept()
+        print(f"🔌 Connessione WebSocket da {ip}")
+
+        #ws_queue = asyncio.Queue()  # Coda per i messaggi WebSocket
+        #messenger_queue = asyncio.Queue()  # Coda per i messaggi di Messenger
+        stop_event = asyncio.Event()  # Evento per fermare il loop quando necessario
+
+        async def listen_websocket():
+            try:
+                while not stop_event.is_set():
+                    msg = await websocket.receive_text()
+                    print(f"📥 Messaggio dal client: {msg}")
+                    await websocket.send_text(msg)
+            except Exception:
+                stop_event.set()  # Ferma il ciclo se il WebSocket si chiude
+
+        async def listen_for_updates():
+            while not stop_event.is_set():
+                msg = await messenger.read(domain='*',identity=ip)
+                print(f"📨 Messaggio dal server: {msg}")
+                #await messenger_queue.put(msg)
+                await websocket.send_text(msg)
+                    
+
+        # Avvia le task di ascolto in background
+        websocket_task = asyncio.create_task(listen_websocket())
+        messenger_task = asyncio.create_task(listen_for_updates())
+
+        try:
+            await stop_event.wait()
+            '''while not stop_event.is_set():
+                done, pending = await asyncio.wait(
+                    [ws_queue.get(), messenger_queue.get()],
+                    return_when=asyncio.FIRST_COMPLETED
+                )'''
+        except Exception as e:
+            print(f"❌ WebSocket error: {e}")
+        finally:
+            stop_event.set()
+            websocket_task.cancel()
+            messenger_task.cancel()
+            await websocket.close()
+            print(f"🔌 Disconnessione WebSocket da {ip}")
+
 
     @flow.asynchronous(managers=('defender',))
     async def websocketssh(self, websocket,defender):
@@ -345,7 +493,9 @@ class adapter():
             
             
             return soup.prettify()
-            
+    
+    async def rebuild(self, id, tag, **data):
+        pass
 
     @flow.asynchronous(managers=('storekeeper','messenger'))
     async def mount_view(self,root,data,storekeeper,messenger):
@@ -364,28 +514,44 @@ class adapter():
                     
         match tag:
             case 'Messenger':
+                id = att['id'] if 'id' in att else str(uuid.uuid4())
                 model = att['type'] if 'type' in att else 'flesh'
                 title = att['title'] if 'title' in att else ''
-                #msg = await messenger.read()
-                html = ''
-                for item in inner:
-                    html += item
-                return html
+                domain = att['domain'] if 'domain' in att else ''
+                view = att['view'] if 'view' in att else ''
+
+                #self.data[domain] = {'domain':domain,'messages':messages}
+                if id not in self.components:
+                    self.data.setdefault(domain,[]).append(id)
+                    self.components[id] = {'id': id}
+                    self.components[id]['view'] = f'application/view/component/{view}.xml'
+                    #self.components[id]['inner'] = f"<{tag} id='{id}' model='repository'>{markupsafe.Markup(xml_string)}</{tag}>"
+                    self.components[id]['attributes'] = att
+                
+                if data.get('url') != self.components[id]['view']:
+                    item = await self.builder(**data|{'component':self.components[id],'url':self.components[id]['view']})
+                    self.att(item,att)
+                    return item
+                else:
+                    item = self.code('div',{'id':id,'class':'container-fluid'},inner)
+                    self.att(item,att)
+                    return item
             case 'Storekeeper':
                 method = att['method'] if 'method' in att else 'overview'
                 new = []
-                print(att)
                 match method:
                     case 'overview':
-                        transaction = await storekeeper.overview(**att)
+                        transaction = await storekeeper.overview(**att,payload=att)
                     case 'gather':
-                        transaction = await storekeeper.gather(**att)
+                        transaction = await storekeeper.gather(**att,payload=att)
                     case _:
                         print('Method not found')
+
+                print('BOOOOOM',transaction)
                 for y in elements:
                     built = await self.mount_view(y,{'storekeeper':transaction}|data)
                     new.append(built)
-                table = self.code('div',{'class':'w-100 h-100'},new)
+                table = self.code('div',{'class':'w-100'},new)
                 self.att(table,att)
                 return table
             case 'Graph':
@@ -425,16 +591,20 @@ class adapter():
                     case 'table.body':
                         new = []
                         storekeeper = data.get('storekeeper', {})
-                        mmm = storekeeper.get('result', {})
-                        keys = list(mmm.keys())
-
+                        results = storekeeper.get('result', {})
+                        for result in results:
+                            #print(result)
+                            built = await self.mount_view(elements[0],{'storekeeper': result})
+                            new.append(built)
+                        '''keys = list(mmm.keys())
+                        print(keys)
                         if keys and mmm.get(keys[0], []):
                             for i in range(0, len(mmm[keys[0]])):
                                 passare = {}
                                 for key in keys:
                                     passare[key] = mmm[key][i]
                                 built = await self.mount_view(elements[0],{'storekeeper': passare})
-                                new.append(built)
+                                new.append(built)'''
                         tbody = self.code('tbody', {}, new)
                         self.att(tbody, att)
                         return tbody
@@ -469,18 +639,6 @@ class adapter():
                 view = await self.builder(**data|att)
                 a = self.code('div',{'class':'container-fluid d-flex flex-row col p-0 m-0'},[view])
                 return a.firstElementChild
-            case 'Message':
-                model = att['type'] if 'type' in att else 'flesh'
-                title = att['title'] if 'title' in att else ''
-
-                if model == 'system':
-                    return self.code('div',
-                        {'class':'toast','role':'alert','aria-live':'assertive','aria-atomic':'true'},[
-                            self.code('div',{'class':'toast-header'}, self.code('strong',{'class':'me-auto'},title)),
-                            self.code('div',{'class':'toast-body'},inner)
-                        ])
-                elif model == 'flesh':
-                    return self.code('div',{'class':'alert alert-primary','role':'alert'},inner)
             case 'Input':
                 tipo = att['type'] if 'type' in att else 'None'
                 tipi = ["button","checkbox","color","date","datetime-local","email","file","hidden","image","month","number","password","radio","range","reset","search","submit","tel","text","time","url","week"]
@@ -536,6 +694,10 @@ class adapter():
                         button = self.code('a',{'class':'btn rounded-0','value':valor},inner)
                         self.att(button,att)
                         return button
+                    case 'submit':
+                        button = self.code('button',{'class':'btn rounded-0','type':'submit','value':valor},inner)
+                        self.att(button,att)
+                        return button
                     case 'dropdown':
                         new = []
                         id = att.get('id','None')
@@ -586,9 +748,10 @@ class adapter():
                     case _:
                         return self.code('div',{'class':'container-fluid d-flex h-100 p-0 m-0'},inner)
             case 'Text':
+                #text-muted text-truncate
                 tipo = att['type'] if 'type' in att else 'None'
                 if 'storekeeper' in data and 'storekeeper' in att:
-                    text = language.get(att['storekeeper'],data['storekeeper'])
+                    text = str(language.get(att['storekeeper'],data['storekeeper']))
                     #print(att['storekeeper'],'text',data['storekeeper'])
                 
                 match tipo:
@@ -607,6 +770,18 @@ class adapter():
             case 'Group':
                 tipo = att['type'] if 'type' in att else 'None'
                 match tipo:
+                    case 'button':
+                        gg = self.code('div',{'class':'btn-group'},inner)
+                        self.att(gg,att)
+                        return gg
+                    case 'list':
+                        new = []
+                        for item in inner:
+                            li = self.code('li',{'class':'list-group-item'},[item])
+                            new.append(li)
+                        ul = self.code('ul',{'class':'list-group'},new)
+                        self.att(ul,att)
+                        return ul
                     case 'breadcrumb':
                         new = []
                         for item in inner:
@@ -725,7 +900,9 @@ class adapter():
                     self.components[id]['attributes'] = att
 
                 inner = markupsafe.Markup(xml_string)
-                print(tag,'-',id)
+
+                #await messenger.post(domain='debug',message=f"✅ Elemento: {tag}|{id} creato.")
+
                 argg = data|{
                     'component':self.components[id],
                     'url':url,
@@ -744,7 +921,7 @@ class adapter():
                                  
     def mount_route(self,routes,url):
         gg = untangle.parse(url)
-        print(gg)
+        #print(gg)
         zz = gg.get_elements()[0]
         for setting in  zz.get_elements():
             

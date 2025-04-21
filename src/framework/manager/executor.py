@@ -1,66 +1,141 @@
-'''Una classe chiamata Executor dovrebbe avere responsabilità ben definite, legate all'esecuzione di azioni, task, o comandi. Ecco cosa dovrebbe fare e gestire:
-Responsabilità principali di una classe Executor
+import asyncio
+from typing import List, Dict, Any, Callable
 
-    Gestione dell'esecuzione di task:
-        Accettare uno o più task (operazioni o funzioni) da eseguire.
-        Fornire un'interfaccia chiara per invocare ed eseguire questi task.
+modules = {'flow': 'framework.service.flow'}
 
-    Concorrenza e threading:
-        In contesti multi-thread, gestire l'esecuzione parallela o asincrona dei task.
-        Fornire meccanismi per sincronizzare o coordinare i thread, se necessario.
+class executor:
+    def __init__(self, **constants):
+        # actuator
+        self.sessions: Dict[str, Any] = {}
+        self.providers = constants.get('providers', [])
 
-    Gestione dello stato di esecuzione:
-        Monitorare se i task sono in esecuzione, completati o falliti.
-        Segnalare eventuali errori o eccezioni durante l'esecuzione.
+    @flow.asynchronous(managers=('messenger',))
+    async def action(self, messenger, **constants):
+        pass
 
-    Priorità e scheduling (opzionale):
-        Includere logiche per dare priorità ai task.
-        Programmare l'esecuzione di task in base a condizioni o tempistiche specifiche.
+    @flow.asynchronous(managers=('messenger',))
+    async def act(self, messenger, **constants) -> Dict[str, Any]:
+        """Esegue un'azione specifica caricando dinamicamente il modulo corrispondente."""
+        action = constants.get('action', '')
+        await messenger.post(domain='debug',message=f"🔄 Caricamento dell'azione: {action}")
 
-    Astrazione dell'esecuzione:
-        Nascondere la complessità del processo di esecuzione. Chi utilizza la classe dovrebbe solo passare i task senza preoccuparsi dei dettagli implementativi.
+        try:
+            module = await language.load_module(
+                language,
+                path=f'application.action.{action}',
+                area='application',
+                service='action',
+                adapter=action
+            )
+            act = getattr(module, action)
+            result = await act(**constants)
 
-Metodi chiave che un Executor potrebbe avere:
+            await messenger.post(domain='debug',message=f"✅ Azione '{action}' eseguita con successo.")
+            return {"state": True, "result": result, "error": None}
 
-    submit(task: Callable): Future
-    Per accettare un task ed eseguirlo, restituendo un oggetto che rappresenta il risultato futuro (utile per task asincroni).
+        except AttributeError:
+            error_msg = f"⚠️ Azione '{action}' non trovata."
+            await messenger.post(domain='debug',message=error_msg)
+            return {"state": False, "result": None, "error": error_msg}
 
-    execute(task: Callable): void
-    Esegue immediatamente il task senza restituire alcun risultato.
+        except Exception as e:
+            error_msg = f"❌ Errore durante '{action}': {str(e)}"
+            await messenger.post(domain='debug',message=error_msg)
+            return {"state": False, "result": None, "error": error_msg}
 
-    shutdown(): void
-    Ferma l'esecuzione di ulteriori task e chiude le risorse associate.
+    @flow.asynchronous(managers=('messenger',))
+    async def first_completed(self, messenger, **constants):
+        """Attende il primo task completato e restituisce il suo risultato."""
+        operations = constants.get('operations', [])
+        await messenger.post(domain='debug',message="⏳ Attesa della prima operazione completata...")
 
-    isRunning(): boolean
-    Controlla se ci sono task in esecuzione.
+        try:
+            while operations:
+                finished, unfinished = await asyncio.wait(operations, return_when=asyncio.FIRST_COMPLETED)
 
-    getResult(taskId: int): Object
-    Restituisce il risultato di un task completato.
+                for operation in finished:
+                    try:
+                        transaction = operation.result()
+                        
+                        if transaction:
+                            print(f"Transazione completata: {type(transaction)}")
+                            if 'success' in constants:
+                                transaction = await constants['success'](transaction=transaction,profile=operation.get_name())
+                            await messenger.post(domain='debug',message=f"✅ Transazione completata: {str(transaction)}")
+                            for task in unfinished:
+                                task.cancel()
+                            return transaction
+                    except Exception as e:
+                        await messenger.post(domain='debug',message=f"❌ Errore nell'operazione: {e}")
 
-Casi d'uso comuni
+                operations = unfinished
 
-    Esecuzione asincrona:
-        Eseguire funzioni o task in background, restituendo risultati quando sono pronti.
-        Esempio: gestire richieste di rete o calcoli lunghi senza bloccare l'interfaccia utente.
+            error_msg = "⚠️ Nessuna transazione valida completata"
+            await messenger.post(domain='debug',message=error_msg)
+            return {"state": False, "result": None, "error": error_msg}
 
-    Parallelizzazione:
-        Suddividere un lavoro complesso in più parti e gestirne l'esecuzione su diversi thread o processi.
+        except Exception as e:
+            error_msg = f"❌ Errore in first_completed: {str(e)}"
+            await messenger.post(domain='debug',message=error_msg)
+            return {"state": False, "result": None, "error": error_msg}
 
-    Gestione comandi:
-        Eseguire comandi o azioni definiti dall'utente o da altre parti del sistema.
+    @flow.asynchronous(managers=('messenger',))
+    async def all_completed(self, messenger, **constants) -> Dict[str, Any]:
+        """Esegue tutti i task in parallelo e attende il completamento di tutti."""
+        tasks = constants.get('tasks', [])
+        
 
-    Workflow orchestrator:
-        Coordinare l'esecuzione sequenziale o parallela di task, gestendo dipendenze e risultati.
-'''
+        try:
+            
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            await messenger.post(domain='debug',message="🚀 Avvio esecuzione parallela di tutte le operazioni...")
+            await messenger.post(domain='debug',message="✅ Tutte le operazioni completate.")
+            return {"state": True, "result": results, "error": None}
 
-class executor():
+        except Exception as e:
+            error_msg = f"❌ Errore in all_completed: {str(e)}"
+            await messenger.post(domain='debug',message=error_msg)
+            return {"state": False, "result": None, "error": error_msg}
 
-    def __init__(self,**constants):
-        self.sessions = dict()
-        self.providers = constants['providers']
+    @flow.asynchronous(managers=('messenger',))
+    async def chain_completed(self, messenger, **constants) -> Dict[str, Any]:
+        """Esegue i task in sequenza, aspettando il completamento di ciascuno prima di passare al successivo."""
+        tasks = constants.get('tasks', [])
+        results = []
 
-    async def act(self,**constants):
-        action = constants.get('action','')
-        module = await language.get_module(f'application/action/{action}.py',language)
-        act = getattr(module,action)
-        _ = await act(**constants)
+        await messenger.post(domain='debug',message="🔄 Avvio esecuzione sequenziale delle operazioni...")
+
+        try:
+            for task in tasks:
+                try:
+                    result = await task(**constants)
+                    results.append(result)
+                    await messenger.post(domain='debug', message=f"✅ Task completato: {result}")
+                except Exception as e:
+                    await messenger.post(domain='debug', message=f"❌ Errore nel task {task}: {e}")
+
+            return {"state": True, "result": results, "error": None}
+
+        except Exception as e:
+            error_msg = f"❌ Errore in chain_completed: {str(e)}"
+            await messenger.post(domain='debug', message=error_msg)
+            return {"state": False, "result": None, "error": error_msg}
+
+    @flow.asynchronous(managers=('messenger',))
+    async def together_completed(self, messenger, **constants) -> Dict[str, Any]:
+        """Esegue tutti i task contemporaneamente senza attendere il completamento di tutti."""
+        tasks = constants.get('tasks', [])
+
+        await messenger.post(domain='debug', message="🚀 Avvio esecuzione simultanea delle operazioni...")
+
+        try:
+            for task in tasks:
+                asyncio.create_task(task)
+
+            await messenger.post(domain='debug', message="✅ Tutti i task sono stati avviati in background.")
+            return {"state": True, "result": "Tasks avviati in background", "error": None}
+
+        except Exception as e:
+            error_msg = f"❌ Errore in together_completed: {str(e)}"
+            await messenger.post(domain='debug', message=error_msg)
+            return {"state": False, "result": None, "error": error_msg}

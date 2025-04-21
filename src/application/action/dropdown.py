@@ -1,4 +1,5 @@
-flow = language.load_module(area="framework",service='service',adapter='flow')
+modules = {'flow':'framework.service.flow'}
+
 import js
 from js import document
 @flow.asynchronous(managers=('messenger','presenter'))

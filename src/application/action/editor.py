@@ -1,4 +1,5 @@
-flow = language.load_module(area="framework",service='service',adapter='flow')
+modules = {'flow':'framework.service.flow'}
+
 import js
 from js import ace,console
 import pyodide
@@ -6,8 +7,8 @@ import pyodide
 @flow.asynchronous(managers=('messenger','presenter'))
 async def editor(messenger,presenter,**constants):
     target = constants.get('target','')
-    file = constants.get('identifier','')
-    print('file',file)
+    file = constants.get('path','')
+    
     # Mappatura delle estensioni ai moduli di modalità di ACE
     mode_mapping = {
         'py': 'ace/mode/python',
@@ -16,20 +17,48 @@ async def editor(messenger,presenter,**constants):
         'html': 'ace/mode/html',
         'css': 'ace/mode/css',
         'json': 'ace/mode/json',
+        'txt': 'ace/mode/text',
+        'toml': 'ace/mode/toml',
+        'yaml': 'ace/mode/yaml',
+        'yml': 'ace/mode/yaml',
+        'md': 'ace/mode/markdown',
+        'java': 'ace/mode/java',
+        'c': 'ace/mode/c_cpp',
+        'cpp': 'ace/mode/c_cpp',
+        'h': 'ace/mode/c_cpp',
+        'hpp': 'ace/mode/c_cpp',
+        'cs': 'ace/mode/csharp',
+        'php': 'ace/mode/php',
+        'rb': 'ace/mode/ruby',
+        'go': 'ace/mode/golang',
+        'rs': 'ace/mode/rust',
+        'sh': 'ace/mode/sh',
+        'sql': 'ace/mode/sql',
+        'swift': 'ace/mode/swift',
+        'ts': 'ace/mode/typescript',
+        'tsx': 'ace/mode/typescript',
+        'vue': 'ace/mode/vue',
+        'scss': 'ace/mode/scss',
+        'less': 'ace/mode/less',
+        'ini': 'ace/mode/ini',
+        'bat': 'ace/mode/batchfile',
+        'dockerfile': 'ace/mode/dockerfile',
+        'makefile': 'ace/mode/makefile',
+        'perl': 'ace/mode/perl',
+        'pl': 'ace/mode/perl',
+        'lua': 'ace/mode/lua',
         # Aggiungi altre estensioni se necessario
     }
-
+    
     # Estrai l'estensione del file
-    file_extension = file.split('.')[-1].lower() if '.' in file else ''
-
-    # Determina la modalità in base all'estensione
-    mode = mode_mapping.get(file_extension, 'text')  # Usa 'text' come fallback
+    mode = mode_mapping.get(file.split('.')[-1], 'ace/mode/text')
+    
 
     # Inizializza l'editor ACE sull'elemento
     ace_editor = ace.edit(target, {
         # Imposta la modalità dinamicamente
     })
-    print(mode)
+    
     ace_editor.setTheme("ace/theme/github")
     ace_editor.session.setMode(mode)
 

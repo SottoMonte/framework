@@ -18,33 +18,38 @@
                 <Action route="application/view/page/project/overview.xml" class="d-inline-flex"><Graph icon="bi-kanban-fill"/><Text padding="px-1">Planning</Text></Action>
             </Column>
             <Column padding="pe-4" content="end" alignment-horizontal="center" >
-                <Action id="button3" size="sm" init="offcanvas(target:'button3',act:'open',id:'#profile')"  padding="p-0">
+                <Messenger id="login-msg" domain="success" view="Toast" />
+                <Action size="sm" show="offcanvas:profile" padding="p-0">
                     <Column alignment-vertical="center" >
-                        <Action  link="#tab-notifications" data-bs-toggle="tab" padding="p-0">
+                        <Action route="tab:tab-notifications" padding="p-0">
                             <Graph icon="bi-inbox-fill" color="white"/> 
                         </Action>
                         <Graph icon="bi-question-circle-fill" color="white"/>
                         <Graph src="{{ user.avatar or 'static/logo.svg' }}" margin="mx-2" width="40px" height="40px" class="rounded-2 border" />
-                        <Text>{{ user.username or 'NaM' }}</Text>
+                        <Text>{{ user.email }}</Text>
                     </Column>  
                 </Action>
                 <Window id="profile" type="canvas" title="Logout" >
-                    <Column alignment="center" height="47px">
-                        <Action id="p-close" size="sm" init="offcanvas(target:'p-close',act:'close')" >
-                            <Column alignment="center">
-                                <Graph src="{{ user.avatar or 'static/logo.svg' }}" height="40px" class="rounded-2 border" />
-                                <Text color="black" >{{ user.username or 'NaM' }}</Text>
-                            </Column>
-                        </Action>
-                        <Action id="button2" icon="REMOVE" size="auto" link="#exampleModal" class=" d-inline" ><Graph icon="bi-box-arrow-right"/></Action>
+                    <Column alignment-content="center" alignment-vertical="center" height="47px">
+                        <Column expand="dynamic">
+                            <Action size="sm" hide="offcanvas:profile" >
+                                <Column alignment-vertical="center" >
+                                    <Graph src="{{ user.avatar or 'static/logo.svg' }}" width="40px" height="40px" class="rounded-2 border" />
+                                    <Text color="black" margin="ms-2" >{{ user.email }}</Text>
+                                </Column>
+                            </Action>
+                        </Column>
+                        <Column expand="auto" padding="p-0">
+                            <Action id="button2" icon="REMOVE" size="auto" show="modal:window-logout" class=" d-inline" ><Graph icon="bi-box-arrow-right"/></Action>
+                        </Column>
                     </Column>
                     <Container class="border-top" padding="p-0">
                         <!-- TabNav -->
                         <Group type="nav" margin="m-0" padding="p-0" class="border-bottom">
-                            <Action link="#contracts" data-bs-toggle="tab"><Graph icon="bi-person-fill-gear"/><Text class="text-uppercase">Profile</Text></Action>
-                            <Action link="#credit-notes" data-bs-toggle="tab"><Graph icon="bi-wallet-fill"/><Text class="text-uppercase">Wallet</Text></Action>
-                            <Action link="#invoices" data-bs-toggle="tab"><Graph icon="bi-key-fill"/><Text class="text-uppercase">API</Text></Action>
-                            <Action link="#tab-notifications" data-bs-toggle="tab"><Graph icon="bi-inbox-fill"/><Text class="text-uppercase">Box</Text></Action>
+                            <Action route="tab:contracts"><Graph icon="bi-person-fill-gear"/><Text class="text-uppercase">Profile</Text></Action>
+                            <Action route="tab:credit-notes"><Graph icon="bi-wallet-fill"/><Text class="text-uppercase">Wallet</Text></Action>
+                            <Action route="tab:invoices"><Graph icon="bi-key-fill"/><Text class="text-uppercase">API</Text></Action>
+                            <Action route="tab:tab-notifications"><Graph icon="bi-inbox-fill"/><Text class="text-uppercase">Box</Text></Action>
                         </Group>
                         <!-- Tab -->
                         <Group type="tab">
@@ -60,8 +65,8 @@
                             <Container id="calls">
                                 <Text>4</Text>
                             </Container>
-                            <Container id="tab-notifications">
-                                <Text>5</Text>
+                            <Container id="tab-notifications" expand="full">
+                                <Messenger id="notifications" domain="*" view="Notifica" />
                             </Container>
                             <Container id="historical">
                                 <Text>6</Text>
@@ -69,7 +74,7 @@
                         </Group>
                     </Container>
                 </Window>
-                <Window id="exampleModal" type="modal" position="centered" size="sm" title="Logout" action="logout">
+                <Window id="window-logout" type="modal" position="centered" size="sm" title="Logout" action="logout">
                     <View url="application/view/content/form/logout.xml" />
                 </Window>
             </Column>
@@ -77,7 +82,6 @@
         <Column id="main" expand="full" margin="mb-auto" padding="p-0" class="overflow-auto" >
             
         </Column>
-        <Footer></Footer>
     </Row>
     {% else %}
     <View url="application/view/page/auth/login.xml" />

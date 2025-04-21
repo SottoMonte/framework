@@ -1,4 +1,5 @@
-flow = language.load_module(area="framework",service='service',adapter='flow')
+modules = {'flow':'framework.service.flow'}
+
 import js
 import asyncio
 @flow.asynchronous(managers=('messenger','presenter','storekeeper'),)
@@ -7,9 +8,10 @@ async def ide(messenger,presenter,storekeeper,**constants):
     target = constants.get('id','')
     component = await presenter.component(name=target)
     #print('target',target)
-    
+    print('component',constants)
     for key in constants:
-        component[key] = constants[key]
+        print(key)
+        #language.put(component,constants[key])
 
     if 'loading' not in component:
         component |= await language.builder('ide',constants,{},'full',language)

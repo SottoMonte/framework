@@ -6,7 +6,7 @@
     </Row>
     <Row expand="dynamic">
         <Column expand="auto" padding="p-5">
-            <Row>
+            <Row expand="dynamic">
                 <Text type="h1" class="h1">{% block title %}{% endblock %}</Text>
                 <Text>{% block subtitle %}{% endblock %}</Text>
             </Row>
@@ -14,10 +14,14 @@
                 <Container>{% block action %}{% endblock %}</Container>
             </Row>
         </Column>
-        <Container id="alert-container" padding="p-2">
-            <Message title="Failed build"><Text>Login: disponibile</Text></Message>
-        </Container>
-        {% block content %}
-        {% endblock %}
+        <Row size="dynamic" flow="auto">
+            <Container id="alerts" padding="p-2">
+                <Messenger id="messenger" domain="success" view="Banner">
+                </Messenger>
+            </Container>
+            {% block content %}
+            {% endblock %}
+        </Row>
+        <Text top="auto">ciao</Text>
     </Row>
 </Column>

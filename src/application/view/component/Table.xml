@@ -38,22 +38,22 @@
             </Column>
         </Column>
         <Column>
-            {% if component.model %}
+            {% if component.repository %}
                 <Graph type="table" class="table-striped">
                     <Graph type="table.head">
                         {{ inner }}
                     </Graph>
                     <Graph type="table.body" id="{{ component.id }}-body">
-                        <View url="application/view/content/table/{{ component.attributes.model or component.model }}.xml" />
+                        <View url="application/view/content/table/{{ component.attributes.view }}.xml" />
                     </Graph>
                 </Graph>
             {% else %}
-                <Graph id="{{ component.id }}-table" init="table(id:'{{ component.id }}',model:'{{ component.attributes.model }}')" type="table" class="table-striped">
+                <Graph id="{{ component.id }}-table" init="table(id:'{{ component.id }}',repository:'{{ component.attributes.repository }}')" type="table" class="table-striped">
                     <Graph type="table.head">
                         {{ inner }}
                     </Graph>
                     <Graph type="table.body" id="{{ component.id }}-body">
-                        <View url="application/view/content/table/{{ component.attributes.model or component.model }}.xml" />
+                        <View url="application/view/content/table/{{ component.attributes.view }}.xml" />
                     </Graph>
                 </Graph>
                 <Action  />

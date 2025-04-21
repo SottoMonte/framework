@@ -1,10 +1,8 @@
-import application.model.identifier as identifier
-import application.model.time as time
-import application.model.string as string
-import application.model.integer as integer
-#import domain.model.natural as natural
-
 file = (
-    {'name':'file','type':identifier.identifier},
-    {'name':'file','type':identifier.identifier},
+    {'name':'name','type':'sting','default':'None','regex':r'^[a-zA-Z0-9_-]+$'},
+    {'name':'message','type':'string','default':'main:','regex':r'^[a-zA-Z0-9_-]+$'},
+    {'name':'path','type':'string','default':'main:','required':True,'regex':r'^[a-zA-Z0-9_-]+$'},
+    {'name':'location','type':'string','default':'None','required':True,'regex':r'^[a-zA-Z0-9_-]+$'},
+    {'name':'content','type':'string','default':'None','required':True},
+    {'name':'sha','type':'string','default':'None','regex':r'^[a-zA-Z0-9_-]+$'},
 )

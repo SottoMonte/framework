@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Column size="expanded" content="mid" alignment="center">
-    <Row size="5" padding="p-5">
-        <Message title="Failed build" type="system"><Text>Login: disponibile</Text></Message>
-        <Message title="Failed build"><Text>Login: disponibile</Text></Message>
-        <Action type="form" act="/login">
-            <Input model="user.name" />
-            <Input model="user.password" />
-            <Action act="submit"/>
-            <Action link="https://github.com/login/oauth/authorize?client_id=Iv23li8IzmjxqtrCVomM">
-                <Text>GitHub Login</Text>
-            </Action>
-            <Action link="https://github.com/login/oauth/authorize?client_id=Ov23lidpWleO0KCHQVm0&amp;scope=repo,user&amp;state=xyz987">
+    <Row size="6" padding="p-5">
+        <Messenger id="login-msg" domain="error" view="Banner">
+        </Messenger>
+        <Action type="form" action="/login" id="form-login">
+            <Input identifier="provider" value="supabase" />
+            <Input identifier="email" model="user.name" />
+            <Input identifier="password" model="user.password" />
+            <Action click="form(id:'form-login',action:'login')" ><Text>Login</Text></Action>
+            <Action route="link:https://github.com/login/oauth/authorize?client_id=Ov23lidpWleO0KCHQVm0&amp;scope=repo,user&amp;state=xyz987">
                 <Text>GitHub OAuth Login</Text>
             </Action>
+        </Action>
+        <Action type="form" action="/registration" id="form-registration">
+            <Input identifier="email" model="user.name" />
+            <Input identifier="password" model="user.password" />
+            <Input identifier="passwordRepeat" model="user.password" />
+            <Action act="submit" click="form(id:'form-registration',action:'registration')" ><Text>Registrazione</Text></Action>
         </Action>
     </Row>
     <Row size="expanded" class="h-100 border-start" color="#444" >

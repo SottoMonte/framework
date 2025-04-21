@@ -1,51 +1,54 @@
-[project]
+# Configurazione del progetto
+[app]
 name = "hub"
-identifier ="cloud.colosso.app"
+identifier = "cloud.colosso.app"
 key = "{{ SECRET_KEY }}"
 version = "0.0.1"
 readme = "README.md"
 requires-python = ">=3.8"
 
-dependencies = []
+# Configurazione della messaggistica
+[amessage.log]
+adapter = "console"
+file = ""
+level = "debug"
+format = "%(asctime)s | %(levelname)-8s | %(process)d | %(message)s"
 
-[presentation.app]
+[message.client]
+adapter = "websocket"
+url = "ws://localhost:8000/messenger"
+
+[amessage.backend]
+adapter = "redis"
+host = "redis-18721.c339.eu-west-3-1.ec2.redns.redis-cloud.com"
+port = "18721"
+database = "Projects-free-db"
+username = "default"
+password = ""
+
+# Configurazione della presentazione
+[presentation.web]
 adapter = "wasm"
 host = "0.0.0.0"
 port = "8000"
 view = "src/domain/view/layout/page.xml"
 routes = "src/application/route/app.xml"
 
-[apresentation.api]
-adapter = "starlette"
-host = "0.0.0.0"
-port = "8001"
-view = "src/domain/view/layout/page.xml"
-routes = "src/application/route/api.xml"
-
-[message.log]
-adapter = "logging"
-host = "127.0.0.1"
-port = "2525"
-persistence = "local"
-
-[message.ui]
-adapter = "websocket"
-url = "ws://localhost:8000/messenger"
-
-[aauthentication.github]
-adapter = "api"
-host = "127.0.0.1"
-port = "2525"
-id = "{{ GITHUB_APP_ID }}"
-secret = "{{ GITHUB_APP_SECRET }}"
+# Configurazione dell'autenticazione
+[authentication.supabase]
+adapter = "supabase"
+url = "https://ljeowpqmovaavxghpsne.supabase.co"
+key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqZW93cHFtb3ZhYXZ4Z2hwc25lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzNDI3NDEsImV4cCI6MjA1NjkxODc0MX0.IAIJo8-x2WIa9tk7HQwLxgmAX1JTX0aK3kLTb7FQTG8"
 
 [authentication.github]
-adapter = "api"
-url_login = "https://github.com/login/oauth/authorize?client_id=Ov23lidpWleO0KCHQVm0&scope=repo,user&state=xyz987"
+adapter = "oauth"
+url = "https://github.com/login/oauth/access_token?client_id={{ GITHUB_OAUTH_ID }}&client_secret={{ GITHUB_OAUTH_SECRET }}"
+link = "https://github.com/login/oauth/authorize?client_id=Ov23lidpWleO0KCHQVm0&scope=repo,user&state=xyz987"
 id = "{{ GITHUB_OAUTH_ID }}"
 secret = "{{ GITHUB_OAUTH_SECRET }}"
 
-[apersistence.bot]
+# Configurazione della persistenza
+[persistence.bot]
 adapter = "jwt"
 url = "https://api.github.com"
 app_id = "{{ GITHUB_COLOSSO_ID }}"
@@ -53,21 +56,34 @@ installation_id = "{{ GITHUB_COLOSSO_APP }}"
 key = "public/colosso-cloud.2024-11-24.private-key.pem"
 autologin = "true"
 
-[persistence.github]
-adapter = "api"
-url = "https://api.github.com"
-authorization = "token "
-accept = "application/vnd.github+json"
-token = "{{ GITHUB_APP_IPE }}"
-autologin = "false"
-expiry = "86400"
+[apersistence.backend]
+adapter = "redis"
+host = "redis-18721.c339.eu-west-3-1.ec2.redns.redis-cloud.com"
+port = "18721"
+database = "Projects-free-db"
+username = "default"
+password = ""
 
-[persistence.repository]
+[persistence.supabase]
+adapter = "supabase"
+url = "https://ljeowpqmovaavxghpsne.supabase.co"
+key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqZW93cHFtb3ZhYXZ4Z2hwc25lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzNDI3NDEsImV4cCI6MjA1NjkxODc0MX0.IAIJo8-x2WIa9tk7HQwLxgmAX1JTX0aK3kLTb7FQTG8"
+token = "{{ session_token_supabase or 'none' }}"
+
+[persistence.github]
 adapter = "api"
 url = "https://api.github.com"
 authorization = "Bearer "
 accept = "application/vnd.github+json"
-token = "{{ session_token or 'none' }}"
+token = "{{ session_token_github or 'none' }}"
 
 [persistence.workspace]
 adapter = "fs"
+
+# Configurazione dell'automazione
+[actuator.devops]
+adapter = "ansible"
+playbook_path = ""
+extra_vars = ""
+inventory_file = ""
+timeout = ""

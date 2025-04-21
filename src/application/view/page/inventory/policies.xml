@@ -1,0 +1,23 @@
+{% extends "sidebar.xml" %}
+{% block title %}Overview{% endblock %}
+{% block subtitle %}Keep track of your inventory{% endblock %}
+{% block bar %}
+<SideBar selected="application/view/page/inventory/policies.xml"/>
+{% endblock %}
+{% block content %}
+<Container background="#fafafa" size="fluid" padding="p-4" expand="True" class="border-top border-bottom">
+    <Table repository="policies" view="policy" >
+        <Text>Nome</Text>
+        <Text>Description</Text>
+        <Text>Type</Text>
+        <Text>IP</Text>
+        <Text>Port</Text>
+        <Text>Protocol</Text>
+        <Text>Host</Text>
+        <Text>Stato</Text>
+        <Text>Tags</Text>
+        <Text>Backup</Text>
+        <Text>Actions</Text>
+    </Table>
+</Container>
+{% endblock %}

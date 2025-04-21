@@ -1,5 +1,4 @@
 import sys
-import re
 from urllib.parse import urlencode, urlparse, urlunparse, parse_qs
 
 
@@ -18,11 +17,12 @@ def add_query_params(url, params):
     new_url = urlunparse(url_parts._replace(query=new_query))
     return new_url
 
+modules = {'flow': 'framework.service.flow',}
 
 if sys.platform == 'emscripten':
     import pyodide
     import json
-    flow = language.load_module(area="framework",service='service',adapter='flow')
+
     async def backend(method,url,headers,payload):
         match method:
             case 'GET':
@@ -38,13 +38,11 @@ if sys.platform == 'emscripten':
             print(data)
             return {"state": True, "result": data}
         else:
-            return {"state": False, "remark": f"Request failed with status {response.status}"}
+            return {"state": False, "result":[],"remark": f"Request failed with status {response.status}"}
                 
 else:
     import aiohttp
     import json
-    import framework.service.flow as flow
-    import framework.service.language as language
 
     #@flow.asynchronous
     async def backend(method,url,headers,payload):
@@ -65,109 +63,41 @@ class adapter():
         self.token = self.config['token']
         self.authorization = self.config['authorization'] if 'authorization' in self.config else 'token '
         self.accept = self.config['accept'] if 'accept' in self.config else 'application/vnd.github+json'
-    
-    async def query(self, **constants):
-        def can_format(template, data):
-            """
-            Verifica se una singola stringa `template` può essere formattata utilizzando le chiavi di un dizionario `data`.
-            """
-            try:
-                placeholders = re.findall(r'\{(\w+)\}', template)
-    
-                # Controlla che tutti i placeholder siano presenti nelle chiavi del dizionario
-                return all(key in data for key in placeholders)
-            except Exception as e:
-                print(f"Errore durante la verifica: {e}")
-                return False
-        def find_first_formattable_template(templates, data):
-            """
-            Trova il primo template nella lista che può essere formattato con il dizionario `data`.
 
-            :param templates: Lista di stringhe che contengono i placeholder.
-            :param data: Dizionario con le chiavi e i valori per il formato.
-            :return: Il primo template formattabile o None se nessuno è valido.
-            """
-            for template in templates:
-                if can_format(template, data):
-                    return template
-            return ''
-        if 'payload' in constants:
-            print(type(constants['payload']),'gggg')
-            payload = constants['payload']
-        else:
-            payload = {}
-        method = constants.get('method','')
-        token = constants.get('token',self.token)
-        headers = {
-            "Authorization": f"{self.authorization} {token}",
-            "Accept": f"{self.accept}",
-        }
-        templates = constants.get('path',[''])
-
-        
-        print(type(payload),'payload ---------->2',payload)
-        # Verifica che tutti i placeholder siano presenti nel dizionario
-        #path = template.format(**constants)
-        template = find_first_formattable_template(templates, constants)
-        path = template.format(**constants)
-        url2 = f"{self.api_url}/{path}"
-        url = constants.get('url',url2)
-
-        if type(payload) == dict and method == 'GET':
-            url = add_query_params(url,payload)
-            print('url:',url)
-
-        return await backend(method,url,headers,payload)
-
-    async def engine(self, **constants):
-        
-        url = constants.get('url','')
-        payload = constants.get('payload',{})
-        method = constants.get('method','')
+    async def request(self, **constants):
+        print('request:',constants)
         headers = {
             "Authorization": f"{self.authorization} {self.token}",
-            "Accept": f"{self.accept}",
+            "Accept": self.accept,
         }
-        return await backend(method,url,headers,payload)
-        
-
-    async def create(self, *services, **constants):
-        print(constants)
-        payload = constants.get('payload',None)
-        if payload:
-            payload = await payload(self,constants)
-        return await self.query(**constants|{'method':'PUT','payload':payload})
-
-    async def delete(self, *services, **constants):
-        payload = constants.get('payload',None)
-        if payload:
-            payload = await payload(self,constants)
-        return await self.query(**constants|{'method':'DELETE','payload':payload})
-
-    async def read(self, *services, **constants):
-        
-        payload = constants.get('payload',None)
-        if payload:
-            print('payload:------------:',payload)
-            payload = await payload(self,constants)
-            
-        return await self.query(**constants|{'method':'GET','payload':payload})
-
-    async def update(self, *services, **constants):
-        print(constants)
+        location = constants.get('location','').replace('//','/')
+        method = constants.get('method','')
         payload = constants.get('payload',{})
-        if payload:
-            payload = await payload(self,constants)
-            print(type(payload),'qui',payload)
-        else:
-            payload = {}
-        gggg = constants|{'payload':payload}
-        return await self.query(**gggg|{'method':'PUT'})
+        url = f"{self.api_url}/{location}"
 
-    async def view(self,**constants):
+        #if payload and method == 'GET':
+        #    url += '?' + urlencode(payload)
         
-        payload = constants.get('payload',None)
-        if payload:
-            payload = await payload(self,constants)
-        #payload=payload
-        return await self.query(**constants|{'method':'GET'}|payload)
+        ok = await backend(method,url,headers,payload)
+        print('request:',constants,'output:',ok)
+        return ok
+        
+    @flow.asynchronous(outputs='transaction')
+    async def create(self, **constants):
+        return await self.request(**constants|{'method':'PUT'})
+
+    @flow.asynchronous(outputs='transaction')
+    async def delete(self, **constants):
+        return await self.request(**constants|{'method':'DELETE'})
+
+    @flow.asynchronous(outputs='transaction')
+    async def read(self, **constants):
+        return await self.request(**constants|{'method':'GET'})
+
+    @flow.asynchronous(outputs='transaction')
+    async def update(self, **constants):
+        return await self.request(**constants|{'method':'PUT'})
+
+    @flow.asynchronous(outputs='transaction')
+    async def view(self,**constants):
+        return await self.request(**constants|{'method':'GET'})

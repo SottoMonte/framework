@@ -2,19 +2,19 @@
 <Container id="{{ component.id }}">
     <!-- TabNav -->
     <Group type="nav" margin="m-0" padding="p-0" border="bottom">
-        <Action link="#tab-property" data-bs-toggle="tab">
+        <Action route="tab:tab-property" data-bs-toggle="tab">
             <Graph icon="bi-rulers" />
             <Text>Property</Text>
         </Action>
-        <Action link="#tab-matter" data-bs-toggle="tab">
+        <Action route="tab:tab-matter" data-bs-toggle="tab">
             <Graph icon="bi bi-grid-1x2-fill" />
             <Text>Matter</Text>
         </Action>
-        <Action link="#tab-style" data-bs-toggle="tab">
+        <Action route="tab:tab-style" data-bs-toggle="tab">
             <Graph icon="bi-palette2" />
             <Text>Style</Text>
         </Action>
-        <Action link="#tab-event" data-bs-toggle="tab">
+        <Action route="tab:tab-event" data-bs-toggle="tab">
             <Graph icon="bi-lightning-fill" />
             <Text>Event</Text>
         </Action>
@@ -177,6 +177,10 @@
                     <Input expand="dynamic" class="rounded-0" type="color" />
                 </Group>
             </Column>
+            <Group type="input">
+                <Graph tooltip="class or tag" icon="bi-tag-fill" />
+                <Input class="rounded-0" />
+            </Group>
             <Group type="input">
                 <Graph icon="bi-fonts" />
                 <Input type="select" expand="dynamic" class="rounded-0" >
