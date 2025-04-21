@@ -58,6 +58,7 @@ On the [Koyeb Control Panel](https://app.koyeb.com/), on the **Overview** tab, c
 You land on the deployment page where you can follow the build of your Django application. Once the build is completed, your application is being deployed and you will be able to access it via `-.koyeb.app`.
 
 ## Contributing
+
 If you have any questions, ideas or suggestions regarding this application sample, feel free to open an [issue](//github.com/koyeb/example-django/issues) or fork this repository and open a [pull request](//github.com/koyeb/example-django/pulls).
 
 ## Contact
