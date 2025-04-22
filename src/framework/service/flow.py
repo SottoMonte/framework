@@ -1,23 +1,47 @@
 import asyncio
 from kink import inject,di
 import sys
-
-
+import inspect
+import traceback
 
 def asynchronous(**constants):
     inject = [di[manager] for manager in constants.get('managers', [])]
     output = constants.get('outputs', [])
     input = constants.get('inputs', [])
+
     def decorator(function):
         async def wrapper(*args, **kwargs):
             args_inject = list(args) + inject
-            if 'inputs' in constants:
-                kwargs_builder = await language.builder(input,kwargs,{},'full',language)
-                outcome = await function(*args_inject,**kwargs_builder)
-            else:
-                outcome = await function(*args_inject,**kwargs)
-            if 'outputs' in constants: return await language.builder(output,outcome,{},'filtered',language)
-            else: return outcome
+            try:
+                if 'inputs' in constants:
+                    kwargs_builder = await language.builder(input, kwargs, {}, 'full', language)
+                    outcome = await function(*args_inject, **kwargs_builder)
+                else:
+                    outcome = await function(*args_inject, **kwargs)
+                if 'outputs' in constants:
+                    return await language.builder(output, outcome, {}, 'filtered', language)
+                else:
+                    return outcome
+
+            except Exception as e:
+                exc_type, exc_obj, tb = sys.exc_info()
+                last_tb = traceback.extract_tb(tb)[-1]
+
+                error_info = {
+                    "module": function.__module__,
+                    "function": function.__name__,
+                    "file": last_tb.filename,
+                    "line": last_tb.lineno,
+                    "error": str(e),
+                    "args": args,
+                    "kwargs": kwargs,
+                }
+
+                print(f"Errore generico: {error_info}")
+
+                # Rilancia l'errore se vuoi interrompere il flusso
+                raise e
+
         return wrapper
     return decorator
 

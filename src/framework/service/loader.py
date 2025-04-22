@@ -20,9 +20,12 @@ async def bootstrap() -> None:
 
         session = cookies.get('session', 'None')
         identifier = cookies.get('session_identifier', 'None')
-        session = eval(session)
-        session = eval(session)
-        print(session, "session",type(session))
+        try:
+            session = eval(session)
+            session = eval(session)
+            print(session, "session",type(session))
+        except:
+            pass
 
         packages = [
             "kink",

@@ -14,6 +14,7 @@ else:
   import importlib
   import uuid
   import re
+  import json
 
   class MyLoader(BaseLoader):
       def get_source(self, environment, template):
@@ -57,11 +58,9 @@ class adapter(starlette.adapter):
           code = asyncio.create_task(self.async_loader(),name="loader")
           
         
-        @flow.asynchronous(managers=('messenger','storekeeper','defender'))
+        @flow.asynchronous(managers=("messenger", "storekeeper", "defender"))
         async def async_loader(self, messenger,storekeeper,defender, **constants):
-          await messenger.post(domain="debug",message="🔄 Avvio async_loader...")
-
-          try:
+              await messenger.post(domain="debug",message="🔄 Avvio async_loader...")
               # Estrai i cookie in modo più sicuro
               self.cookies = {
                   key.strip(): value
@@ -75,7 +74,7 @@ class adapter(starlette.adapter):
               session = self.cookies.get('session', 'None')
               session = eval(session)
               identifier = self.cookies.get('session_identifier', 'None')
-              session = eval(session)
+              #session = eval(session)
               print(session,identifier,type(session),type(identifier),'TIKTIK')
               
               await defender.unionsession(session=session,identifier=identifier)
@@ -111,12 +110,7 @@ class adapter(starlette.adapter):
                 await messenger.post(domain="error",message=transaction.get('error','Errore sconosciuto'))
 
               await messenger.post(domain="debug",message="✅ Contenuto aggiornato con i dati utente.")
-
-          except KeyError as ke:
-              print(f"⚠️ Errore: Cookie non trovato - {ke}")
-
-          except Exception as e:
-              print(f"❌ Errore in async_loader: {e}")
+              
 
         @flow.asynchronous(managers=('messenger',))
         async def bond(self,messenger,**constants):
