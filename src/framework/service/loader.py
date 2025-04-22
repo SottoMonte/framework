@@ -5,6 +5,7 @@ from kink import di
 
 async def bootstrap() -> None:
     env = dict(os.environ)
+    session = dict()
     # Controlla se siamo in Pyodide (browser)
     if sys.platform == "emscripten":
         import js
@@ -36,7 +37,7 @@ async def bootstrap() -> None:
         # Unisce env e cookies
         config = language.get_confi(**{**env, **{"session":session,"identifier":identifier}})
     else:
-        config = language.get_confi(**env)
+        config = language.get_confi(**env|{"session":session,})
 
     print(config, "config")
 
