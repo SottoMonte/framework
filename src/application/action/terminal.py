@@ -39,7 +39,7 @@ async def terminal(messenger,presenter,storekeeper,**constants):
     socket.onopen = on_open
     #terminal.ondata = on_data
 
-    await messenger.post(msg='Terminal is ready',type='info')
+    #await messenger.post(msg='Terminal is ready',type='info')
     #pyodide.create_proxy(self.route)
     #socket.addEventListener('message', pyodide.create_proxy(on_message))
     #socket.addEventListener('open', pyodide.create_proxy(on_open))

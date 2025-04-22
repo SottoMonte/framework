@@ -335,12 +335,19 @@ class adapter():
         password = params.get("password")
         host = params.get("host")
 
-        if session not in self.ssh:
+        '''if session not in self.ssh:
             self.ssh[session] = paramiko.SSHClient()
             self.ssh[session].set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.ssh[session].connect(host, username=username, password=password)
-        channel = self.ssh[session].invoke_shell()
+        channel = self.ssh[session].invoke_shell()'''
 
+        try:
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.connect(host, username=username, password=password)
+            channel = ssh.invoke_shell()
+        except Exception as e:
+            print(f"Errore di connessione SSH: {e}")
         # Stampa la risposta iniziale del canale
         if channel.recv_ready():
             initial_response = channel.recv(1024).decode('utf-8')
