@@ -22,6 +22,8 @@
             {% block content %}
             {% endblock %}
         </Row>
-        <Text top="auto">ciao</Text>
+        <Column margin="mt-auto">
+            <Text top="auto">ciao</Text>
+        </Column>
     </Row>
 </Column>

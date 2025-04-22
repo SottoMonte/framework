@@ -138,24 +138,25 @@ class adapter():
             return RedirectResponse('/', status_code=400)  # Metodo non supportato
 
         # Autenticazione tramite defender
-        token = await defender.authenticate(ip=client_ip, identifier=session_identifier, **credentials)
+        session = await defender.authenticate(ip=client_ip, identifier=session_identifier, **credentials)
         provider = credentials.get('provider', 'undefined')
 
-        '''
+        
         # Aggiorna la sessione se l'autenticazione ha avuto successo
-        if transaction.get('state'):
-            request.session.update(user_data)'''
+        #if session:
+        #    request.session.update(session)
 
         # Crea la risposta di reindirizzamento
         response = RedirectResponse('/', status_code=303)
 
         # Imposta i cookie della sessione se non già presenti
         if 'session_identifier' not in request.cookies:
-            response.set_cookie(key='session_identifier', value=session_identifier, max_age=3600)
+            response.set_cookie(key='session_identifier', value=session_identifier)
         
-        response.set_cookie(key='session_token_'+provider, value=token, max_age=3600)
+        #response.set_cookie(key='session', value=token, max_age=3600)
+        response.set_cookie(key='session', value=session)
         
-        await messenger.post(domain=f"error.{client_ip}",message=f"🔑 Login completato per IP: {client_ip} | con provider: {provider} | Token: {token}")
+        await messenger.post(domain=f"error.{client_ip}",message=f"🔑 Login completato per IP: {client_ip} | con provider: {provider} | Session: {session_identifier}")
 
         return response
 

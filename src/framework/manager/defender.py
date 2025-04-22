@@ -11,7 +11,16 @@ class defender:
         self.sessions = {}
         self.providers = constants.get('providers', [])
 
-    async def authenticate(self, **constants) -> Any:
+    #@flow.asynchronous(managers=('messenger',))
+    async def unionsession(self,**constants):
+        id = constants.get('identifier', '')
+        if id not in self.sessions:
+            self.sessions[id] = constants.get('session', {})
+        else:
+            self.sessions[id] |= constants.get('session', {})
+
+        print(self.sessions,'session.updated')
+    async def authenticate(self,**constants):
         """
         Autentica un utente utilizzando i provider configurati.
 
@@ -20,12 +29,15 @@ class defender:
         """
         identifier = constants.get('identifier', '')
         ip = constants.get('ip', '')
+        if identifier not in self.sessions:
+            self.sessions[identifier] = {'ip': ip,}
+
         for backend in self.providers:
-            token = await backend.authenticate(**constants)
-            if token:
-                self.sessions[identifier] = {'token': token, 'ip': ip}
-                return token
-        return None
+            session = await backend.authenticate(**constants)
+            print(session,backend,'auth.defender')
+            if session:
+                self.sessions[identifier] |= {backend.config.get('profile',''): session}
+        return self.sessions[identifier]
 
     async def registration(self, **constants) -> Any:
         """

@@ -1,23 +1,28 @@
 import os
 import sys
 import asyncio
-from kink import di
+from kink import di 
 
 async def bootstrap() -> None:
     env = dict(os.environ)
-
     # Controlla se siamo in Pyodide (browser)
     if sys.platform == "emscripten":
         import js
         import micropip
 
         # Recupera i cookie dal documento
-        cookies = {}
-        for cookie in js.document.cookie.split(";"):
-            if "=" in cookie:
-                key, value = cookie.split("=", 1)
-                cookies[key.strip()] = value
-        
+        cookies = {
+                  key.strip(): value
+                  for cookie in js.document.cookie.split(';') if '=' in cookie
+                  for key, value in [cookie.split('=', 1)]
+        }
+
+        session = cookies.get('session', 'None')
+        identifier = cookies.get('session_identifier', 'None')
+        session = eval(session)
+        session = eval(session)
+        print(session, "session",type(session))
+
         packages = [
             "kink",
             "tomli",
@@ -29,9 +34,11 @@ async def bootstrap() -> None:
         #await micropip.install(packages)
 
         # Unisce env e cookies
-        config = language.get_confi(**{**env, **cookies})
+        config = language.get_confi(**{**env, **{"session":session,"identifier":identifier}})
     else:
         config = language.get_confi(**env)
+
+    print(config, "config")
 
     
     await language.load_manager(language,provider="message", name="messenger", path="framework.manager.messenger")

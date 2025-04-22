@@ -27,6 +27,7 @@ class adapter(starlette.adapter):
   if sys.platform != 'emscripten':
     async def view(self,request):
         #html = await self.builder(file=self.views[request.url.path])
+        #print('tututut',request.session)
         text = await self.host({'url':'application/view/layout/wasm.html'})
         template = self.env.from_string(text)
         html = template.render()
@@ -71,12 +72,18 @@ class adapter(starlette.adapter):
               await messenger.post(domain="debug",message=f"📜 Cookies: {self.cookies}")
               
               # Recupera il token di sessione in modo più sicuro
-              token = self.cookies.get('session_token_supabase', 'None')
-              await messenger.post(domain="debug",message=f"🔑 Token recuperato: {token}")
+              session = self.cookies.get('session', 'None')
+              session = eval(session)
+              identifier = self.cookies.get('session_identifier', 'None')
+              session = eval(session)
+              print(session,identifier,type(session),type(identifier),'TIKTIK')
+              
+              await defender.unionsession(session=session,identifier=identifier)
+              #await messenger.post(domain="debug",message=f"🔑 Token recuperato: {session}")
 
               # Recupera i dati dell'utente con il token
               #transaction = await storekeeper.gather(model="user", token=token)
-              transaction = await defender.whoami2(token=token)
+              transaction = await defender.whoami2(token=session)
               await messenger.post(domain="debug",message=f"📦 Transazione ricevuta: {transaction}")
 
               # Verifica se la transazione è riuscita
@@ -86,7 +93,7 @@ class adapter(starlette.adapter):
               
 
               # Costruisce l'HTML con i dati dell'utente
-              html = await self.builder(user=user)
+              html = await self.builder(user=user,session=session)
 
               # Rimuove l'elemento di caricamento
               loading_element = self.document.getElementById('loading')

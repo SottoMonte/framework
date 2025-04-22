@@ -22,7 +22,7 @@ if sys.platform == 'emscripten':
         data_js = pyodide.ffi.to_js(data)
         user = await supabase.auth.signInWithPassword(data_js)
         user_dict = user.to_py()
-        return user_dict
+        return user_dict.get('data',{})
 else:
     import supabase
 
@@ -39,6 +39,7 @@ else:
 class adapter:
     def __init__(self, **constants):
         self.config = constants['config']
+        print(self.config,"config")
         self.url = self.config['url']
         self.key = self.config['key']
         
@@ -75,24 +76,18 @@ class adapter:
         except Exception as e:
             print(f"Errore di autenticazione: {e}")
 
-    @flow.asynchronous(managers=("messenger",))
-    async def authenticate(self, messenger, **data):
+    async def authenticate(self, **data):
         email = data.get("email", "").strip()
         password = data.get("password", "").strip()
 
-        if not email or not password:
-            await messenger.post(domain="error", message="Email e password sono obbligatori.")
-            return None
+        #if not email or not password:
+        #    await messenger.post(domain="error", message="Email e password sono obbligatori.")
+        #    return None
 
         try:
             result = await backend_login(self.supabase, **data)
-            if result.get("error"):
-                msg = result["error"]
-                msg_text = msg.get("message") if isinstance(msg, dict) else str(msg)
-                await messenger.post(domain="error", message=f"Errore di autenticazione: {msg_text}")
-                return None
-            await messenger.post(domain="success", message="Autenticazione avvenuta con successo")
-            return result.get("session", {}).get("access_token")
+            #print(dir(result),result)
+            return result
         except Exception as e:
-            await messenger.post(domain="error", message=f"Errore di autenticazione: {e}")
+            #await messenger.post(domain="error", message=f"Errore di autenticazione: {e}")
             return None

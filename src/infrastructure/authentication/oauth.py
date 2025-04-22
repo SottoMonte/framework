@@ -5,7 +5,14 @@ class adapter:
         self.config = constants['config']
         self.url = self.config.get('url')
 
+    
+    async def whoami(self, **data):
+       pass
+    
     async def logout(self,**data):
+        pass
+
+    async def registration(self,**data):
         pass
 
     async def authenticate(self,**data):
@@ -39,6 +46,7 @@ class adapter:
                 print(response.status,response.json())
                 if response.status == 200:
                     data = await response.json()
-                    return data.get('access_token',None)
+                    print(data,'github')
+                    return data
                 else:
                     return None
