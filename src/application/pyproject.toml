@@ -79,7 +79,7 @@ adapter = "api"
 url = "https://api.github.com"
 authorization = "Bearer "
 accept = "application/vnd.github+json"
-token = "{{ session.github.access_token or 'none' }}"
+token = "{% if session.github and session.github.access_token %}{{ session.github.access_token }}{% else %}none{% endif %}"
 
 [persistence.workspace]
 adapter = "fs"

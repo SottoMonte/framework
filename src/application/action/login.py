@@ -7,5 +7,5 @@ async def login(defender,**constants):
     token = await defender.authenticate(ip='1111',identifier='asdasd',**constants)
     print(token,'login')
     if token:
-        #js.location.reload()
+        js.location.reload()
         pass
