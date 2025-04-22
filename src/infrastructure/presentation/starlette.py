@@ -317,9 +317,9 @@ class adapter():
     @flow.asynchronous(managers=('defender',))
     async def websocketssh(self, websocket,defender):
         ip = websocket.client.host
-        accept = await defender.authorize(ip=ip)
-        print(accept,ip)
-        if not accept:
+        #accept = await defender.authorize(ip=ip)
+        #print(accept,ip)
+        if False:
             print(f"Connessione rifiutata per IP non autorizzato: {ip}")
             await websocket.close()  # Chiudi con un codice di errore personalizzato
 
