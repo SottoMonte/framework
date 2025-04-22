@@ -6,7 +6,10 @@
     <Breadcrumb>
         <Action click="ide(id:'{{component.id}}',repository:'SottoMonte/framework')" padding="p-0;ps-3" ><Graph icon="bi-speedometer2"/></Action>
         <Text>Repository</Text>
-        <Text>{{ component.repository }}</Text>
+        {% if component.repository and component.repository != '' %}
+        <Text>{{ component.repository.owner }}</Text>
+        <Text>{{ component.repository.name }}</Text>
+        {% endif %}
     </Breadcrumb>
     <Container>
         <!-- TabNav -->
@@ -62,8 +65,8 @@
                 <Action expand="2" route="tab:tab-views" tooltip="Views"><Graph icon="bi-view-list"/></Action>
                 <Action expand="2" route="tab:tab-views" tooltip="Routes"><Graph icon="bi-sign-turn-left"/></Action>
             </Group>
-            <Input class="rounded-0" >a</Input>
-            <Storekeeper repository='repository' owner="{{component.repository.owner}}" name="{{component.repository.name}}" >
+            <Input class="rounded-0" ></Input>
+            <Storekeeper repository='repository' payload="test(owner:'{{component.repository.owner}}',name:'{{component.repository.name}}')" >
                 <Tree expand="dynamic"></Tree>
             </Storekeeper>
         </Container>
@@ -110,8 +113,8 @@
 <Row expand="dynamic" class="overflow-auto">
     <Column>
         <Group type="nav" margin="m-0" padding="p-0" background="#ededed" expand="dynamic" border="bottom">
-            <Action id="nav-1" route="tab:framework"  class="d-inline-flex"><Graph icon="bi-pass"/><Text padding="ps-1">framework</Text><Action padding="p-0" click="close(target:'framework')|close(target:'nav-1')"><Graph icon="bi-x"/></Action></Action>
-            <Action id="nav-2" route="tab:infrastructure"  class="d-inline-flex"><Graph icon="bi-receipt"/><Text padding="ps-1">infrastructure</Text><Action padding="p-0" click="close(target:'infrastructure')|close(target:'nav-2')"><Graph icon=" bi-x"/></Action></Action>
+            <Action id="nav-1" route="tab:framework"  class="d-inline-flex"><Input class="form-control-sm"/><Action padding="p-0" click="close(target:'framework')|close(target:'nav-1')"><Graph icon="bi-x"/></Action></Action>
+            <Action id="nav-2" route="tab:infrastructure"  class="d-inline-flex"><Input class="form-control-sm"/><Action padding="p-0" click="close(target:'infrastructure')|close(target:'nav-2')"><Graph icon=" bi-x"/></Action></Action>
         </Group>
         <Action route="#tab-code"  class="border-bottom border-start"><Graph icon="bi bi-plus-square"/></Action>
     </Column>

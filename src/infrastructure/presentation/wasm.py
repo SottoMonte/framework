@@ -15,6 +15,7 @@ else:
   import uuid
   import re
   import json
+  import ast
 
   class MyLoader(BaseLoader):
       def get_source(self, environment, template):
@@ -257,6 +258,7 @@ class adapter(starlette.adapter):
 
           _ = await self.act(value=attributeValue)
         
+        
         async def act(self,**constants):
           # Divisione della stringa in base al separatore '|'
           functions = constants['value'].split('|')
@@ -268,15 +270,11 @@ class adapter(starlette.adapter):
             result = {}
             # Estrai il nome della funzione (prima della parentesi)
             key = re.match(r"(\w+)\(", func).group(1)
+            
               
-            # Estrai tutti i parametri in formato chiave:valore (es. 'key': 'value')
-            params = re.findall(r"(\w+):'(.*?)'", func)
-              
-            # Converte la lista di tuple (chiave, valore) in un dizionario
-            param_dict = {k: v for k, v in params}
-              
+            
             # Aggiungi la funzione e i suoi parametri come dizionario
-            result[key] = param_dict
+            result[key] = language.extract_params(func)
             lista.append(result)
           
           for n in lista:

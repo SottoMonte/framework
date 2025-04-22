@@ -45,4 +45,4 @@ async def terminal(messenger,presenter,storekeeper,**constants):
     #socket.addEventListener('open', pyodide.create_proxy(on_open))
     
     #terminal.addEventListener('data', pyodide.create_proxy(on_data))
-    terminal.onData(pyodide.create_proxy(on_data))
+    terminal.onData(pyodide.ffi.create_proxy(on_data))

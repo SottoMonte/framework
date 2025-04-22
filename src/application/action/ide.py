@@ -11,7 +11,9 @@ async def ide(messenger,presenter,storekeeper,**constants):
     print('component',constants)
     for key in constants:
         print(key)
+        component[key] = constants[key]
         #language.put(component,constants[key])
+        print('component',constants)
 
     if 'loading' not in component:
         component |= await language.builder('ide',constants,{},'full',language)

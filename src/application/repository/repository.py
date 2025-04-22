@@ -64,7 +64,9 @@ async def view(storekeeper,**constants):
     repo = constants.get('repo','framework')
     branch = 'main'
     payload = constants.get('payload',{})
-    payload |= {'name':repo,'branch':branch,'owner':'SottoMonte'}
+    #payload |= {'name':repo,'branch':branch,'owner':'SottoMonte'}
+    payload |= {'branch':branch,}
+
     
     branch_data = await storekeeper.gather(**constants|{'payload':payload})
     payload |= {'sha':branch_data.get('result')[0].get('sha')}

@@ -56,6 +56,7 @@ class storekeeper():
     # overview/view/get
     @flow.asynchronous(inputs='storekeeper',outputs='transaction',managers=('executor',))
     async def overview(self, executor, **constants):
+        print("BOOOOM#",constants)
         repository,operations = await self.preparation(**constants|{'operation':'view'})
         return await executor.first_completed(operations=operations,success=repository.results)
 

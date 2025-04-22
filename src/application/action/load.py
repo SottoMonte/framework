@@ -6,7 +6,7 @@ async def load(messenger,presenter,storekeeper,**constants):
     url = f'application/view/component/editor.xml'
     #print(constants)
     component = await presenter.component(name='ide')
-    payload = {'location':component.get('repository'),'path':constants.get('url','')}
+    payload = {'location':f"{component.get('repository')['owner']}/{component.get('repository')['name']}",'path':constants.get('url','')}
     print(payload,'##########3')
     transaction = await storekeeper.gather(repository="file",payload=payload)
     print(component)

@@ -18,30 +18,19 @@ class executor:
         """Esegue un'azione specifica caricando dinamicamente il modulo corrispondente."""
         action = constants.get('action', '')
         await messenger.post(domain='debug',message=f"🔄 Caricamento dell'azione: {action}")
-
-        try:
-            module = await language.load_module(
+        
+        module = await language.load_module(
                 language,
                 path=f'application.action.{action}',
                 area='application',
                 service='action',
                 adapter=action
-            )
-            act = getattr(module, action)
-            result = await act(**constants)
+        )
+        act = getattr(module, action)
+        result = await act(**constants)
 
-            await messenger.post(domain='debug',message=f"✅ Azione '{action}' eseguita con successo.")
-            return {"state": True, "result": result, "error": None}
-
-        except AttributeError:
-            error_msg = f"⚠️ Azione '{action}' non trovata."
-            await messenger.post(domain='debug',message=error_msg)
-            return {"state": False, "result": None, "error": error_msg}
-
-        except Exception as e:
-            error_msg = f"❌ Errore durante '{action}': {str(e)}"
-            await messenger.post(domain='debug',message=error_msg)
-            return {"state": False, "result": None, "error": error_msg}
+        await messenger.post(domain='debug',message=f"✅ Azione '{action}' eseguita con successo.")
+        return {"state": True, "result": result, "error": None}
 
     @flow.asynchronous(managers=('messenger',))
     async def first_completed(self, messenger, **constants):

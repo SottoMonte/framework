@@ -11,10 +11,47 @@ import fnmatch
 from datetime import datetime, timezone
 import uuid
 
+def extract_params(s):
+            match = re.search(r"\w+\((.*)\)", s)
+            if not match:
+                return {}
+
+            content = match.group(1)
+
+            # Split sicuro che tiene conto di {}
+            pairs = []
+            temp = ''
+            depth = 0
+            for char in content:
+                if char == ',' and depth == 0:
+                    pairs.append(temp.strip())
+                    temp = ''
+                else:
+                    if char == '{':
+                        depth += 1
+                    elif char == '}':
+                        depth -= 1
+                    temp += char
+            if temp:
+                pairs.append(temp.strip())
+
+            result = {}
+            for pair in pairs:
+                if ':' not in pair:
+                    continue
+                key, value = pair.split(':', 1)
+                key = key.strip()
+                value = value.strip()
+                # Se è una stringa con apici singoli, rimuovili
+                if value.startswith("'") and value.endswith("'"):
+                    result[key] = value[1:-1]
+                else:
+                    result[key] = eval(value)  # valore grezzo
+
+            return result
+
 def generate_identifier():
     return str(uuid.uuid4())
-
-
 
 def time_now_utc():
     return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S.%f")

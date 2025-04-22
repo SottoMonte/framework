@@ -20,8 +20,8 @@
 ide = (
     {'name':'id','type':'string','default':'None'},
     {'name':'branch','type':'string','default':'main'},
-    #{'name':'repository','type':'dict','default':{'name':'framework','owner':'SottoMonte'}},
-    {'name':'repository','type':'string','default':'SottoMonte/framework'},
+    {'name':'repository','type':'dict','default':{'name':'framework','owner':'SottoMonte'}},
+    #{'name':'repository','type':'string','default':'SottoMonte/framework'},
     {'name':'selected','type':'string','default':'None'},
     {'name':'loading','type':'bool','default':True},
 )

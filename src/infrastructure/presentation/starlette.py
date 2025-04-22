@@ -547,15 +547,25 @@ class adapter():
             case 'Storekeeper':
                 method = att['method'] if 'method' in att else 'overview'
                 new = []
-                match method:
-                    case 'overview':
-                        transaction = await storekeeper.overview(**att,payload=att)
-                    case 'gather':
-                        transaction = await storekeeper.gather(**att,payload=att)
-                    case _:
-                        print('Method not found')
+                payload = att['payload'] if 'payload' in att else ''
+                payload = language.extract_params(payload)
+                repository = att['repository'] if 'repository' in att else 'repository'
 
-                print('BOOOOOM',transaction)
+                print(payload,repository,'transactionok')
+
+                try:
+                    match method:
+                        case 'overview':
+                            transaction = await storekeeper.overview(repository=repository,payload=payload)
+                        case 'gather':
+                            transaction = await storekeeper.gather(repository=repository,payload=payload)
+                        case _:
+                            print('Method not found')
+                except Exception as e:
+                    print('Error',e)
+
+                print(transaction,payload,repository,'###333')
+                
                 for y in elements:
                     built = await self.mount_view(y,{'storekeeper':transaction}|data)
                     new.append(built)
