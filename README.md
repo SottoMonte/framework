@@ -12,7 +12,6 @@ python3 public/app.py
 - biding dati
 - creazione e gestione progetto tramite piattaforma
 - usare type-script per apllicazione zona
-- test
 
 
 # migliorare log/messagistica
