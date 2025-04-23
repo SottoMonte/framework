@@ -1,4 +1,9 @@
 {% extends "sidebar.xml" %}
+{% block breadcrumb %}
+<Action route="application/view/page/inventory/overview.xml" ><Graph icon="bi-speedometer2"/></Action>
+<Text route="application/view/page/inventory/domains.xml">Repository</Text>
+<Text>#exampla.com</Text>
+{% endblock %}
 {% block title %}Domain{% endblock %}
 {% block subtitle %}domain #example.com{% endblock %}
 {% block bar %}

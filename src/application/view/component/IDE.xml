@@ -4,7 +4,7 @@
 {% if component.repository != '' %}
 <Column expand="horizontal" >
     <Column expand="dynamic" >
-        <Breadcrumb class="breadcrumb-arrow">
+        <Breadcrumb class="breadcrumb-arrow" margin="ms-1">
             <Action click="ide(id:'{{component.id}}',repository:'SottoMonte/framework')" ><Graph icon="bi-speedometer2"/></Action>
             <Text route="application/view/page/inventory/repositories.xml">Repository</Text>
             {% if component.repository and component.repository != '' %}

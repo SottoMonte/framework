@@ -5,6 +5,10 @@
         {% endblock %}
     </Row>
     <Row expand="dynamic">
+        <Breadcrumb class="breadcrumb-arrow" margin="m-2">
+            {% block breadcrumb %}
+            {% endblock %}
+        </Breadcrumb>
         <Column expand="auto" padding="p-5">
             <Row expand="dynamic">
                 <Text type="h1" class="h1">{% block title %}{% endblock %}</Text>
