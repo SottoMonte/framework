@@ -315,59 +315,64 @@ class adapter():
 
 
     @flow.asynchronous(managers=('defender',))
-    async def websocketssh(self, websocket,defender):
+    async def websocketssh(self, websocket, defender):
         ip = websocket.client.host
-        #accept = await defender.authorize(ip=ip)
-        #print(accept,ip)
-        if False:
-            print(f"Connessione rifiutata per IP non autorizzato: {ip}")
-            await websocket.close()  # Chiudi con un codice di errore personalizzato
 
+        # Sessione di autenticazione
         session = await defender.whoami(ip=ip)
-        
         await websocket.accept()
-        
-        initial_message = await websocket.receive_text()  
-
-        print(f"Sessione {session} con messaggio iniziale: {initial_message}")
-        params = json.loads(initial_message)  # Decodifica il JSON
-        username = params.get("username")
-        password = params.get("password")
-        host = params.get("host")
-
-        '''if session not in self.ssh:
-            self.ssh[session] = paramiko.SSHClient()
-            self.ssh[session].set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.ssh[session].connect(host, username=username, password=password)
-        channel = self.ssh[session].invoke_shell()'''
 
         try:
+            # Riceve parametri iniziali
+            initial_message = await websocket.receive_text()
+            print(f"Sessione {session} con messaggio iniziale: {initial_message}")
+            params = json.loads(initial_message)
+            username = params.get("username")
+            password = params.get("password")
+            host = params.get("host")
+
+            # Connessione SSH
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             ssh.connect(host, username=username, password=password)
             channel = ssh.invoke_shell()
+
+            # Invia la risposta iniziale del terminale (banner, prompt, ecc.)
+            if channel.recv_ready():
+                initial_response = channel.recv(1024).decode('utf-8')
+                await websocket.send_text(initial_response)
+
+            # Lettura dati da SSH → WebSocket
+            async def read_from_channel():
+                while True:
+                    if websocket.client_state.name != "CONNECTED":
+                        break
+                    if channel.recv_ready():
+                        data = channel.recv(1024).decode('utf-8')
+                        await websocket.send_text(data)
+                    await asyncio.sleep(0.01)
+
+            # Lettura dati da WebSocket → SSH
+            async def read_from_websocket():
+                while True:
+                    data = await websocket.receive_text()
+                    if data:
+                        channel.send(data)
+
+            await asyncio.gather(read_from_channel(), read_from_websocket())
+
         except Exception as e:
-            print(f"Errore di connessione SSH: {e}")
-        # Stampa la risposta iniziale del canale
-        if channel.recv_ready():
-            initial_response = channel.recv(1024).decode('utf-8')
-            await websocket.send_text(initial_response)
-
-        async def read_from_channel():
-            while True:
-                if channel.recv_ready():
-                    await websocket.send_text(channel.recv(1024).decode('utf-8'))
-                await asyncio.sleep(0.01)
-
-        async def read_from_websocket():
-            while True:
-                data = await websocket.receive_text()
-                if data:
-                    channel.send(data)
-
-        await asyncio.gather(read_from_channel(), read_from_websocket())
-
-        await websocket.close()
+            print(f"Errore durante la sessione SSH-WebSocket: {e}")
+            
+        finally:
+            try:
+                if channel:
+                    channel.close()
+                if ssh:
+                    ssh.close()
+                print(f"Sessione SSH chiusa per {session}")
+            except Exception as close_err:
+                print(f"Errore durante la chiusura SSH: {close_err}")
 
     @flow.asynchronous(managers=('storekeeper',))
     async def model(self,request,storekeeper,**constants):
@@ -805,7 +810,7 @@ class adapter():
                         for item in inner:
                             li = self.code('li',{'class':'breadcrumb-item'},[item])
                             new.append(li)
-                        ol = self.code('ol',{'class':'breadcrumb'},new)
+                        ol = self.code('ol',{'class':'breadcrumb m-0'},new)
                         nav = self.code('nav',{'aria-label':'breadcrumb'},[ol])
                         self.att(nav,att)
                         return nav

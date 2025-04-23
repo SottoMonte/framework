@@ -2,37 +2,27 @@
 {% set id = component.id %}
 {% block north %}
 {% if component.repository != '' %}
-<Row>
-    <Breadcrumb>
-        <Action click="ide(id:'{{component.id}}',repository:'SottoMonte/framework')" padding="p-0;ps-3" ><Graph icon="bi-speedometer2"/></Action>
-        <Text>Repository</Text>
-        {% if component.repository and component.repository != '' %}
-        <Text>{{ component.repository.owner }}</Text>
-        <Text>{{ component.repository.name }}</Text>
-        {% endif %}
-    </Breadcrumb>
+<Column expand="horizontal" >
+    <Column expand="dynamic" >
+        <Breadcrumb class="breadcrumb-arrow">
+            <Action click="ide(id:'{{component.id}}',repository:'SottoMonte/framework')" ><Graph icon="bi-speedometer2"/></Action>
+            <Text route="application/view/page/inventory/repositories.xml">Repository</Text>
+            {% if component.repository and component.repository != '' %}
+            <Text>{{ component.repository.owner }}</Text>
+            <Text route="application/view/page/inventory/repositories.xml">{{ component.repository.name }}</Text>
+            {% endif %}
+        </Breadcrumb>
+    </Column>
     <Container>
         <!-- TabNav -->
-        <Group type="nav" margin="m-0" padding="p-0" border="bottom" >
-            <Action route="tab:tab-code" ><Graph icon="bi-code-slash"/><Text>Code</Text></Action>
-            <Action route="tab:tab-build" ><Graph icon="bi-tools"/><Text>Build</Text></Action>
-            <Action route="tab:tab-test" ><Graph icon="bi-play-fill"/><Text>Test</Text></Action>
-            <Action route="tab:tab-release" ><Graph icon="bi-box-seam-fill"/><Text>Package</Text></Action>
-        </Group>
-        <!-- Tab -->
-        <Group type="tab">
-            <Container id="tab-code">
-                <Text>1</Text>
-            </Container>
-            <Container id="tab-build">
-                <Text>2</Text>
-            </Container>
-            <Container id="tab-test">
-                <Text>3</Text>
-            </Container>
+        <Group type="nav" margin="m-0" padding="p-0" >
+            <Action route="tab:tab-code" class="d-inline-flex gap-2"><Graph icon="bi-code-slash"/><Text>Code</Text></Action>
+            <Action route="tab:tab-build" class="d-inline-flex gap-2"><Graph icon="bi-tools"/><Text>Build</Text></Action>
+            <Action route="tab:tab-test" class="d-inline-flex gap-2"><Graph icon="bi-play-fill"/><Text>Test</Text></Action>
+            <Action route="tab:tab-release" class="d-inline-flex gap-2"><Graph icon="bi-box-seam-fill"/><Text>Package</Text></Action>
         </Group>
     </Container>
-</Row>
+</Column>
 {% endif %}
 {% endblock %}
 <!-- West -->
@@ -66,7 +56,7 @@
                 <Action expand="2" route="tab:tab-views" tooltip="Routes"><Graph icon="bi-sign-turn-left"/></Action>
             </Group>
             <Input class="rounded-0" ></Input>
-            <Storekeeper repository='repository' payload="test(owner:'{{component.repository.owner}}',name:'{{component.repository.name}}')" >
+            <Storekeeper flow="auto" repository='repository' payload="test(owner:'{{component.repository.owner}}',name:'{{component.repository.name}}')" >
                 <Tree expand="dynamic"></Tree>
             </Storekeeper>
         </Container>
@@ -111,24 +101,63 @@
 {% block center %}
 {% if component.repository and component.repository != '' %}
 <Row expand="dynamic" class="overflow-auto">
-    <Column>
-        <Group type="nav" margin="m-0" padding="p-0" background="#ededed" expand="dynamic" border="bottom">
-            <Action id="nav-1" route="tab:framework"  class="d-inline-flex"><Input class="form-control-sm"/><Action padding="p-0" click="close(target:'framework')|close(target:'nav-1')"><Graph icon="bi-x"/></Action></Action>
-            <Action id="nav-2" route="tab:infrastructure"  class="d-inline-flex"><Input class="form-control-sm"/><Action padding="p-0" click="close(target:'infrastructure')|close(target:'nav-2')"><Graph icon=" bi-x"/></Action></Action>
-        </Group>
-        <Action route="#tab-code"  class="border-bottom border-start"><Graph icon="bi bi-plus-square"/></Action>
-    </Column>
-    <Group type="tab" expand="dynamic" class="overflow-auto">
-        <Column id="framework" class="overflow-auto" expand="full">
-            <Row droppable="window" class="col overflow-auto">
-                    
-            </Row>
-            <Row droppable="window" class="col overflow-auto">
+    <!-- Tab -->
+    <Group type="tab" expand="full">
+        <Container id="tab-code" class="w-100 h-100" >
+            <Column>
+                <Group type="nav" margin="m-0" padding="p-0" background="#ededed" expand="dynamic" border="bottom">
+                    <Action id="nav-1" route="tab:framework"  class="d-inline-flex"><Input class="text-input"/><Action padding="p-0" click="close(target:'framework')|close(target:'nav-1')"><Graph icon="bi-x"/></Action></Action>
+                    <Action id="nav-2" route="tab:infrastructure"  class="d-inline-flex"><Input class="text-input"/><Action padding="p-0" click="close(target:'infrastructure')|close(target:'nav-2')"><Graph icon=" bi-x"/></Action></Action>
+                </Group>
+                <Action route="#tab-code"  class="border-bottom border-start"><Graph icon="bi bi-plus-square"/></Action>
+            </Column>
+            <Group type="tab" expand="dynamic" class="overflow-auto">
+                <Column id="framework" class="overflow-auto" expand="full">
+                    <Row droppable="window" class="col overflow-auto">
+                            
+                    </Row>
+                    <Row droppable="window" class="col overflow-auto">
+                        
+                    </Row>
+                </Column>
+                <Container id="infrastructure" expand="full">
+                    <Text>3</Text>
+                </Container>
+            </Group>
+        </Container>
+        <Container id="tab-build" expand="full">
+            <Text>2</Text>
+        </Container>
+        <Container id="tab-test" expand="full">
+            <Column expand="full">
+                <Row expand="4">
+                    <Action type="form" id="form-terminal-test" action="/terminal" method="POST">
+                        <Group type="input">
+                            <Input type="text" identifier="target" placeholder="Name" value="terminal-test" collapse="full" />
+                            <Input type="text" identifier="host" placeholder="host" />
+                            <Input type="text" identifier="username" placeholder="username" value="root" />
+                            <Input type="password" identifier="password" placeholder="password" />
+                        </Group>
+                    </Action>
+                    <Action type="button" click="form(id:'form-terminal-test',action:'terminal')" >
+                        <Graph icon="bi bi-terminal-plus"/>
+                    </Action>
+                    <Container id="terminal-test" expand="dynamic" height="100%" padding="p-0"></Container>
+                </Row>
+                <Row expand="dynamic">
+                    <Group type="input" >
+                        <Action type="button" click="iframe(id:'test-iframe',src:'http://195.231.64.226:443')" >
+                            <Graph icon="bi-arrow-repeat"/>
+                        </Action>
+                        <Input type="text" identifier="url" placeholder="url" value="http://195.231.64.226:443" />
+                    </Group>
+                    <Window id="test-iframe" expand="dynamic" type="window" height="100%" url="http://195.231.64.226:443"></Window>
+                </Row>
                 
-            </Row>
-        </Column>
-        <Container id="infrastructure" expand="full">
-            <Text>3</Text>
+            </Column>
+        </Container>
+        <Container id="tab-release" expand="full">
+            <Text>4</Text>
         </Container>
     </Group>
 </Row>
@@ -138,7 +167,7 @@
 {% endblock %}
 {% block south %}
 {% if component.repository and component.repository != '' %}
-<Footer></Footer>
+
 {% endif %}
 {% endblock %}
 {% block east %}
