@@ -157,10 +157,10 @@
                 </Row>
                 <Row expand="dynamic">
                     <Group type="input" >
-                        <Action type="button" click="iframe(id:'test-iframe',src:'http://195.231.64.226:443')" >
+                        <Action type="button" click="iframe(id:'test-iframe',target:'input-url')" >
                             <Graph icon="bi-arrow-repeat"/>
                         </Action>
-                        <Input type="text" identifier="url" placeholder="url" value="http://195.231.64.226:443" />
+                        <Input id="input-url" type="text" identifier="url" placeholder="url" value="http://195.231.64.226:443" />
                         <Action type="button" >
                             <Graph icon="bi-arrows-fullscreen"/>
                         </Action>
