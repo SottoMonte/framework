@@ -5,7 +5,7 @@
 <Column expand="horizontal" >
     <Column expand="dynamic" >
         <Breadcrumb class="breadcrumb-arrow" margin="ms-1">
-            <Action click="ide(id:'{{component.id}}',repository:'SottoMonte/framework')" ><Graph icon="bi-speedometer2"/></Action>
+            <Action click="ide(id:'{{component.id}}',repository:'')" ><Graph icon="bi-speedometer2"/></Action>
             <Text route="application/view/page/inventory/repositories.xml">Repository</Text>
             {% if component.repository and component.repository != '' %}
             <Text>{{ component.repository.owner }}</Text>
@@ -104,26 +104,37 @@
     <!-- Tab -->
     <Group type="tab" expand="full">
         <Container id="tab-code" class="w-100 h-100" >
-            <Column>
-                <Group type="nav" margin="m-0" padding="p-0" background="#ededed" expand="dynamic" border="bottom">
-                    <Action id="nav-1" route="tab:framework"  class="d-inline-flex"><Input class="text-input"/><Action padding="p-0" click="close(target:'framework')|close(target:'nav-1')"><Graph icon="bi-x"/></Action></Action>
-                    <Action id="nav-2" route="tab:infrastructure"  class="d-inline-flex"><Input class="text-input"/><Action padding="p-0" click="close(target:'infrastructure')|close(target:'nav-2')"><Graph icon=" bi-x"/></Action></Action>
-                </Group>
-                <Action route="#tab-code"  class="border-bottom border-start"><Graph icon="bi bi-plus-square"/></Action>
-            </Column>
-            <Group type="tab" expand="dynamic" class="overflow-auto">
-                <Column id="framework" class="overflow-auto" expand="full">
-                    <Row droppable="window" class="col overflow-auto">
-                            
-                    </Row>
-                    <Row droppable="window" class="col overflow-auto">
-                        
-                    </Row>
+            <Row expand="full">
+                <Column alignment-content="center" alignment-vertical="center">
+                    <Group type="nav" margin="m-0" padding="p-0" background="#ededed" expand="dynamic" border="bottom">
+                        <Action id="nav-1" route="tab:framework"  class="d-inline-flex"><Input class="input-as-paragraph"/><Action padding="p-0" click="close(target:'framework')|close(target:'nav-1')"><Graph icon="bi-x"/></Action></Action>
+                        <Action id="nav-2" route="tab:infrastructure"  class="d-inline-flex"><Input class="input-as-paragraph"/><Action padding="p-0" click="close(target:'infrastructure')|close(target:'nav-2')"><Graph icon=" bi-x"/></Action></Action>
+                    </Group>
+                    <Action route="#tab-code" height="100%" class="border-bottom border-start"><Graph icon="bi bi-plus-square"/></Action>
                 </Column>
-                <Container id="infrastructure" expand="full">
-                    <Text>3</Text>
-                </Container>
-            </Group>
+                <Group type="tab" expand="dynamic" class="overflow-auto">
+                    <Container id="framework" class="overflow-auto" expand="full">
+                        <Column expand="full">
+                            <Row droppable="window" class="col overflow-auto">
+                                
+                            </Row>
+                            <Row droppable="window" class="col overflow-auto">
+                                
+                            </Row>
+                        </Column>
+                    </Container>
+                    <Container id="infrastructure" class="overflow-auto" expand="full">
+                        <Column expand="full">
+                            <Row droppable="window" class="col overflow-auto">
+                                
+                            </Row>
+                            <Row droppable="window" class="col overflow-auto">
+                                
+                            </Row>
+                        </Column>
+                    </Container>
+                </Group>
+            </Row>
         </Container>
         <Container id="tab-build" expand="full">
             <Text>2</Text>
@@ -150,6 +161,9 @@
                             <Graph icon="bi-arrow-repeat"/>
                         </Action>
                         <Input type="text" identifier="url" placeholder="url" value="http://195.231.64.226:443" />
+                        <Action type="button" >
+                            <Graph icon="bi-arrows-fullscreen"/>
+                        </Action>
                     </Group>
                     <Window id="test-iframe" expand="dynamic" type="window" height="100%" url="http://195.231.64.226:443"></Window>
                 </Row>

@@ -1,13 +1,13 @@
 {% extends "sidebar.xml" %}
 {% block breadcrumb %}
 <Action route="application/view/page/inventory/overview.xml" ><Graph icon="bi-speedometer2"/></Action>
-<Text route="application/view/page/inventory/domains.xml">Repository</Text>
-<Text>#exampla.com</Text>
+<Action route="application/view/page/inventory/domains.xml" space="1" ><Graph icon="bi-globe"/><Text>Domains</Text></Action>
+<Action space="1" ><Graph icon="bi-file-earmark-post-fill"/><Text>example.com</Text></Action>
 {% endblock %}
 {% block title %}Domain{% endblock %}
 {% block subtitle %}domain #example.com{% endblock %}
 {% block bar %}
-<SideBar selected="application/view/page/inventory/domains.xml"/>
+<SideBar from="inventory" select="application/view/page/inventory/domains.xml"/>
 {% endblock %}
 {% block action %}
 <Group type="button">

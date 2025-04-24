@@ -7,7 +7,7 @@
 {% block title %}Virtual Machine{% endblock %}
 {% block subtitle %}vm #vm-102{% endblock %}
 {% block bar %}
-<SideBar selected="application/view/page/inventory/virtual-machines.xml"/>
+<SideBar from="inventory" select="application/view/page/inventory/virtual-machines.xml"/>
 {% endblock %}
 {% block action %}
 <Group type="button">

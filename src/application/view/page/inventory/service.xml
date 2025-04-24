@@ -2,7 +2,7 @@
 {% block title %}Service{% endblock %}
 {% block subtitle %}service #api-service{% endblock %}
 {% block bar %}
-<SideBar selected="application/view/page/inventory/services.xml"/>
+<SideBar from="inventory" select="application/view/page/inventory/services.xml"/>
 {% endblock %}
 {% block action %}
 <Group type="button">

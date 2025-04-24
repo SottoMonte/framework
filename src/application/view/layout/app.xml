@@ -8,13 +8,13 @@
             </Column>
             <Column expand="dynamic" alignment-horizontal="center" >
                 <Action type="dropdown" border="end" id="lazio" >
-                    <Action id="nn1" route="application/view/page/company/overview.xml" click="move(target:'nn1',place:'lazio-btn')" alignment-content="horizontal" ><Graph icon="bi-buildings-fill"/><Text padding="px-1">Colosso</Text></Action>
-                    <Action id="nn2" route="application/view/page/company/overview.xml" click="move(target:'nn2',place:'lazio-btn')" alignment-content="horizontal" ><Graph icon="bi-person-fill"/><Text padding="px-1">SottoMonte</Text></Action>
+                    <Action id="nn1" route="application/view/page/crm/overview.xml" click="move(target:'nn1',place:'lazio-btn')" alignment-content="horizontal" ><Graph icon="bi-buildings-fill"/><Text padding="px-1">Colosso</Text></Action>
+                    <Action id="nn2" route="application/view/page/crm/overview.xml" click="move(target:'nn2',place:'lazio-btn')" alignment-content="horizontal" ><Graph icon="bi-person-fill"/><Text padding="px-1">SottoMonte</Text></Action>
                 </Action>
                 <Action route="application/view/page/inventory/overview.xml" class="d-inline-flex"><Graph icon="bi-basket3-fill"/><Text padding="px-1">Inventory</Text></Action>
                 <Action route="application/view/page/cubute/overview.xml" class="d-inline-flex"><Graph icon="bi-shield-fill"/><Text padding="px-1">Security</Text></Action>
                 <Action route="application/view/page/cubute/overview.xml" class="d-inline-flex"><Graph icon="bi-easel-fill"/><Text padding="px-1">Monitoring</Text></Action>
-                <Action route="application/view/page/cubute/overview.xml" class="d-inline-flex"><Graph icon="bi-box-fill"/><Text padding="px-1">Developer</Text></Action>
+                <Action route="application/view/page/cms/overview.xml" class="d-inline-flex"><Graph icon="bi-box-fill"/><Text padding="px-1">Developer</Text></Action>
                 <Action route="application/view/page/project/overview.xml" class="d-inline-flex"><Graph icon="bi-kanban-fill"/><Text padding="px-1">Planning</Text></Action>
             </Column>
             <Column padding="pe-4" content="end" alignment-horizontal="center" >

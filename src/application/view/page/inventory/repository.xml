@@ -7,7 +7,7 @@
 {% block title %}Repository{% endblock %}
 {% block subtitle %}repository #git-321{% endblock %}
 {% block bar %}
-<SideBar selected="application/view/page/inventory/repositories.xml"/>
+<SideBar from="inventory" select="application/view/page/inventory/repositories.xml"/>
 {% endblock %}
 {% block action %}
 <Group type="button">

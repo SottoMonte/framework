@@ -2,7 +2,7 @@
 {% block title %}Overview{% endblock %}
 {% block subtitle %}Keep track of your inventory{% endblock %}
 {% block bar %}
-<SideBar selected="application/view/page/inventory/policies.xml"/>
+<SideBar from="inventory" select="application/view/page/inventory/policies.xml"/>
 {% endblock %}
 {% block content %}
 <Container background="#fafafa" size="fluid" padding="p-4" expand="True" class="border-top border-bottom">

@@ -2,7 +2,7 @@
 {% block title %}Policy{% endblock %}
 {% block subtitle %}policy #plc-001{% endblock %}
 {% block bar %}
-<SideBar selected="application/view/page/inventory/politics.xml"/>
+<SideBar from="inventory" select="application/view/page/inventory/politics.xml"/>
 {% endblock %}
 {% block action %}
 <Group type="button">

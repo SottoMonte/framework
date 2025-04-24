@@ -4,8 +4,8 @@
         {% block bar %}
         {% endblock %}
     </Row>
-    <Row expand="dynamic">
-        <Breadcrumb class="breadcrumb-arrow" margin="m-2">
+    <Row expand="dynamic" flow="auto" class="">
+        <Breadcrumb class="breadcrumb-arrow position-fixed" margin="mt-2 ms-2 me-0 mb-0">
             {% block breadcrumb %}
             {% endblock %}
         </Breadcrumb>
@@ -14,11 +14,11 @@
                 <Text type="h1" class="h1">{% block title %}{% endblock %}</Text>
                 <Text>{% block subtitle %}{% endblock %}</Text>
             </Row>
-            <Row>
+            <Row class="position-sticky">
                 <Container>{% block action %}{% endblock %}</Container>
             </Row>
         </Column>
-        <Row size="dynamic" flow="auto">
+        <Row size="dynamic">
             <Container id="alerts" padding="p-2">
                 <Messenger id="messenger" domain="success" view="Banner">
                 </Messenger>

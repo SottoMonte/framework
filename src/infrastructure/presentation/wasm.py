@@ -28,12 +28,14 @@ else:
 class adapter(starlette.adapter):
   if sys.platform != 'emscripten':
     async def view(self,request):
-        #html = await self.builder(file=self.views[request.url.path])
+        #html_page = await self.builder(url=self.views[request.url.path])
+        #print('BOOM',self.views[request.url.path],html_page)
         #print('tututut',request.session)
-        text = await self.host({'url':'application/view/layout/wasm.html'})
-        template = self.env.from_string(text)
-        html = template.render()
-        return HTMLResponse(html)
+        file = await self.host({'url':'application/view/layout/wasm.html'})
+        template = self.env.from_string(file)
+        html_template = template.render()
+        #html_template = html_template.replace('<!-- Body -->',html_page)
+        return HTMLResponse(html_template)
   else:
         def __init__(self, **constants):
           print("🚀 Inizializzazione del modulo WASM...")
@@ -44,10 +46,11 @@ class adapter(starlette.adapter):
           self.cash = {}
           self.cookies = {}
           self.data = {}
+          self.views = {}
           # Configura il loader per i template
           http_loader = MyLoader()
           self.env = Environment(loader=http_loader, autoescape=select_autoescape(["html", "xml"]))
-
+          
           # Riferimento al documento JavaScript
           self.document = js.document
 
@@ -61,6 +64,10 @@ class adapter(starlette.adapter):
         
         @flow.asynchronous(managers=("messenger", "storekeeper", "defender"))
         async def async_loader(self, messenger,storekeeper,defender, **constants):
+              
+              url = self.config['routes'].replace('src/','')
+              data = await self.host({'url':url})
+              self.mount_route(None,data)
               await messenger.post(domain="debug",message="🔄 Avvio async_loader...")
               # Estrai i cookie in modo più sicuro
               self.cookies = {
@@ -93,7 +100,8 @@ class adapter(starlette.adapter):
               
 
               # Costruisce l'HTML con i dati dell'utente
-              html = await self.builder(user=user,session=session)
+              html_template = await self.builder(user=user,session=session)
+              html_page = await self.builder(url=self.views[js.window.location.pathname],user=user,session=session)
 
               # Rimuove l'elemento di caricamento
               loading_element = self.document.getElementById('loading')
@@ -102,7 +110,9 @@ class adapter(starlette.adapter):
                   await messenger.post(domain="debug",message="✅ Elemento di caricamento rimosso.")
 
               # Aggiunge il contenuto alla pagina
-              self.document.body.prepend(html)
+              self.document.body.prepend(html_template)
+              main = self.document.getElementById('main')
+              main.appendChild(html_page)
 
               if transaction.get('state'):
                 await messenger.post(domain="debug",message=f"👤 Dati utente: {user}")
@@ -307,6 +317,8 @@ class adapter(starlette.adapter):
               case 'layer':pass
               case 'identifier':
                 element.setAttribute('name',value)
+              case 'space':
+                element.className += f" gap-{value}"
               case 'id':
                 element.setAttribute(key,value)
               case 'width':
@@ -539,6 +551,27 @@ class adapter(starlette.adapter):
           #  cc.append(x)
           #cc.replaceChild(test,cc)
           #return test
+
+        def mount_route(self, routes, url):
+          route_map = {
+              'model': self.model,
+              'view': self.view,
+              'action': self.action,
+              'logout': self.logout,
+              'login': self.login
+          }
+
+          for setting in untangle.parse(url).get_elements()[0].get_elements():
+              path = setting.get_attribute('path')
+              method = setting.get_attribute('method')
+              typee = setting.get_attribute('type')
+              view = setting.get_attribute('view')
+
+              self.views[path] = view
+              #route = Mount('/static', app=StaticFiles(directory='/public'), name='static') \
+              #    if setting == 'Mount' else Route(path, endpoint=route_map.get(typee), methods=[method])
+
+              #routes.append(route)
 
         def code(self,tag,attr,inner=[]):
           tag = js.document.createElement(tag)

@@ -7,7 +7,7 @@
 {% block title %}Container{% endblock %}
 {% block subtitle %}container #lxc-1001{% endblock %}
 {% block bar %}
-<SideBar selected="application/view/page/inventory/containers.xml"/>
+<SideBar from="inventory" select="application/view/page/inventory/containers.xml"/>
 {% endblock %}
 {% block action %}
 <Group type="button">
