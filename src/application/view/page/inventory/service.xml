@@ -1,4 +1,9 @@
 {% extends "sidebar.xml" %}
+{% block breadcrumb %}
+<Action route="application/view/page/inventory/overview.xml" ><Graph icon="bi-speedometer2"/></Action>
+<Action route="application/view/page/inventory/services.xml" space="1"><Graph icon="bi-boxes"/><Text>Services</Text></Action>
+<Action space="1"><Graph icon="bi-box-fill"/><Text>api service</Text></Action>
+{% endblock %}
 {% block title %}Service{% endblock %}
 {% block subtitle %}service #api-service{% endblock %}
 {% block bar %}

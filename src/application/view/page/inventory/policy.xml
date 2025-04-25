@@ -1,4 +1,9 @@
 {% extends "sidebar.xml" %}
+{% block breadcrumb %}
+<Action route="application/view/page/inventory/overview.xml" ><Graph icon="bi-speedometer2"/></Action>
+<Action route="application/view/page/inventory/politics.xml" space="1" ><Graph icon="bi-globe"/><Text>Policies</Text></Action>
+<Action space="1" ><Graph icon="bi-file-earmark-post-fill"/><Text>block</Text></Action>
+{% endblock %}
 {% block title %}Policy{% endblock %}
 {% block subtitle %}policy #plc-001{% endblock %}
 {% block bar %}

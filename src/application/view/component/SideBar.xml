@@ -9,7 +9,7 @@
             {'route': 'application/view/page/inventory/domains.xml', 'icon': 'bi-globe', 'text': 'Domains'},
             {'route': 'application/view/page/inventory/volumes.xml', 'icon': 'bi-database', 'text': 'Volumes'},
             {'route': 'application/view/page/inventory/repositories.xml', 'icon': 'bi-bookmarks', 'text': 'Repository'},
-            {'route': 'application/view/page/inventory/politics.xml', 'icon': 'bi-file-ruled', 'text': 'Politics'},
+            {'route': 'application/view/page/inventory/policies.xml', 'icon': 'bi-file-ruled', 'text': 'Politics'},
             {'route': 'application/view/page/inventory/secrets.xml', 'icon': 'bi-key', 'text': 'Secrets'}
         ], 
         'crm': [

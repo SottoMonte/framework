@@ -1,7 +1,7 @@
 {% extends "sidebar.xml" %}
 {% block breadcrumb %}
 <Action route="application/view/page/inventory/overview.xml" ><Graph icon="bi-speedometer2"/></Action>
-<Action route="application/view/page/inventory/volumes.xml" ><Graph icon="bi bi-database"/><Text>Repository</Text></Action>
+<Action route="application/view/page/inventory/volumes.xml" space="1" ><Graph icon="bi bi-database-fill"/><Text>volumes</Text></Action>
 {% endblock %}
 {% block title %}Overview{% endblock %}
 {% block subtitle %}Keep track of your inventory{% endblock %}

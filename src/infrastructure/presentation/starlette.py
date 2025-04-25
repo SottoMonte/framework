@@ -100,8 +100,13 @@ class adapter():
             #http_loader = MyLoader()
             #choice_loader = ChoiceLoader([fs_loader, http_loader])
             self.env = Environment(loader=fs_loader,autoescape=select_autoescape(["html", "xml"]))
+            
             loop=constants['loop']
-            config = Config(app=self.app, loop=loop,host=self.config['host'], port=int(self.config['port']),use_colors=True,reload=True)
+            if 'ssl_keyfile' in self.config and 'ssl_certfile' in self.config:
+                print('SSL')
+                config = Config(app=self.app,host=self.config['host'], port=int(self.config['port']),ssl_keyfile=self.config['ssl_keyfile'],ssl_certfile=self.config['ssl_certfile'],use_colors=True,reload=True)
+            else:
+                config = Config(app=self.app, loop=loop,host=self.config['host'], port=int(self.config['port']),use_colors=True,reload=True)
             server = Server(config)
             loop.create_task(server.serve())
         except Exception as e:

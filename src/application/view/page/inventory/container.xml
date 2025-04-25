@@ -1,8 +1,8 @@
 {% extends "sidebar.xml" %}
 {% block breadcrumb %}
 <Action route="application/view/page/inventory/overview.xml" ><Graph icon="bi-speedometer2"/></Action>
-<Text route="application/view/page/inventory/repositories.xml">Repository</Text>
-<Text>#lxc-1001</Text>
+<Action route="application/view/page/inventory/containers.xml" space="1" ><Graph icon="bi-box-seam-fill"/><Text>Containers</Text></Action>
+<Action space="1" ><Graph icon="bi-box-seam-fill"/><Text>lxc-1001</Text></Action>
 {% endblock %}
 {% block title %}Container{% endblock %}
 {% block subtitle %}container #lxc-1001{% endblock %}
