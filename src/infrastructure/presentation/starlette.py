@@ -700,6 +700,10 @@ class adapter():
                         input = self.code('input',{'class':'form-check form-check-input','type':'checkbox'})
                         self.att(input,att)
                         return input
+                    case 'textarea':
+                        input = self.code('textarea',{'class':'form-control','rows':'3','placeholder':placeholder},inner)
+                        self.att(input,att)
+                        return input
                     case 'radio':
                         input = self.code('input',{'class':'form-check form-check-input','type':'radio'})
                         self.att(input,att)

@@ -49,7 +49,7 @@ def build_tree_dict(tree):
         'repository':re.search(r"https://api\.github\.com/repos/([^/]+/[^/]+)/", tree[0].get('url')).group(1),
         "id": "root",
         "name": "Root Node",
-        "path": "",
+        "path": "/",
         "children": []
     }
     

@@ -14,32 +14,34 @@
             <Input type="text" identifier="file_path" placeholder="path" />
         </Action>
     </Window>
-    {% macro render_node(node) %}
-        {% if node['children'] and node['children']|length != 0 %}
-        <Group id="{{ node['id'] }}" type="node" name="{{ node['name'] }}">
-            <Action type="dropdown" >
-                <Action id="maker-{{node.id}}" draggable="window" draggable-component="window" padding="p-0" margin="m-0" value="{{node.path}}"><Text>{{node.name}}</Text></Action>
-                <Action alignment-content="horizontal" modal="window-create-{{ component.id }}"><Text padding="px-1">New folder</Text></Action>
-                <Action alignment-content="horizontal" modal="window-create-{{ component.id }}"><Text padding="px-1">New file</Text></Action>
-                <Action alignment-content="horizontal" modal="window-delete-{{ component.id }}"><Text padding="px-1">Delete</Text></Action>
-                <Action alignment-content="horizontal" modal="window-delete-{{ component.id }}"><Text padding="px-1">Rename folder {{node.name}}</Text></Action>
-            </Action>
-            {% if node['children'] and node['children']|length != 0 %}
-                {% for child in node['children'] %}
+
+    {% macro render_node(tree) %}
+        {% if tree['children'] and tree['children']|length != 0 %}
+            {% if tree.path == '/' or tree.path.startswith(component.attributes.path) or component.attributes.path.startswith(tree.path) %}
+            <Group id="{{ tree['id'] }}" type="node" name="{{ tree['name'] }}">
+                <Action type="dropdown" >
+                    <Action id="maker-{{tree.id}}" draggable="window" draggable-component="window" padding="p-0" margin="m-0" value="{{tree.path}}"><Text>{{tree.name}}</Text></Action>
+                    <Action alignment-content="horizontal" route="modal:window-create-{{ component.id }}"><Text padding="px-1">New folder</Text></Action>
+                    <Action alignment-content="horizontal" route="modal:window-create-{{ component.id }}"><Text padding="px-1">New file</Text></Action>
+                    <Action alignment-content="horizontal" route="modal:window-delete-{{ component.id }}"><Text padding="px-1">Delete</Text></Action>
+                    <Action alignment-content="horizontal" route="modal:window-delete-{{ component.id }}"><Text padding="px-1">Rename folder {{tree.name}}</Text></Action>
+                </Action>
+                {% for child in tree['children'] %}
                     {{ render_node(child) }}
                 {% endfor %}
+            </Group>
             {% endif %}
-        </Group>
         {% else %}
+            {% if tree.path == '/' or tree.path.startswith(component.attributes.path) or component.attributes.path.startswith(tree.path) %}
             <Action type="dropdown" >
-                <Action id="maker-{{node.id}}" draggable="window" draggable-component="window" padding="p-0" margin="m-0" value="{{node.path}}"><Text>{{node.name}}</Text></Action>
-                <Action alignment-content="horizontal" modal="window-delete-{{ component.id }}"><Text padding="px-1">Delete</Text></Action>
-                <Action alignment-content="horizontal" modal="window-delete-{{ component.id }}"><Text padding="px-1">Clone</Text></Action>
-                <Action alignment-content="horizontal" modal="window-delete-{{ component.id }}"><Text padding="px-1">Rename file {{node.name}}</Text></Action>
+                <Action id="maker-{{tree.id}}" draggable="window" draggable-component="window" padding="p-0" margin="m-0" value="{{tree.path}}"><Text>{{tree.name}}</Text></Action>
+                <Action alignment-content="horizontal" route="modal:window-delete-{{ component.id }}"><Text padding="px-1">Delete</Text></Action>
+                <Action alignment-content="horizontal" route="modal:window-delete-{{ component.id }}"><Text padding="px-1">Clone</Text></Action>
+                <Action alignment-content="horizontal" route="modal:window-delete-{{ component.id }}"><Text padding="px-1">Rename file {{tree.name}}</Text></Action>
             </Action>
+            {% endif %}
         {% endif %}
     {% endmacro %}
-
-    {{ render_node(storekeeper.result[0].tree) }}  
     
+    {{ render_node(storekeeper.result[0].tree) }}
 </Group>

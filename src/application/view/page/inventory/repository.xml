@@ -1,7 +1,7 @@
 {% extends "sidebar.xml" %}
 {% block breadcrumb %}
 <Action route="application/view/page/inventory/overview.xml" ><Graph icon="bi-speedometer2"/></Action>
-<Action route="application/view/page/inventory/repositories.xml" ><Graph icon="bi-bookmarks-fill"/><Text>Repository</Text></Action>
+<Action route="application/view/page/inventory/repositories.xml" ><Graph icon="bi-bookmarks-fill"/><Text>Repositories</Text></Action>
 <Action><Graph icon="bi-bookmark-fill"/><Text>git-321</Text></Action>
 {% endblock %}
 {% block title %}Repository{% endblock %}

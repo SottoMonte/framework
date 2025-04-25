@@ -1,15 +1,14 @@
 {% extends "cardinal.xml" %}
 {% set id = component.id %}
 {% block north %}
-{% if component.repository != '' %}
 <Column expand="horizontal" >
     <Column expand="dynamic" >
         <Breadcrumb class="breadcrumb-arrow" margin="ms-1">
-            <Action click="ide(id:'{{component.id}}',repository:'')" ><Graph icon="bi-speedometer2"/></Action>
-            <Text route="application/view/page/inventory/repositories.xml">Repository</Text>
+            <Action ><Graph icon="bi-speedometer2"/></Action>
+            <Action click="ide(id:'{{component.id}}',repository:'')" space="1" ><Graph icon="bi-bookmarks-fill"/><Text>Repositories</Text></Action>
             {% if component.repository and component.repository != '' %}
             <Text>{{ component.repository.owner }}</Text>
-            <Text route="application/view/page/inventory/repositories.xml">{{ component.repository.name }}</Text>
+            <Action space="1" ><Graph icon="bi-bookmark-fill"/><Text>{{ component.repository.name }}</Text></Action>
             {% endif %}
         </Breadcrumb>
     </Column>
@@ -23,7 +22,6 @@
         </Group>
     </Container>
 </Column>
-{% endif %}
 {% endblock %}
 <!-- West -->
 {% block west %}
@@ -33,7 +31,7 @@
     <Row expand="vertical">
         <Group type="nav" margin="m-0" padding="p-0" alignment-content="vertical" expand="vertical">
             <Action width="75px" route="tab:tab-explore" ><Graph icon="bi-archive"/><Text>Explore</Text></Action>
-            <Action width="75px" route="tab:tab-copilot" ><Graph icon="bi-view-list"/><Text>Views</Text></Action>
+            <Action width="75px" route="tab:tab-views" ><Graph icon="bi-view-list"/><Text>Views</Text></Action>
             <Action width="75px" route="tab:tab-copilot" ><Graph icon="bi-file-earmark-spreadsheet"/><Text>Models</Text></Action>
             <Action width="75px" route="tab:tab-copilot" ><Graph icon="bi-play-circle"/><Text>Actions</Text></Action>
             <Action width="75px" route="tab:tab-copilot" ><Graph icon="bi-database"/><Text>Data</Text></Action>
@@ -57,7 +55,7 @@
             </Group>
             <Input class="rounded-0" ></Input>
             <Storekeeper flow="auto" repository='repository' payload="test(owner:'{{component.repository.owner}}',name:'{{component.repository.name}}')" >
-                <Tree expand="dynamic"></Tree>
+                <Tree expand="dynamic" path="/src/application/view/" />
             </Storekeeper>
         </Container>
         <!-- Tool -->
@@ -176,7 +174,17 @@
     </Group>
 </Row>
 {% else %}
-<View url="application/view/page/inventory/repositories.xml" init="ide(id:'{{component.id}}',repository:'')" />
+<Container padding="p-5" expand="full">
+    <Table repository="repository" view="repository" >
+        <Text click="table(id:'{{ component or '' }}',sortField:'name')">Repository</Text>
+        <Text>Description</Text>
+        <Text>Type</Text>
+        <Text>Platform</Text>
+        <Text>Language</Text>
+        <Text>Updated</Text>
+        <Text>Actions</Text>
+    </Table>
+</Container>
 {% endif %}
 {% endblock %}
 {% block south %}
