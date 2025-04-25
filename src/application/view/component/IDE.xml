@@ -160,12 +160,12 @@
                         <Action type="button" click="iframe(id:'test-iframe',target:'input-url')" >
                             <Graph icon="bi-arrow-repeat"/>
                         </Action>
-                        <Input id="input-url" type="text" identifier="url" placeholder="url" value="http://195.231.64.226:443" />
+                        <Input id="input-url" type="text" identifier="url" placeholder="url" value="https://" />
                         <Action type="button" >
                             <Graph icon="bi-arrows-fullscreen"/>
                         </Action>
                     </Group>
-                    <Window id="test-iframe" expand="dynamic" type="window" height="100%" url="http://195.231.64.226:443"></Window>
+                    <Window id="test-iframe" expand="dynamic" type="window" height="100%" url=""></Window>
                 </Row>
                 
             </Column>

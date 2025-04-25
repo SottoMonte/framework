@@ -17,6 +17,7 @@ try:
     from starlette.websockets import WebSocket
     from starlette.middleware.sessions import SessionMiddleware
     from starlette.middleware.cors import CORSMiddleware
+    from starlette.middleware.base import BaseHTTPMiddleware
     from starlette.staticfiles import StaticFiles
     from jinja2 import Environment, select_autoescape,FileSystemLoader,BaseLoader,ChoiceLoader,Template
 
@@ -44,6 +45,16 @@ try:
     import xml.etree.ElementTree as ET
     from xml.sax.saxutils import escape
     import untangle
+
+    class NoCacheMiddleware(BaseHTTPMiddleware):
+        async def dispatch(self, request, call_next):
+            response = await call_next(request)
+            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+            response.headers["Server"] = "Starlette-Test"
+            return response
+
 except Exception as e:
     #import starlette
     import untangle
@@ -76,7 +87,8 @@ class adapter():
 
         middleware = [
             Middleware(SessionMiddleware, session_cookie="session_state",secret_key=self.config['project']['key']),
-            Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*']), 
+            Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*']),
+            Middleware(NoCacheMiddleware),
             #Middleware(AuthorizationMiddleware, manager=defender)
         ]
 
