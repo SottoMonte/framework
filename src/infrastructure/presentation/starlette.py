@@ -676,7 +676,12 @@ class adapter():
                         self.att(out,att)
                         return out
             case 'View':
-                view = await self.builder(**data|att)
+                if 'storekeeper' in data and 'storekeeper' in att:
+                    text = str(language.get(att['storekeeper'],data['storekeeper']))
+                    print(text,'storekeeper34',data['storekeeper'])
+                    view = await self.builder(**data|att|{'text':text})
+                else:
+                    view = await self.builder(**data|att)
                 a = self.code('div',{'class':'container-fluid d-flex flex-row col p-0 m-0'},[view])
                 return a.firstElementChild
             case 'Input':
@@ -824,6 +829,14 @@ class adapter():
                             li = self.code('li',{'class':'list-group-item'},[item])
                             new.append(li)
                         ul = self.code('ul',{'class':'list-group'},new)
+                        self.att(ul,att)
+                        return ul
+                    case 'pagination':
+                        new = []
+                        for item in inner:
+                            li = self.code('li',{'class':'page-item'},[item])
+                            new.append(li)
+                        ul = self.code('ul',{'class':'pagination'},new)
                         self.att(ul,att)
                         return ul
                     case 'breadcrumb':

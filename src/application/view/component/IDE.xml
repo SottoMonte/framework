@@ -44,19 +44,21 @@
     <!-- Tab -->
     <Group type="tab">
         <!-- Explore -->
-        <Container id="tab-explore" expand="vertical" border="start" >
-            <Group type="button" margin="m-0" padding="p-0" class="w-100">
-                <Action expand="2" route="tab:tab-views" tooltip="Policies" ><Graph icon="bi-file-medical"/></Action>
-                <Action expand="2" route="tab:tab-data" tooltip="Datasource"><Graph icon="bi-database"/></Action>
-                <Action expand="2" route="tab:tab-actions" tooltip="Actions"><Graph icon="bi-play-circle"/></Action>
-                <Action expand="2" route="tab:tab-models" tooltip="Models"><Graph icon="bi-ui-radios"/></Action>
-                <Action expand="2" route="tab:tab-views" tooltip="Views"><Graph icon="bi-view-list"/></Action>
-                <Action expand="2" route="tab:tab-views" tooltip="Routes"><Graph icon="bi-sign-turn-left"/></Action>
-            </Group>
-            <Input class="rounded-0" ></Input>
-            <Storekeeper flow="auto" repository='repository' payload="test(owner:'{{component.repository.owner}}',name:'{{component.repository.name}}')" >
-                <Tree expand="dynamic" path="/src/application/view/" />
-            </Storekeeper>
+        <Container id="tab-explore" expand="vertical" border="start" width="250px" height="100%" >
+            <Row expand="full">
+                <Group type="button" margin="m-0" padding="p-0" class="w-100">
+                    <Action expand="2" route="tab:tab-views" tooltip="Policies" ><Graph icon="bi-file-medical"/></Action>
+                    <Action expand="2" route="tab:tab-data" tooltip="Datasource"><Graph icon="bi-database"/></Action>
+                    <Action expand="2" route="tab:tab-actions" tooltip="Actions"><Graph icon="bi-play-circle"/></Action>
+                    <Action expand="2" route="tab:tab-models" tooltip="Models"><Graph icon="bi-ui-radios"/></Action>
+                    <Action expand="2" route="tab:tab-views" tooltip="Views"><Graph icon="bi-view-list"/></Action>
+                    <Action expand="2" route="tab:tab-views" tooltip="Routes"><Graph icon="bi-sign-turn-left"/></Action>
+                </Group>
+                <Input class="rounded-0" ></Input>
+                <Storekeeper expand="dynamic" flow="auto" repository='repository' payload="test(owner:'{{component.repository.owner}}',name:'{{component.repository.name}}')" >
+                    <Tree expand="dynamic" path="/" />
+                </Storekeeper>
+            </Row>
         </Container>
         <!-- Tool -->
         <Container id="tab-tool" expand="vertical" width="200px" border="start" padding="p-0">
@@ -174,7 +176,7 @@
     </Group>
 </Row>
 {% else %}
-<Container padding="p-5" expand="full">
+<Container padding="p-5" margin="my-5" expand="horizontal" background="#fafafa" class="border-top border-bottom">
     <Table repository="repository" view="repository" >
         <Text click="table(id:'{{ component or '' }}',sortField:'name')">Repository</Text>
         <Text>Description</Text>

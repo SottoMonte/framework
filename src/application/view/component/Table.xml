@@ -60,21 +60,21 @@
             {% endif %}
         </Column>
         <Column>
-            <Column expand="dynamic" >
-                <Group type="input" alignment-horizontal="center">
-                    <Action click="table(id:'{{ component.id }}',pageCurrent:'5')" color="light"><Graph icon="bi-chevron-double-left"/></Action>
+            <Column expand="dynamic" alignment-horizontal="center">
+                <Group type="pagination">
+                    <Action class="page-link" click="table(id:'{{ component.id }}',pageCurrent:'5')" color="light"><Graph icon="bi-chevron-double-left"/></Action>
                     {% for x in [1,2,3,4,5] %}
                     {% if component.pageCurrent|string == x|string %}
-                    <Action color="light" class="active"><Text>{{x}}</Text></Action>
+                    <Action class="page-link active" color="light"><Text>{{x}}</Text></Action>
                     {% else %}
-                    <Action click="table(id:'{{ component.id }}',pageCurrent:'{{x}}')" color="light"><Text>{{x}}</Text></Action>
+                    <Action class="page-link" click="table(id:'{{ component.id }}',pageCurrent:'{{x}}')" color="light"><Text>{{x}}</Text></Action>
                     {% endif %}
                     {% endfor %}
-                    <Action color="light"><Graph icon="bi-chevron-double-right"/></Action>
+                    <Action class="page-link" color="light"><Graph icon="bi-chevron-double-right"/></Action>
                 </Group>
             </Column>
             <Column>
-                <Group type="input">
+                <Group type="input" height="37px">
                     {% set pageCurrent = component.pageCurrent if 'pageCurrent' in component else 1 %}
                     {% set pageRows = component.pageRows if 'pageRows' in component else 10 %}
                     {% set totalRows = component.totalRows if 'totalRows' in component else 100 %}

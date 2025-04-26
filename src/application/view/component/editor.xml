@@ -6,22 +6,26 @@
     </Window>
     <Column style="background-color:#ccc;">
         <Group type="nav" margin="m-0" padding="p-0" expand="dynamic">
-            <Action route="tab:text-{{ id }}" class="d-inline-flex"><Graph icon="bi-code-slash"/></Action>
-            <Action route="tab:visual-{{ id }}" class="d-inline-flex"><Graph icon="bi-binoculars"/></Action>
+            <Action route="tab:test-{{ id }}" class="d-inline-flex"><Graph icon="bi-nut-fill"/></Action>
+            <Action route="tab:code-{{ id }}" class="d-inline-flex"><Graph icon="bi-file-code-fill"/></Action>
+            <Action route="tab:view-{{ id }}" class="d-inline-flex"><Graph icon="bi-binoculars-fill"/></Action>
         </Group>
         <Action route="modal:modal-ia-{{ id }}" class="d-inline-flex"><Graph icon="bi-stars"/></Action>
         <Action click="save(model:'file',path:'{{ storekeeper.result.0.path }}',target:'block-editor-{{ id }}')" ><Graph icon="bi-floppy2-fill"/></Action>
     </Column>
     <Row droppable="element" padding="p-0" expand="dynamic" >
         <Group type="tab" expand="dynamic" class="overflow-auto">
-            <Container id="text-{{ id }}" expand="full" padding="p-0">
+            <Container id="test-{{ id }}" expand="full" padding="p-0">
+                <Text>{{ storekeeper.result.0.content }}</Text>
+            </Container>
+            <Container id="code-{{ id }}" expand="full" padding="p-0">
                 <Text id="block-editor-{{ id }}" init="editor(target:'block-editor-{{ id }}',path:'{{ storekeeper.result.0.path }}')" class="editor h-100 border" storekeeper="result.0.content" type="editable"></Text>
             </Container>
-            <Column id="visual-{{ id }}" expand="dynamic" class="overflow-auto" >
-                <Row droppable="element" padding="p-0" expand="full" >
-                    
-                </Row>
-            </Column>
+            <Container id="view-{{ id }}" expand="dynamic" class="overflow-auto" >
+                {% if '.xml' in storekeeper.result.0.path %}
+                    <View storekeeper="result.0.content" />
+                {% endif %}
+            </Container>
         </Group>
     </Row>
 </Row>
