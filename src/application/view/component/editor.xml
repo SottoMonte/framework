@@ -16,7 +16,11 @@
     <Row droppable="element" padding="p-0" expand="dynamic" >
         <Group type="tab" expand="dynamic" class="overflow-auto">
             <Container id="test-{{ id }}" expand="full" padding="p-0">
-                <Text>{{ storekeeper.result.0.content }}</Text>
+                {% if 'parameters' in storekeeper %}
+                <Storekeeper expand="full" method="gather" repository='file' payload="test(location:'{{storekeeper.parameters.payload.location}}',path:'{{ storekeeper.result.0.path | replace('.', '.test.') }}')" >
+                    <Text id="block-test-{{ id }}" init="editor(target:'block-test-{{ id }}',path:'{{ storekeeper.result.0.path | replace('.', '.test.') }}')" class="editor h-100 border" storekeeper="result.0.content" type="editable"></Text>
+                </Storekeeper>
+                {% endif %}
             </Container>
             <Container id="code-{{ id }}" expand="full" padding="p-0">
                 <Text id="block-editor-{{ id }}" init="editor(target:'block-editor-{{ id }}',path:'{{ storekeeper.result.0.path }}')" class="editor h-100 border" storekeeper="result.0.content" type="editable"></Text>

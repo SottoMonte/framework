@@ -53,6 +53,7 @@ class executor:
                             await messenger.post(domain='debug',message=f"✅ Transazione completata: {str(transaction)}")
                             for task in unfinished:
                                 task.cancel()
+                            transaction['parameters'] = operation.parameters
                             return transaction
                     except Exception as e:
                         await messenger.post(domain='debug',message=f"❌ Errore nell'operazione: {e}")

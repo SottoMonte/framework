@@ -589,7 +589,7 @@ class adapter():
                 print(transaction,payload,repository,'###333')
                 
                 for y in elements:
-                    built = await self.mount_view(y,{'storekeeper':transaction}|data)
+                    built = await self.mount_view(y,data|{'storekeeper':transaction})
                     new.append(built)
                 table = self.code('div',{'class':'w-100'},new)
                 self.att(table,att)

@@ -19,7 +19,7 @@ transaction = (
     {'name':'worker','type':'string'},
 
     #{'name':'event','model':event.event},
-    {'name':'parameter','type':'dict','default':{}},
+    {'name':'parameters','type':'dict','default':{}},
     #{'name':'transaction','type':'list','default':[],'iterable':True},
     {'name':'result','type':'list','force_type':'dict','iterable':True,'default':[]},
 )

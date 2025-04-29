@@ -47,6 +47,7 @@ class storekeeper():
                         continue
 
                     task = asyncio.create_task(method(**task_args), name=profile)
+                    task.parameters = task_args
                     operations.append(task)
             except Exception as e:
                 print(f"Errore imprevisto durante la preparazione per il provider {provider}: {e}")
