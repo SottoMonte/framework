@@ -6,12 +6,19 @@
     </Window>
     <Column style="background-color:#ccc;">
         <Group type="nav" margin="m-0" padding="p-0" expand="dynamic">
-            <Action route="tab:test-{{ id }}" class="d-inline-flex"><Graph icon="bi-nut-fill"/></Action>
-            <Action route="tab:code-{{ id }}" class="d-inline-flex"><Graph icon="bi-file-code-fill"/></Action>
-            <Action route="tab:view-{{ id }}" class="d-inline-flex"><Graph icon="bi-binoculars-fill"/></Action>
+            <Action route="tab:test-{{ id }}" click="tab(tab:'context-test-{{ id }}')" class="d-inline-flex"><Graph icon="bi-file-earmark-check"/></Action>
+            <Action route="tab:code-{{ id }}" click="tab(tab:'context-code-{{ id }}')" class="d-inline-flex"><Graph icon="bi-file-code"/></Action>
+            <Action route="tab:view-{{ id }}" class="d-inline-flex"><Graph icon="bi-binoculars"/></Action>
+        </Group>
+        <Group type="tab">
+            <Container id="context-test-{{ id }}" expand="full" padding="p-0">
+                <Action click="save(model:'file',path:'{{ storekeeper.result.0.path | replace('.', '.test.') }}',target:'block-editor-{{ id }}')" ><Graph icon="bi-floppy2-fill"/></Action>
+            </Container>
+            <Container id="context-code-{{ id }}" expand="full" padding="p-0">
+                <Action click="save(model:'file',path:'{{ storekeeper.result.0.path }}',target:'block-editor-{{ id }}')" ><Graph icon="bi-floppy2-fill"/></Action>
+            </Container>
         </Group>
         <Action route="modal:modal-ia-{{ id }}" class="d-inline-flex"><Graph icon="bi-stars"/></Action>
-        <Action click="save(model:'file',path:'{{ storekeeper.result.0.path }}',target:'block-editor-{{ id }}')" ><Graph icon="bi-floppy2-fill"/></Action>
     </Column>
     <Row droppable="element" padding="p-0" expand="dynamic" >
         <Group type="tab" expand="dynamic" class="overflow-auto">
