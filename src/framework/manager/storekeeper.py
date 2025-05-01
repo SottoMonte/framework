@@ -57,27 +57,25 @@ class storekeeper():
     # overview/view/get
     @flow.asynchronous(inputs='storekeeper',outputs='transaction',managers=('executor',))
     async def overview(self, executor, **constants):
-        print("BOOOOM#",constants)
         repository,operations = await self.preparation(**constants|{'operation':'view'})
         return await executor.first_completed(operations=operations,success=repository.results)
 
     # gather/read/get
     @flow.asynchronous(inputs='storekeeper',outputs='transaction',managers=('executor',))
     async def gather(self, executor, **constants):
-        print("BOOOOM#",constants)
         repository,operations = await self.preparation(**constants|{'operation':'read'})
-        print("BOOOOM#",repository,operations)
         return await executor.first_completed(operations=operations,success=repository.results)
     
     # store/create/put
     @flow.asynchronous(inputs='storekeeper',outputs='transaction',managers=('executor',))
     async def store(self, executor, **constants):
         repository,operations = await self.preparation(**constants|{'operation':'create'})
+        
         return await executor.first_completed(operations=operations,success=repository.results)
     
-    # pull/delete/delete
+    # remove/delete/delete
     @flow.asynchronous(inputs='storekeeper',outputs='transaction',managers=('executor',))
-    async def erase(self, executor, **constants):
+    async def remove(self, executor, **constants):
         repository,operations = await self.preparation(**constants|{'operation':'delete'})
         return await executor.first_completed(operations=operations,success=repository.results)
     

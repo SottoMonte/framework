@@ -48,10 +48,13 @@ def rimuovi_ultimo_slash(stringa):
 
 async def create_payload(**constants):
     payload = constants.get('payload',{})
+    payload.pop('action')
+    #payload.pop('location')
     payload |= {
         "message": "Creating new file",
         "content": encode(payload.get('content',''))  # Content should be base64-encoded
     }
+    print(payload,'log')
     return payload
 
 @flow.asynchronous(managers=('storekeeper',))
@@ -76,7 +79,11 @@ async def write_payload(storekeeper,**constants):
     return constants.get('payload')|payload
 
 repository = factory.repository(
-    location = {'GITHUB':["repos/{payload.location}/contents/{payload.path}"]},
+    location = {'GITHUB':[
+       
+       "repos/{payload.location}/contents/{payload.path}",
+       "repos/{payload.location}/contents/{payload.path}/{payload.name}",
+    ]},
     model = 'file',
     values = {
         'content':{'GITHUB':encode,'MODEL':decode},

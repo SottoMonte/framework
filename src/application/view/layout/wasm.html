@@ -168,6 +168,43 @@ input.input-as-paragraph {
   background-position: calc(-2 * var(--radius)) 0;
 }
 
+
+.reset summary {
+  all: unset;
+  display: block;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  position: static;
+  box-sizing: border-box;
+}
+
+.reset ul,
+.reset li {
+  margin: 0px !important;
+  padding: 0px !important;
+  border: 0px !important;
+  background-color: #e4e4e4;
+}
+
+/* Rimuove le pseudo decorazioni */
+.reset *::before,
+.reset *::after {
+  content: none !important;
+  display: none !important;
+  margin: 0px !important;
+  padding: 0px !important;
+  border: 0px !important;
+}
+
+/* Optional: se vuoi ripristinare summary */
+.reset summary {
+  cursor: default;
+  outline: none;
+}
+
 .btn {
   --bs-btn-border-width:0px;
   --bs-btn-hover-color:#2fcc76;

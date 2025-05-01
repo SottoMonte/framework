@@ -6,14 +6,18 @@
     </Window>
     <Column style="background-color:#ccc;">
         <Group type="nav" margin="m-0" padding="p-0" expand="dynamic">
+            {% if 'parameters' in storekeeper and 'src/' in storekeeper.result.0.path and '.py' in storekeeper.result.0.path %}
             <Action route="tab:test-{{ id }}" click="tab(tab:'context-test-{{ id }}')" class="d-inline-flex"><Graph icon="bi-file-earmark-check"/></Action>
+            {% endif %}
             <Action route="tab:code-{{ id }}" click="tab(tab:'context-code-{{ id }}')" class="d-inline-flex"><Graph icon="bi-file-code"/></Action>
             <Action route="tab:view-{{ id }}" class="d-inline-flex"><Graph icon="bi-binoculars"/></Action>
         </Group>
         <Group type="tab">
+            {% if 'parameters' in storekeeper and 'src/' in storekeeper.result.0.path and '.py' in storekeeper.result.0.path %}
             <Container id="context-test-{{ id }}" expand="full" padding="p-0">
                 <Action click="save(model:'file',path:'{{ storekeeper.result.0.path | replace('.', '.test.') }}',target:'block-editor-{{ id }}')" ><Graph icon="bi-floppy2-fill"/></Action>
             </Container>
+            {% endif %}
             <Container id="context-code-{{ id }}" expand="full" padding="p-0">
                 <Action click="save(model:'file',path:'{{ storekeeper.result.0.path }}',target:'block-editor-{{ id }}')" ><Graph icon="bi-floppy2-fill"/></Action>
             </Container>
@@ -22,13 +26,13 @@
     </Column>
     <Row droppable="element" padding="p-0" expand="dynamic" >
         <Group type="tab" expand="dynamic" class="overflow-auto">
+            {% if 'parameters' in storekeeper and 'src/' in storekeeper.result.0.path and '.py' in storekeeper.result.0.path %}
             <Container id="test-{{ id }}" expand="full" padding="p-0">
-                {% if 'parameters' in storekeeper %}
                 <Storekeeper expand="full" method="gather" repository='file' payload="test(location:'{{storekeeper.parameters.payload.location}}',path:'{{ storekeeper.result.0.path | replace('.', '.test.') }}')" >
                     <Text id="block-test-{{ id }}" init="editor(target:'block-test-{{ id }}',path:'{{ storekeeper.result.0.path | replace('.', '.test.') }}')" class="editor h-100 border" storekeeper="result.0.content" type="editable"></Text>
                 </Storekeeper>
-                {% endif %}
             </Container>
+            {% endif %}
             <Container id="code-{{ id }}" expand="full" padding="p-0">
                 <Text id="block-editor-{{ id }}" init="editor(target:'block-editor-{{ id }}',path:'{{ storekeeper.result.0.path }}')" class="editor h-100 border" storekeeper="result.0.content" type="editable"></Text>
             </Container>

@@ -3,7 +3,7 @@ import re
 
 modules = {'factory': 'framework.service.factory','flow': 'framework.service.flow'}
 
-def build_tree_dict(tree):
+def build_tree_dict2(tree):
     """
     Costruisce una rappresentazione ad albero nidificata da una lista di percorsi,
     includendo il campo 'path' per ciascun nodo.
@@ -58,6 +58,48 @@ def build_tree_dict(tree):
         add_to_tree(tree_dict, path_parts, item["sha"], item["type"])
     
     return tree_dict
+
+def build_tree_dict(tree):
+    """Costruisce una struttura ad albero da una lista di percorsi GitHub, con 'path' che esclude il nome file nei file."""
+
+    def add_to_tree(node, parts, sha, type_, parent_path="/"):
+        name = parts[0]
+        is_leaf = len(parts) == 1
+        current_path = parent_path if is_leaf and type_ == "blob" else f"{parent_path}{name}/"
+
+        child = next((c for c in node["children"] if c["name"] == name), None)
+        if not child:
+            child = {
+                "id": f"{parent_path.strip('/')}/{name}",
+                "name": name,
+                "path": current_path,
+                "children": []
+            }
+            node["children"].append(child)
+
+        if is_leaf:
+            child.update({"type": type_, "sha": sha})
+            # I file non hanno 'children'
+            if type_ == "blob":
+                child.pop("children", None)
+        else:
+            add_to_tree(child, parts[1:], sha, type_, current_path)
+
+    repo_url = tree[0].get("url")
+    repository = re.search(r"https://api\.github\.com/repos/([^/]+/[^/]+)/", repo_url).group(1)
+
+    root = {
+        "repository": repository,
+        "id": "root",
+        "name": "Root Node",
+        "path": "/",
+        "children": []
+    }
+
+    for item in tree:
+        add_to_tree(root, item["path"].split("/"), item["sha"], item["type"])
+
+    return root
 
 @flow.asynchronous(managers=('storekeeper',))
 async def view(storekeeper,**constants):

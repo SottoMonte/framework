@@ -11,7 +11,7 @@ import fnmatch
 from datetime import datetime, timezone
 import uuid
 
-def extract_params(s):
+def extract_params2(s):
             match = re.search(r"\w+\((.*)\)", s)
             if not match:
                 return {}
@@ -49,6 +49,66 @@ def extract_params(s):
                     result[key] = eval(value)  # valore grezzo
 
             return result
+
+def extract_params(s):
+    match = re.search(r"\w+\((.*)\)", s)
+    if not match:
+        return {}
+
+    content = match.group(1)
+
+    # Split sicuro che tiene conto di {} e []
+    pairs = []
+    temp = ''
+    depth_curly = 0
+    depth_square = 0
+    in_string = False
+    string_char = ''
+
+    for char in content:
+        if char in ("'", '"'):
+            if not in_string:
+                in_string = True
+                string_char = char
+            elif string_char == char:
+                in_string = False
+        if not in_string:
+            if char == '{':
+                depth_curly += 1
+            elif char == '}':
+                depth_curly -= 1
+            elif char == '[':
+                depth_square += 1
+            elif char == ']':
+                depth_square -= 1
+
+        if char == ',' and depth_curly == 0 and depth_square == 0 and not in_string:
+            pairs.append(temp.strip())
+            temp = ''
+        else:
+            temp += char
+    if temp:
+        pairs.append(temp.strip())
+
+    result = {}
+    for pair in pairs:
+        if ':' not in pair:
+            continue
+        key, value = pair.split(':', 1)
+        key = key.strip()
+        value = value.strip()
+        if value.startswith("'") and value.endswith("'"):
+            result[key] = value[1:-1]
+        elif value.startswith('"') and value.endswith('"'):
+            result[key] = value[1:-1]
+        else:
+            try:
+                result[key] = eval(value)
+            except Exception:
+                result[key] = value  # fallback, ritorna come stringa grezza
+
+    return result
+
 
 def generate_identifier():
     return str(uuid.uuid4())
