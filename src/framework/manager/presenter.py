@@ -26,6 +26,13 @@ class presenter():
     async def component(self,**constants):
         name = constants.get('name','')
         return self.providers[0].components[name]
+    
+    async def DOM(self,**constants):
+        id = constants.get('id','')
+        dom = self.providers[0].document
+        if 'id' in constants:
+            return dom.getElementById(id)
+
 
     async def benchmark(self,**constants):
         if 'module' in constants:

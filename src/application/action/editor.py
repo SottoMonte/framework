@@ -7,6 +7,7 @@ import pyodide
 @flow.asynchronous(managers=('messenger','presenter'))
 async def editor(messenger,presenter,**constants):
     target = constants.get('target','')
+    field = constants.get('field','editor')
     file = constants.get('path','')
     
     # Mappatura delle estensioni ai moduli di modalità di ACE
@@ -55,15 +56,15 @@ async def editor(messenger,presenter,**constants):
     
 
     # Inizializza l'editor ACE sull'elemento
-    ace_editor = ace.edit(target, {
+    ace_editor = ace.edit(field+target, {
         # Imposta la modalità dinamicamente
     })
     
     ace_editor.setTheme("ace/theme/github")
     ace_editor.session.setMode(mode)
 
-    component = await presenter.component(name=target.replace('block-editor-', ''))
-    component['editor'] = ace_editor
+    component = await presenter.component(name=target)
+    component[field] = ace_editor
 
     
     def printEditorDetails():

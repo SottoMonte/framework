@@ -207,13 +207,20 @@ else:
 
 async def load_module(lang, **constants):
     try:
-        # Estrae il nome del modulo
-        area, service, adapter = constants["path"].split(".")
+        if 'code' in constants:
+            module_code = constants['code']
+            adapter = 'Test'
+        else:
+            # Estrae il nome del modulo
+            area, service, adapter = constants["path"].split(".")
+            
+            # Recupera il codice del modulo dal backend
+            module_code = await backend(**constants)
+            if not module_code or not isinstance(module_code, str):
+                raise ValueError(f"⚠️ Codice del modulo '{adapter}' non valido o vuoto.")
         
-        # Recupera il codice del modulo dal backend
-        module_code = await backend(**constants)
-        if not module_code or not isinstance(module_code, str):
-            raise ValueError(f"⚠️ Codice del modulo '{adapter}' non valido o vuoto.")
+        
+            
 
         # Controlla le dipendenze del modulo
         modules_to_install = await extract_modules_from_code(module_code)

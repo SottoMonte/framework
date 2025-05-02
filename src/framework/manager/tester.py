@@ -100,14 +100,16 @@ class tester():
 
 
     async def unittest(self, code: str, **constants):
-        module = types.ModuleType("dynamic_module")
+        '''module = types.ModuleType("dynamic_module")
         module.__dict__.update(constants)
         module.__dict__.update({
             'unittest': unittest,
             'asyncio': asyncio,
         })
 
-        exec(code, module.__dict__)
+        exec(code, module.__dict__)'''
+
+        module = await language.load_module(language,code=code)
 
         test_classes = [
             cls for cls in module.__dict__.values()

@@ -5,9 +5,10 @@ async def save(messenger,storekeeper,presenter,tester,**constants):
     identifier = constants.get('path','')
     model = constants.get('model','')
     target = constants.get('target','')
-    component = await presenter.component(name=target.replace('block-editor-',''))
-    value = component['editor'].getValue()
-
+    field = constants.get('field','editor')
+    component = await presenter.component(name=target)
+    value = component[field].getValue()
+    
     #print(tester,'C-18')
     #response = await storekeeper.gather(repository='file',payload={'location':'SottoMonte/framework','path':identifier, 'content':value})
     

@@ -6,8 +6,8 @@ modules = {'factory': 'framework.service.factory','flow': 'framework.service.flo
 
 
 
-class TestRepository(unittest.IsolatedAsyncioTestCase):
-    '''def setUp(self):
+class TestLanguage(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
         self.repo = factory.repository(
             location={
                 "dev": [
@@ -19,7 +19,7 @@ class TestRepository(unittest.IsolatedAsyncioTestCase):
             values={},
             payloads={},
             model="MyModel"
-        )'''
+        )
 
     # === can_format ===
     def test_can_format_valid(self):
