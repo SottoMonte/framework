@@ -14,7 +14,7 @@ class repository():
             Verifica se una singola stringa `template` può essere formattata utilizzando le chiavi di un dizionario `data`.
             """
             try:
-                placeholders = re.findall(r'\{(\w+)\}', template)
+                placeholders = re.findall(r'\{([\w\.]+)\}', template)
                 gg = []
                 for key in placeholders:
                     a = language.get(key,data)
@@ -64,6 +64,7 @@ class repository():
         #print(f"Templates: {templates}")
         for template in templates:
             can_format_result, num_placeholders = self.can_format(template, data)
+            print(f"Template: {template}, Stato: {can_format_result}, Numero di placeholder: {num_placeholders}",data)
             if can_format_result and num_placeholders >= max_placeholders:
                 best_template = template
                 max_placeholders = num_placeholders
