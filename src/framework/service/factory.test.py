@@ -5,9 +5,18 @@ import asyncio
 modules = {'factory': 'framework.service.factory','flow': 'framework.service.flow'}
 
 
+model = (
+    {'name':'name','type':'sting','default':'None','regex':r'^[a-zA-Z0-9_-]+$'},
+    {'name':'message','type':'string','default':'main:','regex':r'^[a-zA-Z0-9_-]+$'},
+    {'name':'path','type':'string','default':'main:','required':True,'regex':r'^[a-zA-Z0-9_-]+$'},
+    {'name':'location','type':'string','default':'None','required':True,'regex':r'^[a-zA-Z0-9_-]+$'},
+    {'name':'content','type':'string','default':'None','required':True},
+    {'name':'sha','type':'string','default':'None','regex':r'^[a-zA-Z0-9_-]+$'},
+)
+
 
 class TestRepository(unittest.IsolatedAsyncioTestCase):
-    '''def setUp(self):
+    def setUp(self):
         self.repo = factory.repository(
             location={
                 "dev": [
@@ -19,7 +28,7 @@ class TestRepository(unittest.IsolatedAsyncioTestCase):
             values={},
             payloads={},
             model="MyModel"
-        )'''
+        )
 
     # === can_format ===
     def test_can_format_valid(self):
@@ -55,8 +64,7 @@ class TestRepository(unittest.IsolatedAsyncioTestCase):
                 "path": "src"
             }
         }
-        #self.repo.language = MockLanguage
-        #self.repo.get_nested_value = lambda data, key: MockLanguage.get(key, data)
+        
         formatted = self.repo.do_format(template, data)
         self.assertEqual(formatted, "repos/user/repo/contents/src")
 
@@ -72,7 +80,7 @@ class TestRepository(unittest.IsolatedAsyncioTestCase):
                 "path": "src"
             }
         }
-        #self.repo.language = MockLanguage
+        
         best = self.repo.find_first_formattable_template(templates, data)
         self.assertEqual(best, "repos/{payload.location}/contents/{payload.path}")
 

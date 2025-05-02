@@ -7,10 +7,11 @@ messenger = (
     },
     {
         "name": "domain",
-        "type": "string",
+        "type": "list",
         "required": True,
         "description": "Topic MQTT/Redis su cui pubblicare. Deve iniziare con un prefisso come info|error|debug...",
-        "regex": r"^(info|error|debug|warning|event|alert|critical|fatal|success|notice)(\..+)?$"
+        'force_type': 'str',
+        #"regex": r"^(info|error|debug|warning|event|alert|critical|fatal|success|notice)(\..+)?$"
     },
     {
         "name": "operation",

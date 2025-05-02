@@ -46,13 +46,13 @@ class adapter:
         payload = payload.data
         
         payload = json.loads(payload) if isinstance(payload, str) else payload
-        domain = payload.get("domain", "")
+        domain = payload.get("domain", [])
         message = payload.get("message", [])
 
         ok = []
         for x in self.listeners.keys():
             
-            matching_domains = language.wildcard_match([domain], x)
+            matching_domains = language.wildcard_match(domain, x)
             if len(matching_domains) == 1:
                 ok.append(x)
 

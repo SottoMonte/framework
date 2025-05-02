@@ -18,7 +18,7 @@
                 <Action route="application/view/page/project/overview.xml" class="d-inline-flex"><Graph icon="bi-kanban-fill"/><Text padding="px-1">Planning</Text></Action>
             </Column>
             <Column padding="pe-4" content="end" alignment-horizontal="center" >
-                <Messenger id="login-msg" domain="success" view="Toast" />
+                <Messenger id="login-msg" domain="success,error" view="Toast" />
                 <Action size="sm" show="offcanvas:profile" padding="p-0">
                     <Column alignment-vertical="center" >
                         <Action route="tab:tab-notifications" click="tab(tab:'tab-notifications')" padding="p-0">

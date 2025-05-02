@@ -129,7 +129,7 @@ class adapter(starlette.adapter):
           while True:
             print("🔄 Esecuzione del ciclo di polling...")
             msg = await messenger.read(domain="*")
-            domain = msg.get('domain','')
+            domains = msg.get('domain',[])
             
             '''ok = []
             for x in self.data.keys():
@@ -138,10 +138,10 @@ class adapter(starlette.adapter):
                 if len(matching_domains) == 1:
                     ok.append(x)
             print(ok,self.data)'''
-
-            for id  in self.data.get(domain,[]):
-              self.components[id].setdefault('messenger',[]).append(msg)
-              await self.rebuild(id,self.components[id].get('view'),message=msg)
+            for domain in domains:
+              for id  in self.data.get(domain,[]):
+                self.components[id].setdefault('messenger',[]).append(msg)
+                await self.rebuild(id,self.components[id].get('view'),message=msg)
 
             for id  in self.data.get('*',[]):
               self.components[id].setdefault('messenger',[]).append(msg)

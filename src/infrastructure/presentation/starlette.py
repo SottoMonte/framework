@@ -547,12 +547,14 @@ class adapter():
                 id = att['id'] if 'id' in att else str(uuid.uuid4())
                 model = att['type'] if 'type' in att else 'flesh'
                 title = att['title'] if 'title' in att else ''
-                domain = att['domain'] if 'domain' in att else ''
+                domain = att['domain'] if 'domain' in att else []
                 view = att['view'] if 'view' in att else ''
-
+                domain = domain.split(',')
                 #self.data[domain] = {'domain':domain,'messages':messages}
                 if id not in self.components:
-                    self.data.setdefault(domain,[]).append(id)
+                    for dom in domain:
+                        self.data.setdefault(dom,[]).append(id)
+                    
                     self.components[id] = {'id': id}
                     self.components[id]['view'] = f'application/view/component/{view}.xml'
                     #self.components[id]['inner'] = f"<{tag} id='{id}' model='repository'>{markupsafe.Markup(xml_string)}</{tag}>"

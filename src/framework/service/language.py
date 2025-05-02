@@ -521,6 +521,13 @@ async def builder(schema, value=None, spread={}, mode='full', lang=None):
 
     # Ordine di esecuzione delle operazioni
     operation_order = ["required", "force_type","default","function", "type", "regex"]
+    expected_types = {
+        "string": str,
+        "integer": int,
+        "boolean": bool,
+        "dict": dict,
+        "list": list
+    }
 
     for operation in operation_order:
         if operation not in schema:
@@ -528,10 +535,17 @@ async def builder(schema, value=None, spread={}, mode='full', lang=None):
         
         match operation:
             case "force_type":
+                var_type = type(value.get(name)).__name__
+                expected_type = expected_types.get(schema.get("type")).__name__
+                #print(var_type, expected_type)
                 #print(f"⚠️ Forzando il tipo per '{name}'",str(type(value.get(name))), schema["force_type"])
-                if type(value.get(name)).__name__ == schema["force_type"]:
-                    #value[name] = [list(item.items()) if isinstance(item, dict) else item for item in value[name]]
-                    value[name] = [value[name]]
+                match expected_type:
+                    case 'list':
+                        #value[name] = [value[name]]
+                        if var_type == schema["force_type"]:
+                            #value[name] = [list(item.items()) if isinstance(item, dict) else item for item in value[name]]
+                            value[name] = [value[name]]
+                
             case "required":
                 if schema["required"] and name not in value:
                     raise ValueError(f"⚠️ Campo obbligatorio mancante: {name}")
@@ -548,13 +562,7 @@ async def builder(schema, value=None, spread={}, mode='full', lang=None):
                         value[name] = time_now_utc()
 
             case "type":
-                expected_types = {
-                    "string": str,
-                    "integer": int,
-                    "boolean": bool,
-                    "dict": dict,
-                    "list": list
-                }
+                
                 expected_type = expected_types.get(schema.get("type"))
                 if expected_type and not isinstance(value.get(name), expected_type):
                     raise TypeError(f"❌ Tipo non valido per '{name}': atteso {expected_type.__name__}, ricevuto {type(value.get(name)).__name__}")
