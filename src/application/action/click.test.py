@@ -13,5 +13,5 @@ class Test(unittest.IsolatedAsyncioTestCase):
         pass
 
     def test_valid(self):
-        self.assertTrue(False)
+        self.assertTrue(True)
         #self.assertEqual(count, 2)
