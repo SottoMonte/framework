@@ -15,11 +15,11 @@
         <Group type="tab">
             {% if 'parameters' in storekeeper and 'src/' in storekeeper.result.0.path and '.py' in storekeeper.result.0.path %}
             <Container id="context-test-{{ id }}" expand="full" padding="p-0">
-                <Action click="save(model:'file',path:'{{ storekeeper.result.0.path | replace('.', '.test.') }}',target:'{{ id }}',field:'block-test-')" ><Graph icon="bi-floppy2-fill"/></Action>
+                <Action click="save(location:'{{ storekeeper.parameters.payload.location }}',model:'file',path:'{{ storekeeper.result.0.path | replace('.', '.test.') }}',target:'{{ id }}',field:'block-test-')" ><Graph icon="bi-floppy2-fill"/></Action>
             </Container>
             {% endif %}
             <Container id="context-code-{{ id }}" expand="full" padding="p-0">
-                <Action click="save(model:'file',path:'{{ storekeeper.result.0.path }}',target:'{{ id }}',field:'block-editor-')" ><Graph icon="bi-floppy2-fill"/></Action>
+                <Action click="save(location:'{{ storekeeper.parameters.payload.location }}',model:'file',path:'{{ storekeeper.result.0.path }}',target:'{{ id }}',field:'block-editor-')" ><Graph icon="bi-floppy2-fill"/></Action>
             </Container>
         </Group>
         <Action route="modal:modal-ia-{{ id }}" class="d-inline-flex"><Graph icon="bi-stars"/></Action>
@@ -38,7 +38,7 @@
             </Container>
             <Container id="view-{{ id }}" expand="dynamic" class="overflow-auto" >
                 {% if '.xml' in storekeeper.result.0.path %}
-                    <View storekeeper="result.0.content" />
+                <View storekeeper="result.0.content" />
                 {% endif %}
             </Container>
         </Group>

@@ -22,6 +22,14 @@ url = "ws://localhost:8000/messenger"
 adapter = "websocket"
 url = "wss://app.colosso.cloud/messenger"
 
+[message.chatbot]
+adapter = "api"
+domain = "assistant"
+url = "https://openrouter.ai/api/v1/chat/completions"
+authorization = "Bearer "
+accept = "application/json"
+token = "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"
+
 [amessage.backend]
 adapter = "redis"
 host = "redis-18721.c339.eu-west-3-1.ec2.redns.redis-cloud.com"

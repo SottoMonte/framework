@@ -19,10 +19,14 @@ class messenger():
         # Adds operation if profile matches
         for provider in self.providers:
             profile = provider.config['profile'].upper()
-            #can = await provider.can(**constants)
-            #if can or profile in allowed:
-            operations.append(provider.post(location=profile, **constants))
-            map_tasks[len(operations)-1] = profile
+            domain_provider = provider.config.get('domain','*').split(',')
+            domain_message = constants.get('domain',[])
+            #print(f"Domain: {domain_message} - Provider: {domain_provider}",[match for item in domain_provider for match in language.wildcard_match(domain_message, item)])
+            if len([match for item in domain_provider for match in language.wildcard_match(domain_message, item)]) > 0:
+                #can = await provider.can(**constants)
+                #if can or profile in allowed:
+                operations.append(provider.post(location=profile, **constants))
+                map_tasks[len(operations)-1] = profile
 
         # Commit all operations at the same time   
         transactions = await asyncio.gather(*operations)
@@ -35,9 +39,13 @@ class messenger():
 
         for provider in self.providers:
             profile = provider.config['profile'].upper()
+            domain_provider = provider.config.get('domain','*').split(',')
+            domain_message = constants.get('domain',[])
+            #print(f"Domain: {domain_message} - Provider: {domain_provider}",[match for item in domain_provider for match in language.wildcard_match(domain_message, item)])
+            if len([match for item in domain_provider for match in language.wildcard_match(domain_message, item)]) > 0:
             #if profile in allowed:
-            task = asyncio.create_task(provider.read(location=profile,**constants))
-            operations.append(task)
+                task = asyncio.create_task(provider.read(location=profile,**constants))
+                operations.append(task)
         
         finished, unfinished = await asyncio.wait(operations, return_when=asyncio.FIRST_COMPLETED)
         for operation in finished:

@@ -777,7 +777,7 @@ class adapter():
                         ])
                     case 'window':
                         url = att['url'] if 'url' in att else ''
-                        obj =  self.code('iframe',{'src':url,'id':id,'style':'border:none;'},[])
+                        obj =  self.code('iframe',{'src':url,'id':id,'style':'border:none;'},inner)
                         self.att(obj,att)
                         return obj
                     case 'modal':
