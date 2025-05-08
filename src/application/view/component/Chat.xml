@@ -22,8 +22,8 @@
                         {% set color = 'dark' %}
                         {% set icon = 'bi-gear-fill' %}
                 {% endif %}
-                <Column id="{{ message.identifier }}" class="{% if message.sender == 'user' %}message sender{% else %}message receiver{% endif %}">
+                <Row id="{{ message.identifier }}" class="{% if message.sender == 'user' %}message sender{% else %}message receiver{% endif %}">
                         <Text type="code" class="">{{ message.message }}</Text>
-                </Column>
+                </Row>
         {% endfor %}
 </Messenger>

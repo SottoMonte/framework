@@ -813,8 +813,8 @@ class adapter():
                         self.att(text,att)
                         return text
                     case 'code':
-                        if text:
-                            text = escape(text)
+                        #if text:
+                        #    text = escape(text)
                         code = self.code('code',{},[text])
                         pre = self.code('pre',{},[code])
                         self.att(pre,att)
