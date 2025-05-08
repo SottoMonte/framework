@@ -135,7 +135,7 @@ class repository():
 
             # Traduzione del payload
             translated_payload = language.translation(payload, self.fields, self.mapper, self.values, 'MODEL', profile)
-            print("Translated payload:", translated_payload)
+            print("Translated payload:", translated_payload,payload)
 
             # Applica la funzione payload specifica, se esiste
             func_payload = self.payloads.get(ops_crud, None)

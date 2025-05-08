@@ -36,16 +36,16 @@ class messenger():
         prohibited = constants['prohibited'] if 'prohibited' in constants else []
         allowed = constants['allowed'] if 'allowed' in constants else ['FAST']
         operations = []
-
+        
         for provider in self.providers:
             profile = provider.config['profile'].upper()
             domain_provider = provider.config.get('domain','*').split(',')
             domain_message = constants.get('domain',[])
             #print(f"Domain: {domain_message} - Provider: {domain_provider}",[match for item in domain_provider for match in language.wildcard_match(domain_message, item)])
-            if len([match for item in domain_provider for match in language.wildcard_match(domain_message, item)]) > 0:
+            #if len([match for item in domain_provider for match in language.wildcard_match(domain_message, item)]) > 0:
             #if profile in allowed:
-                task = asyncio.create_task(provider.read(location=profile,**constants))
-                operations.append(task)
+            task = asyncio.create_task(provider.read(location=profile,**constants))
+            operations.append(task)
         
         finished, unfinished = await asyncio.wait(operations, return_when=asyncio.FIRST_COMPLETED)
         for operation in finished:

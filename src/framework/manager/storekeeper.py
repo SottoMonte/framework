@@ -70,7 +70,6 @@ class storekeeper():
     @flow.asynchronous(inputs='storekeeper',outputs='transaction',managers=('executor',))
     async def store(self, executor, **constants):
         repository,operations = await self.preparation(**constants|{'operation':'create'})
-        
         return await executor.first_completed(operations=operations,success=repository.results)
     
     # remove/delete/delete

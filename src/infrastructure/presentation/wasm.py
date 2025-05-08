@@ -129,8 +129,9 @@ class adapter(starlette.adapter):
           while True:
             print("🔄 Esecuzione del ciclo di polling...")
             msg = await messenger.read(domain="*")
+            print(msg,'BONDmsg')
             domains = msg.get('domain',[])
-            
+            print(constants,'BOND',domains,msg)
             '''ok = []
             for x in self.data.keys():
                 

@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Row id="{% set id = '{:0=8}'.format(range(0, 99999999) | random) %}{{ id }}" padding="p-0" draggable="element" expand="dynamic" >
-    <Window id="modal-ia-{{ id }}" type="modal" size="normal" title="Create" action="terminal" >
-        <Input identifier="answer" type="textarea" class="rounded-0" />
-        <Input identifier="request" class="rounded-0" />
+    <Window id="modal-ia-{{ id }}" type="modal" size="xl" title="chat" action="chat" >
+        <Messenger id="chat-ai" domain="chat" view="Chat" />
+        <Action type="form" id="form-chat" action="/chat" method="POST">
+            <Input identifier="sender" collapse="full" type="text" value="user" />
+            <Input identifier="domain" collapse="full" type="text" value="chat" />
+            <Input identifier="file" collapse="full" type="text" value="{{ storekeeper.result.0.path }}" />
+            <Input identifier="location" collapse="full" type="text" value="{{ storekeeper.parameters.payload.location }}" />
+            <Input identifier="message" type="textarea" class="rounded-0" />
+        </Action>
     </Window>
     <Column style="background-color:#ccc;">
         <Group type="nav" margin="m-0" padding="p-0" expand="dynamic">
