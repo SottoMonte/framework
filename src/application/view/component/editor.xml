@@ -44,7 +44,9 @@
             </Container>
             <Container id="view-{{ id }}" expand="dynamic" class="overflow-auto" >
                 {% if '.xml' in storekeeper.result.0.path %}
-                <View storekeeper="result.0.content" />
+                    <View storekeeper="result.0.content" />
+                {% else %}
+                    <Text type="code" storekeeper="result.0.content" />
                 {% endif %}
             </Container>
         </Group>

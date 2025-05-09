@@ -193,11 +193,13 @@ class adapter(starlette.adapter):
         async def on_drop(self,event,**constants):
           event.preventDefault()
           draggable_element = js.document.getElementById(self.drag)
+          print(draggable_element.getAttribute('draggable-event'))
           if self.drag in self.components:
             print(self.components[self.drag])
             name = self.components[self.drag].get('id')
             component = js.document.getElementById(name)
             component.className = component.className.replace(' opacity-25','')
+            
             #component.className = component.className.replace('highlight','')
           
           if 'maker' in self.drag and self.drag in self.components:
@@ -234,13 +236,13 @@ class adapter(starlette.adapter):
                   #self.components[identifier]['id'] = view.getAttribute('id')
                 view.className += ' highlight'
                 event.target.appendChild(view)
-                print("BOOOOOM")
+                #print("BOOOOOM")
                 
             else:
               if identifier in self.components and self.components[identifier] != '':
                 #component = js.document.getElementById(self.components[identifier])
                 component = js.document.getElementById(self.components[identifier]['id'])
-                print(component)
+                #print(component)
                 if 'opacity-25' not in event.target.className:
                   component.className += ' opacity-25'
                 if event.target != component and component.parentNode != event.target:
@@ -504,6 +506,8 @@ class adapter(starlette.adapter):
                 element.setAttribute('draggable-domain',value)
                 element.addEventListener('dragstart',pyodide.ffi.create_proxy(self.on_drag_start))
               case 'draggable-component':
+                element.setAttribute(key,value)
+              case 'draggable-event':
                 element.setAttribute(key,value)
               
         async def rebuild(self, id, tag, **data):

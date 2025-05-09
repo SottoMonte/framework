@@ -8,6 +8,8 @@
 </div>
 {% endblock %}
 {% block style %}
+<link href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism.css" rel="stylesheet" />
+
 <style>
 .chat-container {
   display: flex;
@@ -274,6 +276,40 @@ input.input-as-paragraph {
 </style>
 {% endblock %}
 {% block body_script %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<!-- Inclusione di Prism.js e del componente Markdown -->
+<script src="https://cdn.jsdelivr.net/npm/prismjs/prism.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-markdown.min.js"></script>
+
+<script>
+  function renderMarkdownFromElement(el) {
+    const raw = el.innerText;
+    const rendered = marked.parse(raw);
+    el.innerHTML = rendered;
+  }
+
+  
+
+  // Osserva modifiche al contenuto
+  const observer2 = new MutationObserver((mutationsList, observer) => {
+
+    const toasts = document.querySelectorAll('.language-markdown');
+
+    toasts.forEach(toastEl => {
+      Prism.highlightAll();
+    });
+    
+  });
+
+  observer2.observe(markdownContainer, {
+    characterData: true,
+    childList: true,
+    subtree: true
+  });
+
+</script>
+
+
 <script>
   const showNewToasts = () => {
     const toasts = document.querySelectorAll('.toast:not(.shown)');
@@ -362,6 +398,7 @@ input.input-as-paragraph {
 </script>
 {% endblock %}
 {% block head_script %}
+
 <script>
     function allowDrop(ev) {
         ev.preventDefault();
