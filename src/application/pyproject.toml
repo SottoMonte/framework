@@ -28,7 +28,7 @@ domain = "assistant,chat"
 url = "https://openrouter.ai/api/v1/chat/completions"
 authorization = "Bearer"
 accept = "application/json"
-token = "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"
+token = "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"
 
 [amessage.backend]
 adapter = "redis"

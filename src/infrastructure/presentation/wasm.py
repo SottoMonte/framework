@@ -192,15 +192,20 @@ class adapter(starlette.adapter):
 
         async def on_drop(self,event,**constants):
           event.preventDefault()
+          print('on_drop',event.target.id)
           draggable_element = js.document.getElementById(self.drag)
-          print(draggable_element.getAttribute('draggable-event'))
+          
           if self.drag in self.components:
-            print(self.components[self.drag])
+            target = js.document.getElementById(event.target.id)
+            #print(self.components[self.drag])
+            data_drag = target.getAttribute('droppable-data')
+            #print('data_drag',data_drag)
             name = self.components[self.drag].get('id')
             component = js.document.getElementById(name)
             component.className = component.className.replace(' opacity-25','')
             
             #component.className = component.className.replace('highlight','')
+            await self.act(value=draggable_element.getAttribute('draggable-event').replace(')',",data:'"+str(data_drag)+"')"))
           
           if 'maker' in self.drag and self.drag in self.components:
             self.components.pop(self.drag)
@@ -508,6 +513,8 @@ class adapter(starlette.adapter):
               case 'draggable-component':
                 element.setAttribute(key,value)
               case 'draggable-event':
+                element.setAttribute(key,value)
+              case 'droppable-data':
                 element.setAttribute(key,value)
               
         async def rebuild(self, id, tag, **data):
