@@ -573,6 +573,8 @@ class adapter():
                 new = []
                 payload = att['payload'] if 'payload' in att else ''
                 payload = language.extract_params(payload)
+                filter = att['filter'] if 'filter' in att else ''
+                filter = language.extract_params(filter)
                 repository = att['repository'] if 'repository' in att else 'repository'
 
                 print(payload,repository,'transactionok')
@@ -580,9 +582,9 @@ class adapter():
                 try:
                     match method:
                         case 'overview':
-                            transaction = await storekeeper.overview(repository=repository,payload=payload)
+                            transaction = await storekeeper.overview(repository=repository,filter=filter,payload=payload)
                         case 'gather':
-                            transaction = await storekeeper.gather(repository=repository,payload=payload)
+                            transaction = await storekeeper.gather(repository=repository,filter=filter,payload=payload)
                         case _:
                             print('Method not found')
                 except Exception as e:
@@ -819,6 +821,12 @@ class adapter():
                         pre = self.code('pre',{},[code])
                         self.att(pre,att)
                         return pre
+                    case 'text':
+                        if text:
+                            text = escape(text)
+                        obj = self.code('p',{'class':'fw-lighter p-0 m-0','type':'data'},text)
+                        self.att(obj,att)
+                        return obj
                     case _:
                         if text:
                             text = escape(text)
@@ -913,24 +921,51 @@ class adapter():
                         self.att(tab,att)
                         return tab
                     case 'accordion':
-                        new = []
-                        id = "#accordionExample"
-                        cc = 0
-                        for item in inner:
-                            
-                            if item.tagName not in ['A']:
-                                #body = self.code('div',{'class':''},[item])
-                                li = self.code('div',{'class':'accordion-collapse collapse show','data-bs-parent':id,'id':str(cc)},[item])
-                                cc += 1
-                            else:
-                                bb = self.code('div',{'class':'accordion-button py-0','type':'button','data-bs-toggle':'collapse','data-bs-target':f'#{str(cc)}'},[item])
-                                li = self.code('div',{'class':'accordion-header'},[bb])
-                            #li = self.code('div',{'class':''},[hh1,cola])
-                            new.append(li)
+                        accordion_id = att['id'] if 'id' in att else "accordionExample"
+                        items = []
+                        pair_index = 1  # per collapseOne, collapseTwo...
 
-                        tab = self.code('div',{'class':'accordion','id':id},new)
-                        self.att(tab,att)
-                        return tab
+                        # Sicurezza: assicurati che inner abbia lunghezza pari
+                        if len(inner) % 2 != 0:
+                            inner = inner[:-1]  # Rimuove l'ultimo elemento orfano
+
+                        for i in range(0, len(inner), 2):
+                            header = inner[i]
+                            body = inner[i + 1]
+
+                            # Assicurati che non siano None
+                            if header is None or body is None:
+                                continue
+
+                            collapse_id = f"collapse-{accordion_id}"
+                            #collapse_id = accordion_id
+                            
+                            is_first = (pair_index == 1)
+
+                            button = self.code('button', {
+                                'class': 'accordion-button collapsed',
+                                'type': 'button',
+                                'data-bs-toggle': 'collapse',
+                                'data-bs-target': f"#{collapse_id}",
+                                'aria-expanded': 'false',
+                                'aria-controls': collapse_id
+                            }, [header])
+
+                            header_h2 = self.code('h2', {'class': 'accordion-header'}, [button])
+                            body_inner = self.code('div', {'class': 'accordion-body p-0 m-0'}, [body])
+                            collapse_div = self.code('div', {
+                                'id': collapse_id,
+                                'class': 'accordion-collapse collapse',
+                                'data-bs-parent': f"#{accordion_id}",
+                            }, [body_inner])
+
+                            accordion_item = self.code('div', {'class': 'accordion-item'}, [header_h2, collapse_div])
+                            items.append(accordion_item)
+                            pair_index += 1
+
+                        accordion = self.code('div', {'class': 'accordion', 'id': accordion_id}, items)
+                        self.att(accordion, att)
+                        return accordion
                     case _:
                         return self.code('div',{'class':'container-fluid p-0 m-0'},inner)
             case 'Layout':

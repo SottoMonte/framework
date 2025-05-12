@@ -32,20 +32,49 @@ class adapter:
         self.token = token
         self.client.auth.session = {"access_token": token}  # Usa il token per autenticazione
 
+    def generate_query_filter(self, filters):
+        """
+        Genera una stringa di query Python per Supabase applicando dinamicamente i filtri.
+        """
+        query = ""
 
+        # Applica i filtri dinamicamente
+        if 'eq' in filters:
+            for field, value in filters['eq']:
+                query += f'.eq("{field}", "{value}")'
+        if 'neq' in filters:
+            for field, value in filters['neq']:
+                query += f'.neq("{field}", "{value}")'
+        if 'like' in filters:
+            for field, value in filters['like']:
+                query += f'.like("{field}", "{value}")'
+        if 'ilike' in filters:
+            for field, value in filters['ilike']:
+                query += f'.ilike("{field}", "{value}")'
+        if 'pagination' in filters:
+            for tuple in filters['pagination']:
+                start, end = tuple
+                start, end = (start - 1) * end, start * end - 1
+                query += f'.range({start}, {end})'
+        if 'in' in filters:
+            for field, value in filters['in']:
+                query += f'.in("{field}", {value})'
+
+        return query
+
+    @flow.asynchronous()
     async def query(self, **constants):
-        print('BOOOOMq',constants,self.token,self.config)
+        
         """
         Esegue una query su Supabase tramite supabase-js, con supporto per filtri e paginazione.
         """
-        payload = json.dumps(constants.get('payload', {})) or "{}"
+        payload = constants.get('payload', {}) or "{}"
         method = constants.get('method', '')
         location = constants.get('location', '')
-        filters = constants.get('filters', {})
-
+        filter = constants.get('filter', {})
+        filter = self.generate_query_filter(filter)
         # Configura la paginazione
-        page, per_page = filters.get('currentPage', 1), filters.get('perPage', 10)
-        start, end = (page - 1) * per_page, page * per_page - 1  
+        
 
         # Genera il codice JavaScript per la query
         js_code = f"""
@@ -53,36 +82,36 @@ class adapter:
             let query = supabaseClient.from("{location}");
             let response;
 
-            const filters = {json.dumps(filters)};
-            const payload = {payload};
+           
+            const payload = {json.dumps(payload)};
             const method = "{method}";
             const location = "{location}";
 
             switch (method) {{
                 case "GET":
-                    response = await query.select("*");
+                    response = await query.select("*"){filter};
                     break;
                 case "POST":
-                    response = await query.insert(payload);
+                    response = await query.insert(payload){filter};
                     break;
                 case "PUT":
-                    response = await query.update(payload);
+                    response = await query.update(payload){filter};
                     break;
                 case "DELETE":
-                    response = await query.delete();
+                    response = await query.delete(){filter};
                     break;
                 default:
-                    return {{ state: false, error: "Invalid method", input: {{ method, payload, location, filters }} }};
+                    return {{ state: false, error: "Invalid method", input: {{ method, payload, location }} }};
             }}
 
             return response.error 
-                ? {{ state: false, error: response.error.message, input: {{ method, payload, location, filters }} }}
-                : {{ state: true, result: response.data, input: {{ method, payload, location, filters }} }};
+                ? {{ state: false, error: response.error.message, input: {{ method, payload, location }} }}
+                : {{ state: true, result: response.data, input: {{ method, payload, location }} }};
         }}
         query();
         """
         test = await pyodide.code.run_js(js_code)
-        print('BOOOOOMt',test.to_py())
+        #print(test.to_py(),'test....',js_code)
         return test.to_py()
     
     async def query2(self, **constants):

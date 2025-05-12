@@ -12,7 +12,7 @@ storekeeper = (
     {'name': 'repository', 'type': 'string', 'default': None},
     
     # Query o filtro per le operazioni READ/UPDATE/DELETE
-    {'name': 'filters', 'type': 'dict', 'default': {}},
+    {'name': 'filter', 'type': 'dict', 'default': {}},
     
     # Dati da inserire o aggiornare
     {'name': 'payload', 'type': 'dict', 'default': {}},

@@ -16,6 +16,7 @@
         <!-- TabNav -->
         <Group type="nav" margin="m-0" padding="p-0" >
             <Action route="tab:tab-code" class="d-inline-flex gap-2"><Graph icon="bi-code-slash"/><Text>Code</Text></Action>
+            <Action route="tab:tab-plan" class="d-inline-flex gap-2"><Graph icon="bi-kanban-fill"/><Text>Plan</Text></Action>
             <Action route="tab:tab-build" class="d-inline-flex gap-2"><Graph icon="bi-tools"/><Text>Build</Text></Action>
             <Action route="tab:tab-test" class="d-inline-flex gap-2"><Graph icon="bi-play-fill"/><Text>Test</Text></Action>
             <Action route="tab:tab-release" class="d-inline-flex gap-2"><Graph icon="bi-box-seam-fill"/><Text>Package</Text></Action>
@@ -31,10 +32,10 @@
     <Row expand="vertical">
         <Group type="nav" margin="m-0" padding="p-0" alignment-content="vertical" expand="vertical">
             <Action width="75px" route="tab:tab-explore" ><Graph icon="bi-archive"/><Text>Explore</Text></Action>
-            <Action width="75px" route="tab:tab-views" ><Graph icon="bi-view-list"/><Text>Views</Text></Action>
-            <Action width="75px" route="tab:tab-copilot" ><Graph icon="bi-file-earmark-spreadsheet"/><Text>Models</Text></Action>
-            <Action width="75px" route="tab:tab-copilot" ><Graph icon="bi-play-circle"/><Text>Actions</Text></Action>
-            <Action width="75px" route="tab:tab-copilot" ><Graph icon="bi-database"/><Text>Data</Text></Action>
+            <Action width="75px" route="tab:tab-view" ><Graph icon="bi-view-list"/><Text>Views</Text></Action>
+            <Action width="75px" route="tab:tab-model" ><Graph icon="bi-file-earmark-spreadsheet"/><Text>Models</Text></Action>
+            <Action width="75px" route="tab:tab-action" ><Graph icon="bi-play-circle"/><Text>Actions</Text></Action>
+            <Action width="75px" route="tab:tab-data" ><Graph icon="bi-database"/><Text>Data</Text></Action>
             <Action width="75px" route="tab:tab-copilot" ><Graph icon="bi-file-medical"/><Text>Policies</Text></Action>
             <Action width="75px" route="tab:tab-tool" ><Graph icon="bi-tools"/><Text>Tools</Text></Action>
             <Action width="75px" route="tab:tab-copilot" ><Graph icon="bi-stars"/><Text>Copilot</Text></Action>
@@ -59,6 +60,30 @@
                     <Tree expand="dynamic" path="/" />
                 </Storekeeper>
             </Row>
+        </Container>
+        <!-- Repository -->
+        <Container id="tab-action" expand="vertical" width="250px" border="start" padding="p-0">
+            <Storekeeper expand="full" flow="auto" repository='repository' payload="test(owner:'{{component.repository.owner}}',name:'{{component.repository.name}}')" >
+                <Tre expand="dynamic" path="/src/application/action/" />
+            </Storekeeper>
+        </Container>
+        <!-- Repository -->
+        <Container id="tab-model" expand="vertical" width="250px" border="start" padding="p-0">
+            <Storekeeper expand="full" flow="auto" repository='repository' payload="test(owner:'{{component.repository.owner}}',name:'{{component.repository.name}}')" >
+                <Tre expand="dynamic" path="/src/application/model/" />
+            </Storekeeper>
+        </Container>
+        <!-- Repository -->
+        <Container id="tab-data" expand="vertical" width="250px" border="start" padding="p-0">
+            <Storekeeper expand="full" flow="auto" repository='repository' payload="test(owner:'{{component.repository.owner}}',name:'{{component.repository.name}}')" >
+                <Tre expand="dynamic" path="/src/application/repository/" />
+            </Storekeeper>
+        </Container>
+        <!-- Repository -->
+        <Container id="tab-view" expand="vertical" width="250px" border="start" padding="p-0">
+            <Storekeeper expand="full" flow="auto" repository='repository' payload="test(owner:'{{component.repository.owner}}',name:'{{component.repository.name}}')" >
+                <Tre expand="dynamic" path="/src/application/view/" />
+            </Storekeeper>
         </Container>
         <!-- Tool -->
         <Container id="tab-tool" expand="vertical" width="200px" border="start" padding="p-0">
@@ -135,6 +160,11 @@
                     </Container>
                 </Group>
             </Row>
+        </Container>
+        <Container id="tab-plan" expand="full">
+            <Storekeeper method="gather" repository='notes' filter="project(eq: [('location', '{{component.repository.owner}}/{{component.repository.name}}')])" >
+                <Scrum location="{{component.repository.owner}}/{{component.repository.name}}" />
+            </Storekeeper>
         </Container>
         <Container id="tab-build" expand="full">
             <Text>2</Text>

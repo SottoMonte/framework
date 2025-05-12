@@ -57,3 +57,29 @@ async def create(messenger, storekeeper, **constants):
         await messenger.post(domain='success', message=f"Creato {constants.get('path', '')}{constants.get('name', '')}")
     else:
         await messenger.post(domain='error', message=f"Errore creazione {constants.get('path', '')}{constants.get('name', '')}")
+
+
+@flow.asynchronous(managers=('messenger', 'storekeeper','presenter'),)
+async def note(messenger, storekeeper, presenter, **constants):
+    print(f"Note: {constants}")
+    target = constants.get('target', '')
+    component = await presenter.component(name=target)
+    print(f"Component: {component}")
+    id = language.get('attributes.identifier', component)
+    filters = {
+        'eq': [('id', id)],
+        #'neq': [('age', '30')],
+        #'like': [('email', '%example.com')],
+        #'ilike': [('city', '%rome%')]
+    }
+    #payload=constants
+    
+
+    response = await storekeeper.change(repository='notes', filter=filters, payload={'type':constants.get('data', '')})
+    '''response = await storekeeper.store(repository='notes', payload=constants)
+
+    # Notifica il risultato del salvataggio
+    if response.get('state', False):
+        await messenger.post(domain='success', message=f"Creato {constants.get('path', '')}{constants.get('name', '')}")
+    else:
+        await messenger.post(domain='error', message=f"Errore creazione {constants.get('path', '')}{constants.get('name', '')}")'''

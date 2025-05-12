@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Text id="{% set id = '{:0=8}'.format(range(0, 99999999) | random) %}{{ id }}" draggable="element">
-    Text
-</Text>
