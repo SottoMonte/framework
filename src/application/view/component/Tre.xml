@@ -45,7 +45,7 @@
                 </Row>
             {% endif %}
         {% else %}
-            {% if tree.path.startswith(component.attributes.path) %}
+            {% if tree.path.startswith(component.attributes.path) and (component.attributes.extent == '*' or  tree.name.split('.')[-1] in component.attributes.extent.split('|')) %}
             <Action type="dropdown" class="reset">
                 <Action  id="maker-{{tree.id}}" draggable="window" draggable-component="window" padding="p-0" margin="m-0" value="{{tree.id}}"><Text>{{tree.name}}</Text></Action>
                 <Action click="input(inputs:['tree-delete-path'],value:'{{tree.path}}')|input(inputs:['tree-delete-name'],value:'{{tree.name}}')" alignment-content="horizontal" route="modal:window-delete-{{ component.id }}"><Text padding="px-1">Delete file {{tree.name}}</Text></Action>
