@@ -16,7 +16,7 @@
             <Action route="tab:test-{{ id }}" click="tab(tab:'context-test-{{ id }}')" class="d-inline-flex"><Graph icon="bi-file-earmark-check"/></Action>
             {% endif %}
             <Action route="tab:code-{{ id }}" click="tab(tab:'context-code-{{ id }}')" class="d-inline-flex"><Graph icon="bi-file-code"/></Action>
-            <Action route="tab:view-{{ id }}" class="d-inline-flex"><Graph icon="bi-binoculars"/></Action>
+            <Action route="tab:view-{{ id }}" click="" class="d-inline-flex"><Graph icon="bi-binoculars"/></Action>
         </Group>
         <Group type="tab">
             {% if 'parameters' in storekeeper and 'src/' in storekeeper.result.0.path and '.py' in storekeeper.result.0.path %}
@@ -43,11 +43,7 @@
                 <Text id="block-editor-{{ id }}" init="editor(field:'block-editor-',target:'{{ id }}',path:'{{ storekeeper.result.0.path }}')" class="editor h-100 border" storekeeper="result.0.content" type="editable"></Text>
             </Container>
             <Container id="view-{{ id }}" expand="dynamic" class="overflow-auto" >
-                {% if '.xml' in storekeeper.result.0.path %}
-                    <View storekeeper="result.0.content" />
-                {% else %}
-                    <Text type="code" storekeeper="result.0.content" />
-                {% endif %}
+                <Preview/>
             </Container>
         </Group>
     </Row>

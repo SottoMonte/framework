@@ -19,7 +19,7 @@ try:
     from starlette.middleware.cors import CORSMiddleware
     from starlette.middleware.base import BaseHTTPMiddleware
     from starlette.staticfiles import StaticFiles
-    from jinja2 import Environment, select_autoescape,FileSystemLoader,BaseLoader,ChoiceLoader,Template
+    from jinja2 import Environment, select_autoescape,FileSystemLoader,BaseLoader,ChoiceLoader,Template,DebugUndefined
 
     import os
     import uuid
@@ -99,7 +99,7 @@ class adapter():
             fs_loader = FileSystemLoader("src/application/view/layout/")
             #http_loader = MyLoader()
             #choice_loader = ChoiceLoader([fs_loader, http_loader])
-            self.env = Environment(loader=fs_loader,autoescape=select_autoescape(["html", "xml"]))
+            self.env = Environment(loader=fs_loader,autoescape=select_autoescape(["html", "xml"]),undefined=DebugUndefined)
             
             loop=constants['loop']
             if 'ssl_keyfile' in self.config and 'ssl_certfile' in self.config:

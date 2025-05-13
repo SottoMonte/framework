@@ -1,3 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Column id="{% set id = '{:0=8}'.format(range(0, 99999999) | random) %}{{ id }}" class="drop-target" size="expanded" draggable="element">
-</Column>
