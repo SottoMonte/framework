@@ -5,6 +5,7 @@
         <Column background="#fbfbfb" height="48px" padding="py-1;px-3" margin="m-0" class="border-bottom">
             <Column>
                 <Graph src="static/logo.png" height="40px" />
+                <Graph src="static/text.png" height="40px" />
             </Column>
             <Column expand="dynamic" alignment-horizontal="center" >
                 <Action type="dropdown" border="end" id="lazio" >

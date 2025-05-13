@@ -18,7 +18,7 @@ format = "%(asctime)s | %(levelname)-8s | %(process)d | %(message)s"
 adapter = "websocket"
 url = "ws://localhost:8000/messenger"
 
-[amessage.server]
+[message.server]
 adapter = "websocket"
 url = "wss://app.colosso.cloud/messenger"
 
@@ -28,7 +28,7 @@ domain = "assistant,chat"
 url = "https://openrouter.ai/api/v1/chat/completions"
 authorization = "Bearer"
 accept = "application/json"
-token = "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"
+token = "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"
 
 [amessage.backend]
 adapter = "redis"

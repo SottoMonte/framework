@@ -456,6 +456,47 @@ def get(domain,dictionary={}):
                 if len(puntatore) != 0:
                     puntatore = puntatore[key]
 
+def get_safe(dictionary, domain):
+    """
+    Safe access to nested dict/list structures using dot notation.
+    Supports wildcard '*' to map over lists.
+    """
+    def _get(domain, d):
+        output = None
+        lista = []
+
+        parts = domain.split('.')
+        current = d
+
+        for idx, key in enumerate(parts):
+            if key.isnumeric():
+                key = int(key)
+
+            if key == '*':
+                # wildcard: iterate over current list
+                arr = _get('.'.join(parts[:idx]), d)
+                if not isinstance(arr, list):
+                    return None
+                for i in range(len(arr)):
+                    new_parts = parts.copy()
+                    new_parts[idx] = str(i)
+                    lista.append(_get('.'.join(new_parts), d))
+                return lista
+
+            try:
+                if isinstance(current, list) and isinstance(key, int):
+                    current = current[key]
+                elif isinstance(current, dict):
+                    current = current.get(key)
+                else:
+                    return None
+            except (KeyError, IndexError, TypeError):
+                return None
+
+        return current
+
+    return _get(domain, dictionary)
+
 
 def put(domain,value,data=dict()):
         #print(domain)

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Row id="{% set id = '{:0=8}'.format(range(0, 99999999) | random) %}{{ id }}" padding="p-0" draggable="element" expand="dynamic" >
-    {% if '.xml' in storekeeper.result.0.path %}
-        <View storekeeper="result.0.content" />
+<Row id="{{ component.id }}" padding="p-0" expand="dynamic" >
+    {% if '.xml' in component.attributes.path %}
+        <View storekeeper="text" />
     {% else %}
-        <Text type="code" storekeeper="result.0.content" />
+        <Text type="code" storekeeper="text" />
     {% endif %}
 </Row>

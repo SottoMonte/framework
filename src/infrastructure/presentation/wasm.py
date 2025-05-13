@@ -7,7 +7,7 @@ if sys.platform != 'emscripten':
   from starlette.responses import JSONResponse,HTMLResponse,RedirectResponse
 else:
   import js
-  from jinja2 import Environment, select_autoescape,FileSystemLoader,BaseLoader,ChoiceLoader,Template
+  from jinja2 import Environment, select_autoescape,FileSystemLoader,BaseLoader,ChoiceLoader,Template,DebugUndefined,Undefined
   import untangle
   import asyncio
   import pyodide
@@ -49,7 +49,8 @@ class adapter(starlette.adapter):
           self.views = {}
           # Configura il loader per i template
           http_loader = MyLoader()
-          self.env = Environment(loader=http_loader, autoescape=select_autoescape(["html", "xml"]))
+          self.env = Environment(loader=http_loader, undefined=DebugUndefined, autoescape=select_autoescape(["html", "xml"]))
+          self.env.filters['get'] = language.get_safe
           
           # Riferimento al documento JavaScript
           self.document = js.document

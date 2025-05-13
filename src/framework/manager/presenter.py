@@ -32,6 +32,10 @@ class presenter():
         dom = self.providers[0].document
         if 'id' in constants:
             return dom.getElementById(id)
+        
+    async def rebuild(self,**constants):
+        provider = language.last(self.providers)
+        await provider.rebuild(constants.get('id',''),constants.get('view',''),**constants.get('data',dict()))
 
 
     async def benchmark(self,**constants):

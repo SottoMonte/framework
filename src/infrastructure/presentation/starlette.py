@@ -681,8 +681,10 @@ class adapter():
                         return out
             case 'View':
                 if 'storekeeper' in data and 'storekeeper' in att:
-                    text = str(language.get(att['storekeeper'],data['storekeeper']))
-                    print(text,'storekeeper34',data['storekeeper'])
+                    if type(data['storekeeper']) == type(dict()):
+                        text = str(language.get(att['storekeeper'],data['storekeeper']))
+                    else:
+                        text = str(data['storekeeper'])
                     view = await self.builder(**data|att|{'text':text})
                 else:
                     view = await self.builder(**data|att)
@@ -804,7 +806,10 @@ class adapter():
                 #text-muted text-truncate
                 tipo = att['type'] if 'type' in att else 'None'
                 if 'storekeeper' in data and 'storekeeper' in att:
-                    text = str(language.get(att['storekeeper'],data['storekeeper']))
+                    if type(data['storekeeper']) == type(dict()):
+                        text = str(language.get(att['storekeeper'],data['storekeeper']))
+                    else:
+                        text = str(data['storekeeper'])
                     #print(att['storekeeper'],'text',data['storekeeper'])
                 
                 match tipo:
@@ -997,8 +1002,9 @@ class adapter():
                 if id not in self.components:
                     self.components[id] = {'id': id}
                     self.components[id]['view'] = f'application/view/component/{tag}.xml'
-                    self.components[id]['inner'] = f"<{tag} id='{id}' model='repository'>{markupsafe.Markup(xml_string)}</{tag}>"
+                    self.components[id]['inner'] = f"<{tag} id='{id}'>{markupsafe.Markup(xml_string)}</{tag}>"
                     self.components[id]['attributes'] = att
+                    #self.components[id]['storekeeper'] = data.get('storekeeper',dict())
 
                 inner = markupsafe.Markup(xml_string)
 
