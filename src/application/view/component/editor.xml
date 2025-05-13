@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Row id="{% set id = '{:0=8}'.format(range(0, 99999999) | random) %}{{ id }}" padding="p-0" draggable="element" expand="dynamic" >
-    <Window id="modal-ia-{{ id }}" type="modal" size="xl" title="chat" action="chat" >
+    <Window id="modal-ia" type="modal" size="xl" title="chat" action="chat" >
         <Messenger id="chat-ai" domain="chat" view="Chat" />
         <Action type="form" id="form-chat" action="/chat" method="POST">
             <Input identifier="sender" collapse="full" type="text" value="user" />
@@ -28,7 +28,7 @@
                 <Action click="save(location:'{{ storekeeper.parameters.payload.location }}',model:'file',path:'{{ storekeeper.result.0.path }}',target:'{{ id }}',field:'block-editor-')" ><Graph icon="bi-floppy2-fill"/></Action>
             </Container>
         </Group>
-        <Action route="modal:modal-ia-{{ id }}" class="d-inline-flex"><Graph icon="bi-stars"/></Action>
+        <Action route="modal:modal-ia" class="d-inline-flex"><Graph icon="bi-stars"/></Action>
     </Column>
     <Row droppable="element" padding="p-0" expand="dynamic" >
         <Group type="tab" expand="dynamic" class="overflow-auto">

@@ -2,9 +2,9 @@
 <Window type="main" layout="application/view/layout/base.html" >
     {% if user %}
     <Row background="#f8f8f8" class="w-100"  margin="m-0" padding="p-0" >
-        <Column background="#fbfbfb" height="48px" padding="py-1" margin="m-0" class="border-bottom">
+        <Column background="#fbfbfb" height="48px" padding="py-1;px-3" margin="m-0" class="border-bottom">
             <Column>
-                <Graph src="static/logo.svg" height="40px" />
+                <Graph src="static/logo.png" height="40px" />
             </Column>
             <Column expand="dynamic" alignment-horizontal="center" >
                 <Action type="dropdown" border="end" id="lazio" >

@@ -2,14 +2,12 @@
 <Group id="registration-wizard" type="tab" expand="full">
     <!-- Step 1: Informazioni base -->
     <Group id="step1" type="tab-pane" title="Dati Personali">
-        <Storekeeper method="get_countries" repository="utils">
             <Group type="input">
                 <Input type="text" id="first-name" placeholder="Nome" required="true" />
                 <Input type="text" id="last-name" placeholder="Cognome" required="true" />
                 <Input type="email" id="email" placeholder="Email" required="true" />
                 <Input type="select" id="country" placeholder="Seleziona Paese" storekeeper="countries" />
             </Group>
-        </Storekeeper>
         <Action type="button" value="Avanti" click="nextTab" target="step2" />
     </Group>
 
