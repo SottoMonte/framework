@@ -35,7 +35,7 @@
         <Group type="tab" expand="dynamic" class="overflow-auto">
             {% if 'parameters' in storekeeper and 'src/' in storekeeper|get('result.0.path')  %}
             <Container id="test-{{ id }}" expand="full" padding="p-0">
-                <Storekeeper expand="full" method="gather" repository='file' payload="test(location:'{{storekeeper|get('parameters.payload.location')}}',path:'{{ storekeeper|get('result.0.path') | replace('.', '.test.') }}')" >
+                <Storekeeper expand="full" method="gather" repository='file' payload="test(location:'{{storekeeper|get('parameters.payload.location')}}',path:'{{ storekeeper|get('result.0.path') | replace('.py', '.test.py') | replace('.xml', '.test.py') }}')" >
                     <Text id="block-test-{{ id }}" init="editor(field:'block-test-',target:'{{ id }}',path:'{{ storekeeper|get('result.0.path') | replace('.', '.test.') }}')" class="editor h-100 border" storekeeper="result.0.content" type="editable"></Text>
                 </Storekeeper>
             </Container>

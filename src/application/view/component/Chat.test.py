@@ -11,7 +11,8 @@ class Test(unittest.IsolatedAsyncioTestCase):
             'view':'application/view/component/Chat.xml',
             'attributes': {'domain':'casa','view':'Chat'},
             'messenger':[
-                {"location": "SERVER", "message": " Attesa della prima operazione completata...", "domain": ["debug"], "operation": "read", "sender": "anonym", "receiver": "anonym", "timestamp": "2025-05-13 13:46:02.659000", "identifier": "fe75f943-8107-4ecc-8b20-dd3080408907", "priority": "normal"}
+                {"location": "SERVER", "message": " Ciao!", "domain": ["debug"], "operation": "read", "sender": "user", "receiver": "anonym", "timestamp": "2025-05-13 13:46:02.659000", "identifier": "fe75f943-8107-4ecc-8b20-dd3080408907", "priority": "normal"},
+                {"location": "SERVER", "message": " Ciao , come stai oggi ?", "domain": ["debug"], "operation": "read", "sender": "anonym", "receiver": "anonym", "timestamp": "2025-05-13 13:46:02.659000", "identifier": "fe75f943-8107-4ecc-8b20-dd3080408907", "priority": "normal"}
             ]
         }
 

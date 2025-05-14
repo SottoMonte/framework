@@ -525,10 +525,11 @@ class adapter(starlette.adapter):
 
               #url = f"application/view/component/{tag}.xml"
               url = tag
-              print(self.components.get(id,{}),'URLLLLLLLLLLLL')
               #new_component = await self.builder(url=url, **{'component':self.components.get(id,{})}|data)
+              print('BOOM',self.components.get(id,{}))
               new_component = await self.builder(url=url, component=self.components.get(id,{}) , **data)
               old_component = self.document.getElementById(id)
+              #old_component.innerHTML = new_component.innerHTML
 
               if old_component is None:
                   raise ValueError(f"Elemento con id '{id}' non trovato nel documento.")

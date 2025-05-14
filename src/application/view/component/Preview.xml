@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Row id="{{ component.id }}" padding="p-0" expand="dynamic" >
     {% if '.xml' in component.attributes.path %}
-        <View id="view-{{ component.id }}" code="ss" />
+        <View id="view-{{ component.id }}" code="yes" />
     {% else %}
         <Text type="code"  />
     {% endif %}
