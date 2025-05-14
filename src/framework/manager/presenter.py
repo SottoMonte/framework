@@ -27,6 +27,11 @@ class presenter():
         name = constants.get('name','')
         return self.providers[0].components[name]
     
+    async def Upcomponent(self,**constants):
+        name = constants.get('name','')
+        va = constants.get('value','')
+        self.providers[0].components[name] |= va
+    
     async def DOM(self,**constants):
         id = constants.get('id','')
         dom = self.providers[0].document

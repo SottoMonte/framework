@@ -40,7 +40,6 @@ def asynchronous(**constants):
                 print(f"Errore generico: {error_info}")
 
                 # Rilancia l'errore se vuoi interrompere il flusso
-                raise e
 
         return wrapper
     return decorator

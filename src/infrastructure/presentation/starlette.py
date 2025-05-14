@@ -117,19 +117,24 @@ class adapter():
             text = file.read()
             return text
 
+    @flow.asynchronous()
     async def builder(self,**constants):
-        try:
-            if 'text' in constants:
-                text = constants['text']
-            else:
-                text = await self.host(constants)
-            template = self.env.from_string(text)
-            content = template.render(constants)
-            xml = ET.fromstring(content)
-            view = await self.mount_view(xml,constants)
-            return view
-        except Exception as e:
-            print("errore generico",e)
+        if 'application/view/component/.xml' == constants.get('url'):
+            print('KANBOOOM!',constants)
+        #print('BUILD41',constants)
+        #try:
+        if 'text' in constants:
+            text = constants['text']
+        else:
+            text = await self.host(constants)
+        
+
+        template = self.env.from_string(text)
+        content = template.render(constants)
+        print("BUILDER.CONTENET:",content)
+        xml = ET.fromstring(content)
+        view = await self.mount_view(xml,constants)
+        return view
         
     @flow.asynchronous(managers=('defender',))
     async def logout(self,request,defender) -> None:
@@ -685,11 +690,23 @@ class adapter():
                         text = str(language.get(att['storekeeper'],data['storekeeper']))
                     else:
                         text = str(data['storekeeper'])
-                    view = await self.builder(**data|att|{'text':text})
+                    view = await self.builder(**data|{'text':text})
+                elif 'code' in data and 'code' in att:
+                    print('View-data:',data)
+                    view = await self.builder(**data|{'text':data['code'],'component':data.get('dati',{})})
+                elif 'url' in att:
+                    view = await self.builder(**data|{'url':att['url']})
                 else:
-                    view = await self.builder(**data|att)
-                a = self.code('div',{'class':'container-fluid d-flex flex-row col p-0 m-0'},[view])
-                return a.firstElementChild
+                    view = None
+                if 'id' in att:
+                    id = att.get('id')
+                    if id not in self.components:
+                        self.components[id] = {'id': id}
+                    a = self.code('div',{'class':'container-fluid d-flex flex-row p-0 m-0'},[view])
+                    self.att(a,att)
+                    return a
+                else:
+                    return view
             case 'Input':
                 tipo = att['type'] if 'type' in att else 'None'
                 tipi = ["button","checkbox","color","date","datetime-local","email","file","hidden","image","month","number","password","radio","range","reset","search","submit","tel","text","time","url","week"]
@@ -995,6 +1012,11 @@ class adapter():
                     return xml_string
                 if 'text' in data:
                     data.pop('text')
+                    pass
+                if 'inner' in data:
+                    data.pop('inner')
+                if 'component' in data:
+                    data.pop('component')
                 xml_string = elements_to_xml_string(elements)
                 url = f'application/view/component/{tag}.xml'
                 #attrii = ''.join(x.outerHTML for x in att)
@@ -1002,24 +1024,28 @@ class adapter():
                 if id not in self.components:
                     self.components[id] = {'id': id}
                     self.components[id]['view'] = f'application/view/component/{tag}.xml'
-                    self.components[id]['inner'] = f"<{tag} id='{id}'>{markupsafe.Markup(xml_string)}</{tag}>"
+                    attributes = " ".join([f"{key}='{value}'" for key, value in att.items()])
+                    self.components[id]['inner'] = f"<{tag} id='{id}' >{markupsafe.Markup(xml_string)}</{tag}>"
                     self.components[id]['attributes'] = att
                     #self.components[id]['storekeeper'] = data.get('storekeeper',dict())
 
                 inner = markupsafe.Markup(xml_string)
 
                 #await messenger.post(domain='debug',message=f"✅ Elemento: {tag}|{id} creato.")
-
+                
                 argg = data|{
-                    'component':self.components[id],
+                    'component':self.components.get(id,{}),
                     'url':url,
                     'inner':inner,
                 }
-
-                
-                
+                print(url,'CASE:',tag,att,argg)
+                #print(att,data.get('storekeeper',{}).get('component',{}),id,tag,'DATA|COM',data)
+                #print(att,data.get('storekeeper',{}).get('component',{}),id,tag,'DATA|arg',argg)
                 # Creiamo la vista per il componente
-                view = await self.builder(**argg)
+                if 'application/view/component/.xml' != url:
+                    view = await self.builder(**argg)
+                else:
+                    return None
 
                 #view = await self.mount_view(root,data)
 

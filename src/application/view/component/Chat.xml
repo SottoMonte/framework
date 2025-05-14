@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Messenger id="{{ component.id }}" domain="{{ component.attributes.domain }}" class="chat-container" >
+<Messenger id="{{ component.id }}" domain="{{ component.attributes.domain }}" view="{{ component.attributes.view }}" class="chat-container" >
         {% for message in component.messenger %}
                 {% set color = 'primary' %}
                 {% set icon = 'bi-info-circle-fill' %}

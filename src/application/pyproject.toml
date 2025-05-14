@@ -18,7 +18,7 @@ format = "%(asctime)s | %(levelname)-8s | %(process)d | %(message)s"
 adapter = "websocket"
 url = "ws://localhost:8000/messenger"
 
-[message.server]
+[amessage.server]
 adapter = "websocket"
 url = "wss://app.colosso.cloud/messenger"
 

@@ -121,6 +121,8 @@ class tester():
             "errors": [],
             "failures": [],
             "successes": [],
+            "setup":None,
+            "teardown":None,
         }
 
         for TestClass in test_classes:
@@ -136,9 +138,11 @@ class tester():
 
                 async def run_test():
                     if hasattr(test_instance, "setUp"):
-                        test_instance.setUp()
+                        results["setup"] = test_instance.setUp()
                     if hasattr(test_instance, "asyncSetUp"):
-                        await test_instance.asyncSetUp()
+                        ok = await test_instance.asyncSetUp()
+                        results["teardown"] = ok
+                        
 
                     method = getattr(test_instance, method_name)
                     if inspect.iscoroutinefunction(method):

@@ -518,14 +518,16 @@ class adapter(starlette.adapter):
               case 'droppable-data':
                 element.setAttribute(key,value)
               
+        
         async def rebuild(self, id, tag, **data):
           try:
               await asyncio.sleep(1)
 
               #url = f"application/view/component/{tag}.xml"
               url = tag
-              new_component = await self.builder(url=url, component=self.components[id], **data)
-
+              print(self.components.get(id,{}),'URLLLLLLLLLLLL')
+              #new_component = await self.builder(url=url, **{'component':self.components.get(id,{})}|data)
+              new_component = await self.builder(url=url, component=self.components.get(id,{}) , **data)
               old_component = self.document.getElementById(id)
 
               if old_component is None:
