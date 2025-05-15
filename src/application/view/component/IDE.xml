@@ -36,10 +36,10 @@
             <Action width="75px" route="tab:tab-model" ><Graph icon="bi-file-earmark-spreadsheet"/><Text>Models</Text></Action>
             <Action width="75px" route="tab:tab-action" ><Graph icon="bi-play-circle"/><Text>Actions</Text></Action>
             <Action width="75px" route="tab:tab-data" ><Graph icon="bi-database"/><Text>Data</Text></Action>
-            <Action width="75px" route="tab:tab-copilot" ><Graph icon="bi-file-medical"/><Text>Policies</Text></Action>
+            <Action width="75px" route="tab:tab-policy" ><Graph icon="bi-file-medical"/><Text>Policies</Text></Action>
             <Action width="75px" route="tab:tab-assets" ><Graph icon="bi-image-alt"/><Text>Assets</Text></Action>
             <Action width="75px" route="tab:tab-tool" ><Graph icon="bi-tools"/><Text>Tools</Text></Action>
-            <Action width="75px" route="tab:tab-copilot" ><Graph icon="bi-stars"/><Text>Copilot</Text></Action>
+            <Action width="75px" route="tab:tab-assistant" ><Graph icon="bi-stars"/><Text>Copilot</Text></Action>
         </Group>
         <Action route="tab:tab-code"  border="top"><Graph icon="bi bi-plus-square"/></Action>
     </Row>
@@ -78,6 +78,10 @@
                 <Tre expand="dynamic" path="/public/" extent="*" />
             </Container>
             <!-- Repository -->
+            <Container id="tab-policy" expand="vertical" width="250px" border="start" padding="p-0">
+                <Tre expand="dynamic" path="/src/application/policy/" extent="*" />
+            </Container>
+            <!-- Repository -->
             <Container id="tab-view" expand="vertical" width="250px" border="start" padding="p-0">
                 <Tre expand="dynamic" path="/src/application/view/" extent="xml" />
             </Container>
@@ -110,7 +114,7 @@
                 </Row>
             </Container>
             <!-- AI -->
-            <Container id="tab-copilot" expand="vertical" border="start">
+            <Container id="tab-assistant" expand="vertical" border="start">
                 <View content="tab/assistant.xml" />
             </Container>
         </Group>
