@@ -118,6 +118,10 @@ class adapter():
         with open('src/'+constants['url'], 'r', encoding='utf-8') as file:
             text = file.read()
             return text
+    
+    async def mount_css(self,constants):
+        pass
+        
 
     @flow.asynchronous()
     async def builder(self,**constants):
@@ -134,6 +138,7 @@ class adapter():
         content = template.render(constants)
         xml = ET.fromstring(content)
         view = await self.mount_view(xml,constants)
+        await self.mount_css(view)
         return view
         
     @flow.asynchronous(managers=('defender',))
@@ -431,7 +436,8 @@ class adapter():
         html = await self.builder(url=self.views[request.url.path])
         layout = 'application/view/layout/base.html'
         file = await self.host({'url':layout})
-        template = self.env.from_string(file)
+        css = await self.host({'url':layout.replace('.html','.css').replace('.xml','.css')})
+        template = self.env.from_string(file.replace('{% block style %}','{% block style %}<style>'+css+'</style>'))
         content = template.render()
         content = content.replace('<!-- Body -->',html)
         return HTMLResponse(content)
@@ -722,6 +728,8 @@ class adapter():
                     view = await self.builder(**data|{'text':data['code']})
                 elif 'url' in att:
                     view = await self.builder(**data|{'url':att['url']})
+                elif 'content' in att:
+                    view = await self.builder(**data|{'url':'application/view/content/'+att['content']})
                 else:
                     view = None
 
@@ -1074,7 +1082,7 @@ class adapter():
 
                 #view = await self.mount_view(root,data)
 
-                self.att(view, att|{'type':tag})
+                self.att(view, att|{'component':tag})
                 return view
                                  
     def mount_route(self,routes,url):

@@ -31,8 +31,10 @@ class adapter(starlette.adapter):
         #html_page = await self.builder(url=self.views[request.url.path])
         #print('BOOM',self.views[request.url.path],html_page)
         #print('tututut',request.session)
-        file = await self.host({'url':'application/view/layout/wasm.html'})
-        template = self.env.from_string(file)
+        layout = 'application/view/layout/wasm.html'
+        file = await self.host({'url':layout})
+        css = await self.host({'url':layout.replace('.html','.css').replace('.xml','.css')})
+        template = self.env.from_string(file.replace('{% block style %}','{% block style %}<style>'+css+'</style>'))
         html_template = template.render()
         #html_template = html_template.replace('<!-- Body -->',html_page)
         return HTMLResponse(html_template)
@@ -395,6 +397,8 @@ class adapter(starlette.adapter):
                   case 'scroll':element.className += f" overflow-{value} "
               case 'type':
                 element.setAttribute(key,value)
+              case 'component':
+                element.setAttribute(key,value)
               # Style
               case 'text-size':
                 if 'px' in value:
@@ -543,28 +547,35 @@ class adapter(starlette.adapter):
 
           except Exception as e:
               print(f"Errore durante la ricostruzione del componente '{id}': {e}")
-        
-        async def rebuild3(self,id,tag,**data):
-                  
-          #response = js.fetch(f"gather?model={self.components[id]['model']}&row={self.components[id]['pageRow']}&page={self.components[id]['pageCurrent']}&order={self.components[id]['sortField']}",{'method':'GET'})
-          #file = await response
-          #aa = await file.text()
-          #bb = json.loads(aa)
-          await asyncio.sleep(1)
-          #url = f"application/view/component/{tag}.xml"
-          url = tag
-                  
-                  
-          test = await self.builder(url=url,component=self.components[id],**data)
 
-          cc = self.document.getElementById(id)
-          cc.replaceChild(test,cc)
-          #cc.innerHTML = ""
-          #for x in test.childNodes:
-            #print(dir(test))
-          #  cc.append(x)
-          #cc.replaceChild(test,cc)
-          #return test
+        '''async def mount_css(self,constants):
+          elements = constants.querySelectorAll('[component]')
+          for element in elements:
+            text = await self.host({'url':f"application/view/component/{element.getAttribute('component')}.css"})
+            print(element.getAttribute('component'),'mount_css:',text)'''
+        async def mount_css(self, constants):
+          elements = constants.querySelectorAll('[component]')
+          
+          for element in elements:
+              component_name = element.getAttribute('component')
+
+              # Controlla se lo style è già presente nel <head>
+              existing_styles = self.document.querySelectorAll(f'style[data-component="{component_name}"]')
+              if existing_styles.length > 0:
+                  print(f"{component_name} style already mounted.")
+                  continue  # Salta questo componente, lo style è già presente
+
+              # Altrimenti scarica e aggiungi lo style
+              css_text = await self.host({'url': f"application/view/component/{component_name}.css"})
+              print(component_name, 'mount_css:', css_text)
+
+              # Crea nuovo tag <style>
+              style_element = self.document.createElement('style')
+              style_element.setAttribute('data-component', component_name)
+              style_element.textContent = css_text
+
+              # Inserisce lo <style> nel <head>
+              self.document.head.appendChild(style_element)
 
         def mount_route(self, routes, url):
           route_map = {

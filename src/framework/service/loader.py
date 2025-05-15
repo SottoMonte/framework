@@ -33,9 +33,10 @@ async def bootstrap() -> None:
             "jinja2",
             "untangle",
             "bs4",
+            #"webassets",
         ]
         
-        #await micropip.install(packages)
+        await micropip.install(packages)
 
         # Unisce env e cookies
         config = language.get_confi(**{**env, **{"session":session,"identifier":identifier}})

@@ -111,9 +111,7 @@
             </Container>
             <!-- AI -->
             <Container id="tab-copilot" expand="vertical" border="start">
-                <Text width="200px">testo by ia</Text>
-                <Input>a</Input>
-                <Column><Graph icon="bi bi-file-plus" /><Graph icon="bi bi-at" /><Graph icon="bi bi-mic" /><Graph icon="bi bi-send"/></Column>
+                <View content="tab/assistant.xml" />
             </Container>
         </Group>
     </Storekeeper>

@@ -1,6 +1,5 @@
 .sticker-note {
   width: 200px;
-  height: 200px;
   padding: 20px;
   background: #fffaa8;
   color: #333;
@@ -20,7 +19,7 @@
   height: 20px;
   top: 0;
   left: 0;
-  background: #f6e58d;
+  background: #fffaa8;
   border-bottom: 1px solid #e1c542;
 }
 

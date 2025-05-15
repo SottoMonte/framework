@@ -1,4 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Container color="light" size="true" margin="-0" padding="-0" >
-    
+<Container color="light" size="true" margin="-0" padding="-0">
+    <!-- Sezione per la selezione del modello -->
+    <Group type="card" class="mb-4" shadow="md">
+        <Text type="h5" text-color="primary">Modello AI</Text>
+        <Group type="input">
+            <Input type="select" id="ai-model" value="gpt-4">
+                <Text value="gpt-3.5">GPT-3.5</Text>
+                <Text value="gpt-4">GPT-4</Text>
+                <Text value="gpt-4-turbo">GPT-4 Turbo</Text>
+            </Input>
+            <Text type="small" class="text-muted mt-1">Seleziona il modello da utilizzare per le risposte</Text>
+        </Group>
+    </Group>
+
+    <!-- Impostazioni di comportamento -->
+    <Group type="card" class="mb-4" shadow="md">
+        <Text type="h5" text-color="primary">Comportamento</Text>
+        
+        <Group type="input">
+            <Input type="range" id="creativity-level" min="0" max="2" step="0.1" value="1">
+                <Text storekeeper="label">Livello di creatività: <Text id="creativity-value">1</Text></Text>
+            </Input>
+        </Group>
+        
+        <Group type="input" class="mt-3">
+            <Input type="checkbox" id="enable-memory" value="true" checked="true"/>
+            <Text>Abilita memoria contestuale</Text>
+        </Group>
+    </Group>
+
+    <!-- Impostazioni di privacy -->
+    <Group type="card" shadow="md">
+        <Text type="h5" text-color="primary">Privacy</Text>
+        
+        <Group type="input">
+            <Input type="radio" name="data-usage" id="data-usage-improve" value="improve" checked="true"/>
+            <Text>Consenti l'uso delle mie conversazioni per migliorare il modello</Text>
+        </Group>
+        
+        <Group type="input">
+            <Input type="radio" name="data-usage" id="data-usage-private" value="private"/>
+            <Text>Mantieni le mie conversazioni private</Text>
+        </Group>
+        
+        <Action type="button" class="mt-3" background="primary" click="saveSettings">
+            <Text>Salva impostazioni</Text>
+        </Action>
+    </Group>
 </Container>
