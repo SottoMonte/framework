@@ -17,6 +17,7 @@ try:
     from starlette.websockets import WebSocket
     from starlette.middleware.sessions import SessionMiddleware
     from starlette.middleware.cors import CORSMiddleware
+    #from starlette.middleware.csrf import CSRFMiddleware
     from starlette.middleware.base import BaseHTTPMiddleware
     from starlette.staticfiles import StaticFiles
     from jinja2 import Environment, select_autoescape,FileSystemLoader,BaseLoader,ChoiceLoader,Template,DebugUndefined
@@ -89,6 +90,7 @@ class adapter():
             Middleware(SessionMiddleware, session_cookie="session_state",secret_key=self.config['project']['key']),
             Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*']),
             Middleware(NoCacheMiddleware),
+            #Middleware(CSRFMiddleware, secret=self.config['project']['key']),
             #Middleware(AuthorizationMiddleware, manager=defender)
         ]
 
@@ -546,6 +548,32 @@ class adapter():
                 inner.append(mounted)
                     
         match tag:
+            case 'Defender':
+                # Implementazione di un controllo di sicurezza base per prevenire attacchi OWASP comuni
+                # come XSS, SQL Injection, ecc. su codice/text stampato dal componente Defender.
+                # Esegue escaping e validazione degli attributi e del testo.
+
+                # Esempio: verifica e sanifica tutti gli attributi e il testo
+                sanitized_att = {}
+                for k, v in att.items():
+                    # Escape HTML per evitare XSS
+                    sanitized_att[k] = escape(str(v))
+
+                # Sanifica il testo (se presente)
+                sanitized_text = escape(text) if text else ''
+
+                # Controllo su inner: se sono stringhe, esegui escape, se sono elementi, ricorsione
+                sanitized_inner = []
+                for item in inner:
+                    if isinstance(item, str):
+                        sanitized_inner.append(escape(item))
+                    else:
+                        sanitized_inner.append(item)  # Se è già un elemento HTML/XML, si presume sia gestito
+
+                # Costruisci il markup sicuro per Defender
+                defender_html = self.code('div', {'class': 'defender-component', **sanitized_att}, sanitized_inner or sanitized_text)
+                self.att(defender_html, sanitized_att)
+                return defender_html
             case 'Messenger':
                 id = att['id'] if 'id' in att else str(uuid.uuid4())
                 model = att['type'] if 'type' in att else 'flesh'

@@ -17,7 +17,7 @@
         <Column background="#3498DB" alignment-vertical="center">
             <Window id="modal-note-{{ component.id }}" type="modal" size="xl" title="chat" action="note" >
                 <Action type="form" id="form-note" action="/note" method="POST">
-                    <Input identifier="owner" collapse="full" type="text" value="{{ user }}99938d7a-ec20-4ad2-b319-60b3833be160" />
+                    <Input identifier="owner" collapse="full" type="text" value="99938d7a-ec20-4ad2-b319-60b3833be160" />
                     <Input identifier="location" collapse="full" type="text" value="{{ component.attributes.location }}" />
                     <Input identifier="type" collapse="full" type="text" value="backlog.product" />
                     <Input identifier="color" type="color" />
