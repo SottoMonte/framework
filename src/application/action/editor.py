@@ -3,13 +3,14 @@ modules = {'flow':'framework.service.flow'}
 import js
 from js import ace,console
 import pyodide
+import asyncio
 
 @flow.asynchronous(managers=('messenger','presenter'))
 async def editor(messenger,presenter,**constants):
     target = constants.get('target','')
     field = constants.get('field','editor')
     file = constants.get('path','')
-    
+    await asyncio.sleep(0.5)
     # Mappatura delle estensioni ai moduli di modalità di ACE
     mode_mapping = {
         'py': 'ace/mode/python',
@@ -62,7 +63,7 @@ async def editor(messenger,presenter,**constants):
     
     ace_editor.setTheme("ace/theme/github")
     ace_editor.session.setMode(mode)
-
+    
     component = await presenter.component(name=target)
     component[field] = ace_editor
 

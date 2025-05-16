@@ -562,12 +562,12 @@ class adapter(starlette.adapter):
               # Controlla se lo style è già presente nel <head>
               existing_styles = self.document.querySelectorAll(f'style[data-component="{component_name}"]')
               if existing_styles.length > 0:
-                  print(f"{component_name} style already mounted.")
+                  #print(f"{component_name} style already mounted.")
                   continue  # Salta questo componente, lo style è già presente
 
               # Altrimenti scarica e aggiungi lo style
               css_text = await self.host({'url': f"application/view/component/{component_name}.css"})
-              print(component_name, 'mount_css:', css_text)
+              #print(component_name, 'mount_css:', css_text)
 
               # Crea nuovo tag <style>
               style_element = self.document.createElement('style')

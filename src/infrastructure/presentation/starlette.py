@@ -635,6 +635,34 @@ class adapter():
                 table = self.code('div',{'class':'w-100'},new)
                 self.att(table,att)
                 return table
+            case 'Media':
+                src = att['src'] if 'src' in att else ''
+                tipo = att['type'] if 'type' in att else 'image'
+
+                match tipo:
+                    case 'image':
+                        media = self.code('img',{'src':src})
+                        self.att(media,att)
+                        return media
+                    case 'video':
+                        media = self.code('img',{'src':src})
+                        self.att(media,att)
+                        return media
+                    case 'audio':
+                        media = self.code('img',{'src':src})
+                        self.att(media,att)
+                        return media
+                    case 'embed':
+                        media = self.code('iframe',{'src':src})
+                        self.att(media,att)
+                        return media
+            case 'Icon':
+                name = att['name'] if 'name' in att else 'bi-image-alt'
+                tipo = att['type'] if 'type' in att else 'bi'
+
+                icon = self.code('i',{'class':f'{tipo} {name}','type':'icon'})
+                self.att(icon,att)
+                return icon
             case 'Graph':
                 if 'type' in att:
                     tipo = att['type']
@@ -686,6 +714,68 @@ class adapter():
                                     passare[key] = mmm[key][i]
                                 built = await self.mount_view(elements[0],{'storekeeper': passare})
                                 new.append(built)'''
+                        tbody = self.code('tbody', {}, new)
+                        self.att(tbody, att)
+                        return tbody
+                    case 'table.row':
+                        row = []
+                        for x in inner:
+                            th = self.code('td',{},[x])
+                            row.append(th)
+                        tr = self.code('tr',{},row)
+                        self.att(tr,att)
+                        return tr
+                    case 'carousel':
+                        ind = []
+                        for item in inner:
+                            self.att(item,{'class':'carousel-item'})
+                            #s = self.code('button',{'data-bs-target':'test','data-bs-slide-to':'0'},[])
+                            ind.append(self.code('button',{'type':'button','data-bs-target':f'#{att["id"]}','data-bs-slide-to':str(len(ind))})) 
+                        self.att(ind[0],{'class':'active','aria-current':'true'})
+                        self.att(inner[0],{'class':'active'})
+                        carousel = self.code('div',{'class':'carousel carousel-dark slide','data-bs-ride':'carousel'},[
+                            self.code('div',{'class':'carousel-indicators'},ind),
+                            self.code('div',{'class':'carousel-inner'},inner)
+                        ])
+                        self.att(carousel,att)
+                        return carousel
+                    case _:
+                        icon = att['icon'] if 'icon' in att else 'bi-image-alt'
+                        out = self.code('i',{'class':f'bi {icon}'})
+                        self.att(out,att)
+                        return out
+            case 'Visual':
+                if 'type' in att:
+                    tipo = att['type']
+                elif 'src' in att:
+                    tipo = 'img'
+                elif 'icon' in att:
+                    tipo = 'icon'
+                else:
+                    tipo = 'None'
+                
+                
+                match tipo:
+                    case 'table':
+                        table = self.code('table',{'class':'table'},inner)
+                        self.att(table,att)
+                        return table
+                    case 'table.head':
+                        row = []
+                        for x in inner:
+                            th = self.code('th',{},[x])
+                            row.append(th)
+                        tr = self.code('tr',{},row)
+                        thead = self.code('thead',{},[tr])
+                        return thead
+                    case 'table.body':
+                        new = []
+                        storekeeper = data.get('storekeeper', {})
+                        results = storekeeper.get('result', {})
+                        for result in results:
+                            #print(result)
+                            built = await self.mount_view(elements[0],{'storekeeper': result})
+                            new.append(built)
                         tbody = self.code('tbody', {}, new)
                         self.att(tbody, att)
                         return tbody
@@ -893,6 +983,10 @@ class adapter():
             case 'Group':
                 tipo = att['type'] if 'type' in att else 'None'
                 match tipo:
+                    case 'card':
+                        r = self.code('div',{'class':'card-group'},inner)
+                        self.att(r,att)
+                        return r
                     case 'button':
                         gg = self.code('div',{'class':'btn-group'},inner)
                         self.att(gg,att)

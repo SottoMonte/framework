@@ -14,7 +14,9 @@ Ogni tag corrisponde a un tipo di elemento da costruire. Ecco i tag principali:
 |-------------|-----------------------------------------------------------------------------|
 | Messenger   | Componente dinamico che carica un file `.xml` da un altro percorso.         |
 | Storekeeper | Inizializza un'interazione con un repository dati.                          |
-| Graph       | Rappresentazioni grafiche: immagini, tabelle, icone, carousel, ecc.         |
+| Icon        | Visualizza un'icona da librerie come Bootstrap Icons.                       |
+| Media       | Per contenuti multimediali concreti: immagini, video, audio, embeddati      |
+| Visual      | Per rappresentazioni grafiche astratte o generate: grafici, canvas, SVG     |
 | View        | Rende una vista interna, eventualmente usando dati da storekeeper.          |
 | Input       | Elementi input HTML: testo, select, radio, checkbox, range, ecc.            |
 | Action      | Pulsanti, form, dropdown e altri trigger.                                   |
@@ -36,28 +38,6 @@ Ogni tag corrisponde a un tipo di elemento da costruire. Ecco i tag principali:
 
 ---
 
-## 📌 Esempio base
-
-```xml
-<Messenger id="main-chat" type="flesh" title="Chat" domain="chat" view="chat/main"/>
-
-<Storekeeper method="overview" payload="id={{user.id}}" repository="users">
-    <Graph type="table.body">
-        <Graph type="table.row">
-            <Text storekeeper="name"/>
-            <Text storekeeper="email"/>
-        </Graph>
-    </Graph>
-</Storekeeper>
-
-<Group type="input">
-    <Input type="text" value="Hello" />
-    <Input type="submit" value="Send" />
-</Group>
-```
-
----
-
 ## 🔁 Gerarchia e annidamento
 
 Ogni tag può contenere altri tag (elementi figli), a seconda della logica della UI. Ad esempio:
@@ -65,6 +45,7 @@ Ogni tag può contenere altri tag (elementi figli), a seconda della logica della
 - `<Group>` può contenere `<Input>`, `<Text>, `<Action>`, ecc.
 - `<Graph type="table.body">` richiede una riga di riferimento (type="table.row") come figlio.
 - `<Action type="form">` può contenere `<Input>` ed elementi `<Text>`.
+- `<Input>` non puo contenere elementi figli.
 
 ---
 
@@ -82,6 +63,7 @@ Ogni tag può contenere altri tag (elementi figli), a seconda della logica della
 - Assicurati che gli `id` siano univoci nel file XML.
 - Gli `attributi` sono case-sensitive.
 - Gli elementi `Messenger` possono richiamare altre viste `.xml`, creando componenti annidati.
+- L'attributo `type` in `<Icon>` serve per supportare diverse librerie (es. `fas` per Font Awesome)
 
 ---
 
@@ -168,6 +150,12 @@ Il metodo `att(self, element, attributes)` gestisce una vasta gamma di attributi
 - `type`: modello da utilizzare (default: `flesh`)
 - `title`, `domain`, `view`
 
+### 📌 Esempio base
+
+```xml
+<Messenger id="main-chat" type="flesh" title="Chat" domain="chat" view="Chat"/>
+```
+
 ### Comportamento:
 Inietta un componente dinamico da `application/view/component/{view}.xml` e lo monta nel contesto corrente.
 
@@ -185,16 +173,27 @@ Interagisce con una fonte dati tramite il metodo indicato e rende gli elementi f
 
 ---
 
-## 3. `<Graph>`
+## 3. `<Visual>`
 
 ### Tipi supportati (`type`):
-- `icon`
-- `img`
 - `table`, `table.head`, `table.body`, `table.row`
 - `carousel`
 
 ### Comportamento:
 Genera rappresentazioni grafiche dinamiche: icone, tabelle, immagini, caroselli.
+
+### 📌 Esempio base
+
+```xml
+<Storekeeper method="overview" payload="id={{user.id}}" repository="users">
+    <Visual type="table.body">
+        <Visual type="table.row">
+            <Text storekeeper="name"/>
+            <Text storekeeper="email"/>
+        </Visual>
+    </Visual>
+</Storekeeper>
+```
 
 ---
 
@@ -257,7 +256,7 @@ Crea finestre modali, canvas laterali o iframe.
 ## 9. `<Group>`
 
 ### Tipi supportati:
-- `button`, `list`, `pagination`, `breadcrumb`
+- `button`, `list`, `pagination`, `breadcrumb`, `card`
 - `tab`, `nav`, `tree`, `input`, `node`, `accordion`
 
 ### Comportamento:
@@ -269,5 +268,54 @@ Struttura e raggruppa elementi visivi correlati (liste, tab, gruppi input...).
 
 ### Comportamento:
 Container generico, restituisce un `div` con attributi personalizzati.
+
+---
+
+## 🆕 11. `<Icon>` - Componente per icone
+
+### Attributi supportati:
+- `name` (obbligatorio): Nome dell'icona (es. `bi-image-alt`)
+- `type`: Prefisso della libreria (default: `bi` per Bootstrap Icons)
+- Tutti gli attributi generici di stile/allineamento
+
+### 📌 Esempi:
+```xml
+<!-- Icona base -->
+<Icon name="bi-check-circle" />
+
+<!-- Icona con stile personalizzato -->
+<Icon name="bi-exclamation-triangle" type="bi" color="danger" size="fs-3"/>
+
+<!-- Icona cliccabile -->
+<Icon name="bi-trash" click="deleteItem()" class="cursor-pointer"/>
+```
+
+### Best practice:
+1. Usare sempre il prefisso della libreria (es. `bi-` per Bootstrap Icons)
+3. Aggiungere `click` o altri eventi per interattività
+
+---
+
+## 12. `<Media>`
+
+### Tipi supportati (`type`):
+- `image`: immagini
+- `video`: video player
+- `audio`: audio player
+- `embed`: contenuti esterni (iframe, YouTube, ecc.)
+
+### Attributi principali:
+- `src`: percorso o URL del media
+- `alt`, `title`, `controls`, `autoplay`, `loop`, `muted`, ecc.
+
+### 📌 Esempio
+
+```xml
+<!-- Esempio Media -->
+<Media type="img" src="logo.png" alt="Logo"/>
+```
+
+### Comportamento:
+Gestisce la visualizzazione di contenuti multimediali concreti come immagini, video, audio o embed esterni.
 
 ---
