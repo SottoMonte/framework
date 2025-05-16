@@ -106,7 +106,7 @@
             <Action type="button" route="modal:modal-note-{{ id }}"><Graph icon="bi-people-fill"/></Action>
             <Text>All team</Text>
         </Column>
-        <Row expand="dynamic" droppable="note-inner" droppable-data="backlog.increment" flow="auto" padding="p-2" space="2">
+        <Row expand="dynamic" flow="auto" padding="p-2" space="2">
             {% for note in storekeeper.result %}
                 {% if note.type == 'backlog.increment' %}
                     <Note title="Sistema di gestione dei prodotti" identifier="{{ note.id }}" text="{{ note.text }}" color="{{ note.color }}"></Note>

@@ -28,7 +28,7 @@ domain = "assistant,chat"
 url = "https://openrouter.ai/api/v1/chat/completions"
 authorization = "Bearer"
 accept = "application/json"
-token = "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"
+token = "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"
 
 [amessage.backend]
 adapter = "redis"
@@ -101,3 +101,10 @@ playbook_path = ""
 extra_vars = ""
 inventory_file = ""
 timeout = ""
+
+[actuator.functions]
+adapter = "api"
+url = "https://ljeowpqmovaavxghpsne.supabase.co/functions/v1/scrum-release"
+authorization = "Bearer"
+accept = "application/json"
+token = "{{ SUPABASE_SECRET }}"

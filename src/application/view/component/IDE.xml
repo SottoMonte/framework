@@ -124,7 +124,7 @@
                     <Input identifier="message" type="textarea" class="rounded-0" />
                 </Action>
             </Window>
-            <Container id="tab-assistant" expand="vertical" border="start">
+            <Container id="tab-assistant" expand="vertical" width="250px" border="start">
                 <View content="tab/assistant.xml" />
             </Container>
         </Group>

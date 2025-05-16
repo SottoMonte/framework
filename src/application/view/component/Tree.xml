@@ -20,7 +20,7 @@
             {% if tree.path == '/' or tree.path.startswith(component.attributes.path) or component.attributes.path.startswith(tree.path) %}
             <Group id="{{ tree['id'] }}" type="node" name="{{ tree['name'] }}">
                 <Action type="dropdown" class="reset" >
-                    <Action id="maker-{{tree.id}}" draggable="window" draggable-component="window" padding="p-0" margin="m-0" value="{{tree.path}}"><Text>{{tree.name}}</Text></Action>
+                    <Action id="{{tree.id}}" draggable="window" draggable-maker="true" draggable-component="window" padding="p-0" margin="m-0" value="{{tree.path}}"><Text>{{tree.name}}</Text></Action>
                     <Action click="input(inputs:['tree-create-path'],value:'{{tree.path}}')" alignment-content="horizontal" route="modal:window-create-{{ component.id }}"><Text padding="px-1">New folder</Text></Action>
                     <Action click="input(inputs:['tree-create-path'],value:'{{tree.path}}')" alignment-content="horizontal" route="modal:window-create-{{ component.id }}"><Text padding="px-1">New file</Text></Action>
                     <Action click="input(inputs:['tree-delete-path'],value:'{{tree.path}}')" alignment-content="horizontal" route="modal:window-delete-{{ component.id }}"><Text padding="px-1">Delete</Text></Action>
@@ -33,7 +33,7 @@
         {% else %}
             {% if tree.path == '/' or tree.path.startswith(component.attributes.path) or component.attributes.path.startswith(tree.path) %}
             <Action type="dropdown" class="reset">
-                <Action  id="maker-{{tree.id}}" draggable="window" draggable-component="window" padding="p-0" margin="m-0" value="{{tree.id}}"><Text>{{tree.name}}</Text></Action>
+                <Action  id="{{tree.id}}" draggable="window" draggable-maker="true" draggable-component="window" padding="p-0" margin="m-0" value="{{tree.id}}"><Text>{{tree.name}}</Text></Action>
                 <Action click="input(inputs:['tree-delete-path'],value:'{{tree.path}}')|input(inputs:['tree-delete-name'],value:'{{tree.name}}')" alignment-content="horizontal" route="modal:window-delete-{{ component.id }}"><Text padding="px-1">Delete file {{tree.name}}</Text></Action>
                 <Action  alignment-content="horizontal" route="modal:window-delete-{{ component.id }}"><Text padding="px-1">Rename file {{tree.name}}</Text></Action>
             </Action>
