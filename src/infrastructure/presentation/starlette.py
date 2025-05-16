@@ -977,7 +977,8 @@ class adapter():
                     case _:
                         if text:
                             text = escape(text)
-                        obj = self.code('p',{'class':'text-truncate fw-lighter p-0 m-0','type':'data'},text)
+                        inner.append(text)
+                        obj = self.code('p',{'class':'text-truncate fw-lighter p-0 m-0','type':'data'},inner)
                         self.att(obj,att)
                         return obj
             case 'Group':

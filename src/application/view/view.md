@@ -43,9 +43,8 @@ Ogni tag corrisponde a un tipo di elemento da costruire. Ecco i tag principali:
 Ogni tag può contenere altri tag (elementi figli), a seconda della logica della UI. Ad esempio:
 
 - `<Group>` può contenere `<Input>`, `<Text>, `<Action>`, ecc.
-- `<Graph type="table.body">` richiede una riga di riferimento (type="table.row") come figlio.
+- `<Visual type="table.body">` richiede una riga di riferimento (type="table.row") come figlio.
 - `<Action type="form">` può contenere `<Input>` ed elementi `<Text>`.
-- `<Input>` non puo contenere elementi figli.
 
 ---
 
