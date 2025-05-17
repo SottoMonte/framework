@@ -276,11 +276,15 @@ async def load_manager(lang,**constants):
             # Ottiene il provider e lo registra
             provider = getattr(module, adapter)
             
-            ser = constants["provider"]
-            if ser not in di:
-                di[ser] = lambda di: list([])
+            providers = constants["provider"]
+            if providers is list:
+                providers = [di[provider] for provider in providers ]
+            else:
+                if providers not in di:
+                    di[providers] = lambda di: list([])
+                providers = di[providers]
 
-            di[constants["name"]] = lambda _di: provider(providers=di[ser])
+            di[constants["name"]] = lambda _di: provider(providers=providers)
         except Exception as e:
             print(constants)
             print(f"❌ Error: loading 'infrastructure.{service}.{adapter}': {repr(e)}")
@@ -351,6 +355,7 @@ ADAPTER_FIELDS = {
     "logging": ["host", "port", "persistence"],
     "websocket": ["url"],
     "api": ["url",'authorization','accept',],
+    "task": ["url",'authorization','accept',],
     "mqtt": ["url", "port", "username", "password"],
     'oauth': ['url','id','secret'],
     "jwt": ["url", "app_id", "installation_id", "key", "autologin"],

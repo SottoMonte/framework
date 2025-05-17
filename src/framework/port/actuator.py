@@ -7,5 +7,21 @@ class port(ABC):
         pass
 
     @abstractmethod
-    async def realize(self,*services,**constants):
+    async def activate(self,*services,**constants):
+        pass
+
+    @abstractmethod
+    async def deactivate(self,*services,**constants):
+        pass
+
+    @abstractmethod
+    async def calibrate(self,*services,**constants):
+        pass
+
+    @abstractmethod
+    async def status(self,*services,**constants):
+        pass
+
+    @abstractmethod
+    async def reset(self,*services,**constants):
         pass

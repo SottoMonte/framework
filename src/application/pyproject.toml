@@ -95,7 +95,7 @@ token = "{% if session.github and session.github.access_token %}{{ session.githu
 adapter = "fs"
 
 # Configurazione dell'automazione
-[actuator.devops]
+[aactuator.devops]
 adapter = "ansible"
 playbook_path = ""
 extra_vars = ""
@@ -103,7 +103,7 @@ inventory_file = ""
 timeout = ""
 
 [actuator.functions]
-adapter = "api"
+adapter = "task"
 url = "https://ljeowpqmovaavxghpsne.supabase.co/functions/v1/scrum-release"
 authorization = "Bearer"
 accept = "application/json"

@@ -47,7 +47,7 @@ async def bootstrap() -> None:
 
     
     await language.load_manager(language,provider="message", name="messenger", path="framework.manager.messenger")
-    await language.load_manager(language,provider="authentication", name="executor", path="framework.manager.executor")
+    await language.load_manager(language,provider="actuator", name="executor", path="framework.manager.executor")
 
     executor = di["executor"]
 
@@ -68,7 +68,7 @@ async def bootstrap() -> None:
 
     # Carica i provider dai moduli di configurazione
     tasks = []
-    for module in ["presentation", "persistence", "message", "authentication"]:
+    for module in ["presentation", "persistence", "message", "authentication","actuator"]:
         if module in config:
             for driver, setting in config[module].items():
                 adapter = setting["adapter"]

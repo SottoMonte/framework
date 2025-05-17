@@ -8,10 +8,19 @@ class executor:
         # actuator
         self.sessions: Dict[str, Any] = {}
         self.providers = constants.get('providers', [])
-
+        #print('EXE-',self.providers)
+        asyncio.create_task(self.action())
+    
     @flow.asynchronous(managers=('messenger',))
     async def action(self, messenger, **constants):
-        pass
+        await asyncio.sleep(5)
+        print('EXE2-',self.providers)
+        tasks = [x.load() for x in self.providers]
+        
+        print(tasks)
+        await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+        #await self.all_completed(tasks=tasks)
+        
 
     @flow.asynchronous(managers=('messenger',))
     async def act(self, messenger, **constants) -> Dict[str, Any]:
@@ -78,13 +87,13 @@ class executor:
         try:
             
             results = await asyncio.gather(*tasks, return_exceptions=True)
-            await messenger.post(domain='debug',message="🚀 Avvio esecuzione parallela di tutte le operazioni...")
-            await messenger.post(domain='debug',message="✅ Tutte le operazioni completate.")
+            #await messenger.post(domain='debug',message="🚀 Avvio esecuzione parallela di tutte le operazioni...")
+            #await messenger.post(domain='debug',message="✅ Tutte le operazioni completate.")
             return {"state": True, "result": results, "error": None}
 
         except Exception as e:
             error_msg = f"❌ Errore in all_completed: {str(e)}"
-            await messenger.post(domain='debug',message=error_msg)
+            #await messenger.post(domain='debug',message=error_msg)
             return {"state": False, "result": None, "error": error_msg}
 
     @flow.asynchronous(managers=('messenger',))

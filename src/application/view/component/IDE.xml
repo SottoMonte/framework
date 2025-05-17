@@ -15,11 +15,12 @@
     <Container>
         <!-- TabNav -->
         <Group type="nav" margin="m-0" padding="p-0" >
-            <Action route="tab:tab-code" class="d-inline-flex gap-2"><Graph icon="bi-code-slash"/><Text>Code</Text></Action>
             <Action route="tab:tab-plan" class="d-inline-flex gap-2"><Graph icon="bi-kanban-fill"/><Text>Plan</Text></Action>
+            <Action route="tab:tab-code" class="d-inline-flex gap-2"><Graph icon="bi-code-slash"/><Text>Code</Text></Action>
             <Action route="tab:tab-build" class="d-inline-flex gap-2"><Graph icon="bi-tools"/><Text>Build</Text></Action>
             <Action route="tab:tab-test" class="d-inline-flex gap-2"><Graph icon="bi-play-fill"/><Text>Test</Text></Action>
             <Action route="tab:tab-release" class="d-inline-flex gap-2"><Graph icon="bi-box-seam-fill"/><Text>Package</Text></Action>
+            <Action route="tab:tab-release" class="d-inline-flex gap-2"><Graph icon="bi-rocket"/><Text>Deploy</Text></Action>
         </Group>
     </Container>
 </Column>
@@ -137,6 +138,11 @@
 <Row expand="dynamic" class="overflow-auto">
     <!-- Tab -->
     <Group type="tab" expand="full">
+        <Container id="tab-plan" expand="full">
+            <Storekeeper method="gather" repository='notes' filter="project(eq: [('location', '{{component.repository.owner}}/{{component.repository.name}}')])" >
+                <Scrum location="{{component.repository.owner}}/{{component.repository.name}}" />
+            </Storekeeper>
+        </Container>
         <Container id="tab-code" class="w-100 h-100" >
             <Row expand="full">
                 <Column alignment-content="center" alignment-vertical="center">
@@ -169,11 +175,6 @@
                     </Container>
                 </Group>
             </Row>
-        </Container>
-        <Container id="tab-plan" expand="full">
-            <Storekeeper method="gather" repository='notes' filter="project(eq: [('location', '{{component.repository.owner}}/{{component.repository.name}}')])" >
-                <Scrum location="{{component.repository.owner}}/{{component.repository.name}}" />
-            </Storekeeper>
         </Container>
         <Container id="tab-build" expand="full">
             <Text>2</Text>
