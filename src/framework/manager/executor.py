@@ -14,10 +14,10 @@ class executor:
     @flow.asynchronous(managers=('messenger',))
     async def action(self, messenger, **constants):
         await asyncio.sleep(5)
-        print('EXE2-',self.providers)
+        #print('EXE2-',self.providers)
         tasks = [x.load() for x in self.providers]
         
-        print(tasks)
+        #print(tasks)
         await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
         #await self.all_completed(tasks=tasks)
         

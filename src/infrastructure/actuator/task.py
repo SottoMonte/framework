@@ -1,6 +1,140 @@
 modules = {'flow': 'framework.service.flow',}
 
 import sys
+import json
+import asyncio
+import datetime
+import xml.etree.ElementTree as ET
+import os
+from jinja2 import Template
+
+if sys.platform == 'emscripten':
+    import pyodide
+
+    async def backend(method, url, headers, payload):
+        if method == 'GET':
+            response = await pyodide.http.pyfetch(url, method=method, headers=headers)
+        else:
+            payload = json.dumps(payload if isinstance(payload, dict) else {})
+            response = await pyodide.http.pyfetch(url, method=method, headers=headers, body=payload)
+        if response.status in [200, 201]:
+            return {"state": True, "result": await response.json()}
+        else:
+            return {"state": False, "result": [], "remark": f"Request failed with status {response.status}"}
+else:
+    import aiohttp
+
+    async def backend(method, url, headers, payload):
+        async with aiohttp.ClientSession() as session:
+            async with session.request(method=method, url=url, headers=headers, json=payload) as response:
+                rr = await response.json()
+                if response.status in [200, 201]:
+                    return {"state": True, "result": rr}
+                else:
+                    return {"state": False, "remark": f"Request failed with status {response.status}"}
+
+
+class adapter():
+
+    def __init__(self, **constants):
+        self.config = constants.get('config', {})
+        self.api_url = self.config.get('url', '')
+        self.token = self.config.get('token', '')
+        self.authorization = self.config.get('authorization', 'token')
+        self.accept = self.config.get('accept', 'application/vnd.github+json')
+        self.scheduled_jobs = []  # Configurazioni caricate da XML
+        self.load_cron_config("src/application/action")
+
+    @flow.asynchronous(outputs='transaction')
+    async def load(self, *services, **constants):
+        await self.event_loop()
+        #return await self.actuate(**constants | {'method': 'PUT'})
+
+    async def actuate(self, **constants):
+        headers = {
+            "Authorization": f"{self.authorization} {self.token}",
+            "Accept": self.accept,
+        }
+        location = constants.get('location', '').replace('//', '/')
+        method = constants.get('method', '')
+        payload = constants.get('payload', {})
+        url = f"{self.api_url}/{location}"
+        return await backend(method, url, headers, payload)
+
+    def load_cron_config(self, xml_dir_path):
+        """Legge e renderizza con Jinja2 tutti i file XML in una cartella"""
+        #self.scheduled_jobs.clear()
+
+        for filename in os.listdir(xml_dir_path):
+            if filename.endswith('.xml'):
+                filepath = os.path.join(xml_dir_path, filename)
+
+                try:
+                    # Carica il contenuto del file
+                    with open(filepath, "r", encoding="utf-8") as file:
+                        raw_template = file.read()
+
+                    # Esegui rendering Jinja2 con le variabili
+                    rendered_xml = Template(raw_template).render(**self.config)
+
+                    # Fai parsing del contenuto XML
+                    root = ET.fromstring(rendered_xml)
+
+                    for job in root.findall('job'):
+                        config = {
+                            'weekday': int(job.findtext('day', default='-1')),
+                            'hour': int(job.findtext('hour', default='-1')),
+                            'minute': int(job.findtext('minute', default='-1')),
+                            'url': job.findtext('url'),
+                            'method': job.findtext('method', default='GET'),
+                            'token': job.findtext('token'),
+                            'headers': {},
+                            'payload': {}
+                        }
+
+                        headers_elem = job.find('headers')
+                        if headers_elem is not None:
+                            for h in headers_elem.findall('header'):
+                                config['headers'][h.attrib['name']] = h.text
+
+                        payload_text = job.findtext('payload')
+                        if payload_text:
+                            try:
+                                config['payload'] = json.loads(payload_text)
+                            except json.JSONDecodeError:
+                                config['payload'] = {}
+
+                        if config['url'] and config['weekday'] >= 0:
+                            self.scheduled_jobs.append(config)
+
+                except Exception as e:
+                    print(f"❌ Errore nel file {filepath}: {e}")
+    
+    async def run_cron_jobs(self):
+        now = datetime.datetime.now()
+        for job in self.scheduled_jobs:
+            if (now.weekday() == job['weekday']):
+                #and now.hour == job['hour'] and now.minute == job['minute']
+                headers = job['headers']
+                headers["Authorization"] = f"Bearer {job['token']}"
+                
+                #print(f"[{now}] Eseguo job {job['method']} {job['url']}")
+                await backend(job['method'], job['url'], headers, {})
+                self.scheduled_jobs.remove(job)
+            #else:
+            #print("falso",now.weekday(),now.date())
+            #
+
+    async def event_loop(self):
+        while True:
+            await self.run_cron_jobs()
+            await asyncio.sleep(60)
+
+
+
+
+
+'''import sys
 
 if sys.platform == 'emscripten':
     import pyodide
@@ -87,4 +221,4 @@ class adapter():
 
     @flow.asynchronous(outputs='transaction')
     async def reset(self,*services,**constants):
-        pass
+        pass'''
