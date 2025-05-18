@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Column expand="dynamic" >
+    {% block start %}
+    {% endblock %}
     <Row background="#fcfcfc" size="auto" width="80px" class="border-end">
         {% block bar %}
         {% endblock %}
@@ -12,7 +14,7 @@
         <Column expand="auto" padding="p-5">
             <Row expand="dynamic">
                 <Text type="h1" class="h1">{% block title %}{% endblock %}</Text>
-                <Text>{% block subtitle %}{% endblock %}</Text>
+                <Text alignment-content="horizontal" >{% block subtitle %}{% endblock %}</Text>
             </Row>
             <Row class="position-sticky">
                 <Container>{% block action %}{% endblock %}</Container>
@@ -30,4 +32,6 @@
             <Text top="auto">ciao</Text>
         </Column>
     </Row>
+    {% block fine %}
+    {% endblock %}
 </Column>

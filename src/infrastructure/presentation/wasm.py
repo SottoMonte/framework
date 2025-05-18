@@ -1,7 +1,7 @@
 import sys
 
 modules = {'flow': 'framework.service.flow','starlette': 'infrastructure.presentation.starlette'}
-
+import urllib.parse
 if sys.platform != 'emscripten':
   import os
   from starlette.responses import JSONResponse,HTMLResponse,RedirectResponse
@@ -183,7 +183,13 @@ class adapter(starlette.adapter):
             attributeValue = currentElement.getAttribute('url')
             currentElement = currentElement.parentElement
 
-          code = await self.builder(url=attributeValue)
+          # Parsing dell'URL
+          parsed = urllib.parse.urlparse(attributeValue)
+          path = parsed.path
+          query = urllib.parse.parse_qs(parsed.query)
+          fragment = urllib.parse.parse_qs(parsed.fragment)
+          print('BOOM',path,query,fragment)
+          code = await self.builder(url=attributeValue,path=path,query=query,fragment=fragment)
           js.document.getElementById('main').innerHTML = ''
           js.document.getElementById('main').prepend(code)
 
@@ -417,6 +423,14 @@ class adapter(starlette.adapter):
                     element.className += " d-flex flex-column"
                   case 'horizontal':
                     element.className += " d-flex flex-row"
+                  case 'center':
+                    element.className += " d-flex justify-content-center align-items-center"
+                  case 'between':
+                    element.className += " d-flex justify-content-between align-items-center"
+                  case 'around':
+                    element.className += " d-flex justify-content-around align-items-center"
+                  case 'evenly':
+                    element.className += " d-flex justify-content-evenly align-items-center"
               case 'expand':
                 match value:
                   case 'vertical':

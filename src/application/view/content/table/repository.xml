@@ -7,6 +7,6 @@
     <Text storekeeper="updated">Updated</Text>
     <Group type="button">
         <Action click="ide(id:'ide',repository:{'owner':'{{ storekeeper.owner.login }}','name':'{{ storekeeper.name }}'})" route="application/view/page/cms/overview.xml" class="d-inline-flex"><Graph icon="bi-box-fill"/></Action>
-        <Action route="application/view/page/inventory/repository.xml" class="d-inline-flex"><Graph icon="bi-bookmark-fill"/></Action>
+        <Action route="application/view/page/inventory/repository.xml?id={{storekeeper.id}}" class="d-inline-flex"><Graph icon="bi-bookmark-fill"/></Action>
     </Group>
 </Graph>

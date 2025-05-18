@@ -176,7 +176,7 @@ class adapter():
     async def run_cron_jobs(self):
         now = datetime.datetime.now()
         for job in self.scheduled_jobs:
-            print(job)
+            
             if (now.weekday() == job['weekday']):
                 #and now.hour == job['hour'] and now.minute == job['minute']
                 headers = job['headers']

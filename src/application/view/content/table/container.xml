@@ -8,6 +8,6 @@
     <Text storekeeper="environment">Environment</Text>
     <Text storekeeper="server">Server</Text>
     <Group type="button">
-        <Action route="application/view/page/inventory/container.xml" class="d-inline-flex"><Graph icon="bi-card-heading"/></Action>
+        <Action route="application/view/page/inventory/container.xml?id={{storekeeper.id}}" class="d-inline-flex"><Graph icon="bi-card-heading"/></Action>
     </Group>
 </Graph>

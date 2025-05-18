@@ -15,6 +15,6 @@
     <Text storekeeper="created_at">Created At</Text>
     <Text storekeeper="updated_at">Updated At</Text>
     <Group type="button">
-        <Action route="application/view/page/inventory/volume.xml" class="d-inline-flex"><Graph icon="bi-card-heading"/></Action>
+        <Action route="application/view/page/inventory/volume.xml?id={{storekeeper.id}}" class="d-inline-flex"><Graph icon="bi-card-heading"/></Action>
     </Group>
 </Graph>
