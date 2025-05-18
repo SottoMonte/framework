@@ -355,7 +355,7 @@ ADAPTER_FIELDS = {
     "logging": ["host", "port", "persistence"],
     "websocket": ["url"],
     "api": ["url",'authorization','accept',],
-    "task": ["url",'authorization','accept',],
+    "flow": [],
     "mqtt": ["url", "port", "username", "password"],
     'oauth': ['url','id','secret'],
     "jwt": ["url", "app_id", "installation_id", "key", "autologin"],

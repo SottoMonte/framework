@@ -185,8 +185,8 @@ class adapter():
                 #print(f"[{now}] Eseguo job {job['method']} {job['url']}")
                 await backend(job['method'], job['url'], headers, {})
                 self.scheduled_jobs.remove(job)
-            else:
-                print("falso",now.weekday(),now.date())
+            #else:
+            #    print("falso",now.weekday(),now.date())
 
     async def event_loop(self):
         while True:
