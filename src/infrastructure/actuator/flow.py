@@ -28,6 +28,7 @@ else:
         async with aiohttp.ClientSession() as session:
             async with session.request(method=method, url=url, headers=headers, json=payload) as response:
                 rr = await response.json()
+                print(rr)
                 if response.status in [200, 201]:
                     return {"state": True, "result": rr}
                 else:
@@ -43,7 +44,7 @@ class adapter():
         self.authorization = self.config.get('authorization', 'token')
         self.accept = self.config.get('accept', 'application/vnd.github+json')
         self.scheduled_jobs = []  # Configurazioni caricate da XML
-        self.load_cron_config("src/application/action")
+        self.load_flow_config("src/application/action")
 
     @flow.asynchronous(outputs='transaction')
     async def load(self, *services, **constants):
@@ -61,7 +62,7 @@ class adapter():
         url = f"{self.api_url}/{location}"
         return await backend(method, url, headers, payload)
 
-    def load_cron_config(self, xml_dir_path):
+    def load_cron_config2(self, xml_dir_path):
         """Legge e renderizza con Jinja2 tutti i file XML in una cartella"""
         #self.scheduled_jobs.clear()
 
@@ -110,9 +111,72 @@ class adapter():
                 except Exception as e:
                     print(f"❌ Errore nel file {filepath}: {e}")
     
+    def load_flow_config(self, xml_dir_path):
+        """Carica tutti i file XML nella cartella e aggiunge i job definiti nei <case>"""
+        self.scheduled_jobs.clear()
+
+        for filename in os.listdir(xml_dir_path):
+            if filename.endswith('.xml'):
+                filepath = os.path.join(xml_dir_path, filename)
+                try:
+                    with open(filepath, 'r', encoding='utf-8') as file:
+                        raw_template = file.read()
+
+                    # Esegui il rendering del template
+                    rendered_xml = Template(raw_template).render(**self.config)
+
+                    # Parsing XML
+                    root = ET.fromstring(rendered_xml)
+
+                    for case_elem in root.findall('case'):
+                        case_name = case_elem.attrib.get('name', 'unknown')
+                        description = case_elem.findtext('description', '')
+
+                        schedule_elem = case_elem.find('schedule')
+                        action_elem = case_elem.find('action/https')
+
+                        if schedule_elem is None or action_elem is None:
+                            print(f"⚠️  Skipping case '{case_name}' - missing schedule or action.")
+                            continue
+
+                        job = {
+                            'name': case_name,
+                            'description': description,
+                            'weekday': int(schedule_elem.findtext('day', '-1')),
+                            'hour': int(schedule_elem.findtext('hour', '-1')),
+                            'minute': int(schedule_elem.findtext('minute', '-1')),
+                            'interval': schedule_elem.findtext('interval', 'weekly'),
+                            'url': action_elem.findtext('url'),
+                            'method': action_elem.findtext('method', 'GET'),
+                            'headers': {},
+                            'payload': {}
+                        }
+
+                        headers_elem = action_elem.find('headers')
+                        if headers_elem is not None:
+                            for header in headers_elem.findall('header'):
+                                name = header.attrib.get('name')
+                                value = header.text
+                                if name:
+                                    job['headers'][name] = value
+
+                        payload_text = action_elem.findtext('payload')
+                        if payload_text:
+                            try:
+                                job['payload'] = json.loads(payload_text)
+                            except json.JSONDecodeError:
+                                job['payload'] = {}
+
+                        if job['url'] and job['weekday'] >= 0:
+                            self.scheduled_jobs.append(job)
+
+                except Exception as e:
+                    print(f"❌ Errore caricando {filepath}: {e}")
+
     async def run_cron_jobs(self):
         now = datetime.datetime.now()
         for job in self.scheduled_jobs:
+            print(job)
             if (now.weekday() == job['weekday']):
                 #and now.hour == job['hour'] and now.minute == job['minute']
                 headers = job['headers']
@@ -121,9 +185,8 @@ class adapter():
                 #print(f"[{now}] Eseguo job {job['method']} {job['url']}")
                 await backend(job['method'], job['url'], headers, {})
                 self.scheduled_jobs.remove(job)
-            #else:
-            #print("falso",now.weekday(),now.date())
-            #
+            else:
+                print("falso",now.weekday(),now.date())
 
     async def event_loop(self):
         while True:

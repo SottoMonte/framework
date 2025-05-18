@@ -103,8 +103,6 @@ inventory_file = ""
 timeout = ""
 
 [actuator.functions]
-adapter = "task"
+adapter = "flow"
 url = "https://ljeowpqmovaavxghpsne.supabase.co/functions/v1/scrum-release"
-authorization = "Bearer"
-accept = "application/json"
 token = "{{ SUPABASE_SECRET }}"
