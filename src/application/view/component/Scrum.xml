@@ -16,13 +16,11 @@
         </Column>
         <Column background="#3498DB" alignment-vertical="center">
             <Window id="modal-note-{{ component.id }}" type="modal" size="xl" title="chat" action="note" >
-                <Action type="form" id="form-note" action="/note" method="POST">
-                    <Input identifier="owner" collapse="full" type="text" value="99938d7a-ec20-4ad2-b319-60b3833be160" />
-                    <Input identifier="location" collapse="full" type="text" value="{{ component.attributes.location }}" />
-                    <Input identifier="type" collapse="full" type="text" value="backlog.product" />
-                    <Input identifier="color" type="color" />
-                    <Input identifier="text" type="textarea" class="rounded-0" />
-                </Action>
+                <Input identifier="owner" collapse="full" type="text" value="99938d7a-ec20-4ad2-b319-60b3833be160" />
+                <Input identifier="location" collapse="full" type="text" value="{{ component.attributes.location }}" />
+                <Input identifier="type" collapse="full" type="text" value="backlog.product" />
+                <Input identifier="color" type="color" />
+                <Input identifier="text" type="textarea" class="rounded-0" />
             </Window>
             <Action type="button" route="modal:modal-note-{{ component.id }}"><Graph icon="bi-sticky-fill"/></Action>
             <Text expand="dynamic" >Product Backlog</Text>

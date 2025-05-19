@@ -1,23 +1,38 @@
 modules = {'flow': 'framework.service.flow'}
 
+import asyncio
+
+async def handle_response(messenger):
+    while True:
+        print("In attesa di una risposta...")
+        response = await messenger.read(domain='backlog.producer')
+        print("Risposta ricevuta:", response)
+        await asyncio.sleep(1)
+
 @flow.asynchronous(managers=('messenger', 'storekeeper'))
 async def create(messenger, storekeeper, **constants):
+    print(f"Create: {constants}")
     model = constants.get('type', 'repository')
     match model:
         case 'file':
             payload = await file(**constants)
         case 'repository':
+            if 'backlog' in constants:
+                await asyncio.create_task(handle_response(messenger))
+                await asyncio.sleep(3)
+                msg = await messenger.post(domain='backlog.producer', message=f"Rispondimi come se fossi un product owner che utilizza metologie agile framework SCRUM ! commando : creami una lista Product Backlog sottoforma di una lista dizionario con i seguneti campi (text,title,) in python  per :{constants.get('description', '')}")
+                print('msg:', msg)
             payload = await repository(**constants)
         case 'note':
             payload = await note(**constants)
 
     print(f"Payload: {payload} | Repository: {model}")
-    transaction = await storekeeper.store(repository=model, payload=payload)
+    '''transaction = await storekeeper.store(repository=model, payload=payload)
     # Notifica il risultato del salvataggio
     if transaction.get('state', False):
         await messenger.post(domain='success', message=f"Creato ")
     else:
-        await messenger.post(domain='error', message=f"Errore creazione ")
+        await messenger.post(domain='error', message=f"Errore creazione ")'''
 
 @flow.asynchronous(managers=('messenger', 'storekeeper'),inputs='file')
 async def file(messenger, storekeeper, **constants):

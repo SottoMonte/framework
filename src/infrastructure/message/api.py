@@ -64,7 +64,9 @@ class adapter():
         self.accept = self.config.get('accept','application/vnd.github+json')
         self.listeners = dict()
 
+    @flow.asynchronous()
     async def request(self, **constants):
+        print(f"DEBUG - Request: {constants}")
         headers = {
             "Authorization": f"{self.authorization.strip()} {self.token.strip()}",
             #"Accept": self.accept,
@@ -123,6 +125,7 @@ class adapter():
     async def read(self, **constants):
         
         domain = constants.get("domain", "info")
+
         if domain not in self.listeners:
             q = asyncio.Queue()
             self.listeners[domain] = q

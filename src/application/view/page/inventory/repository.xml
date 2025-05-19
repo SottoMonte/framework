@@ -96,23 +96,27 @@
 </Container>
 
 <Group type="nav" margin="m-0" padding="p-0" class="border-bottom">
-    <Action class="d-inline-flex" route="tab:overview"><Graph icon="bi-code"/><Text class="text-uppercase">Code</Text></Action>
-    <Action class="d-inline-flex" route="tab:issues"><Graph icon="bi-exclamation-circle"/><Text class="text-uppercase">Issues</Text></Action>
-    <Action class="d-inline-flex" route="tab:pulls"><Graph icon="bi-git"/><Text class="text-uppercase">Pull Requests</Text></Action>
-    <Action class="d-inline-flex" route="tab:actions"><Graph icon="bi-play-circle"/><Text class="text-uppercase">Actions</Text></Action>
-    <Action class="d-inline-flex" route="tab:project"><Graph icon="bi-kanban"/><Text class="text-uppercase">Project</Text></Action>
-    <Action class="d-inline-flex" route="tab:wiki"><Graph icon="bi-book"/><Text class="text-uppercase">Wiki</Text></Action>
-    <Action class="d-inline-flex" route="tab:security"><Graph icon="bi-shield-exclamation"/><Text class="text-uppercase">Security</Text></Action>
-    <Action class="d-inline-flex" route="tab:settings"><Graph icon="bi-gear"/><Text class="text-uppercase">Settings</Text></Action>
-    <Action class="d-inline-flex" route="tab:logs"><Graph icon="bi-clock-history"/><Text class="text-uppercase">Activity</Text></Action>
+    <Action class="d-inline-flex" route="tab:overview" space="2"><Graph icon="bi-code"/><Text class="text-uppercase">Code</Text></Action>
+    <Action class="d-inline-flex" route="tab:issues" space="2"><Graph icon="bi-exclamation-circle"/><Text class="text-uppercase">Issues</Text></Action>
+    <Action class="d-inline-flex" route="tab:pulls" space="2"><Graph icon="bi-git"/><Text class="text-uppercase">Pull Requests</Text></Action>
+    <Action class="d-inline-flex" route="tab:actions" space="2"><Graph icon="bi-play-circle"/><Text class="text-uppercase">Actions</Text></Action>
+    <Action class="d-inline-flex" route="tab:project" space="2"><Graph icon="bi-kanban"/><Text class="text-uppercase">Project</Text></Action>
+    <Action class="d-inline-flex" route="tab:wiki" space="2"><Graph icon="bi-book"/><Text class="text-uppercase">Wiki</Text></Action>
+    <Action class="d-inline-flex" route="tab:security" space="2"><Graph icon="bi-shield-exclamation"/><Text class="text-uppercase">Security</Text></Action>
+    <Action class="d-inline-flex" route="tab:settings" space="2"><Graph icon="bi-gear"/><Text class="text-uppercase">Settings</Text></Action>
+    <Action class="d-inline-flex" route="tab:logs" space="2"><Graph icon="bi-clock-history"/><Text class="text-uppercase">Activity</Text></Action>
 </Group>
 
-<Group type="tab" background="#fafafa" padding="p-4" class=" border-bottom" >
+<Group type="tab" background="#fafafa" padding="p-0" class=" border-bottom" >
     <Container expand="dynamic" id="overview"><Text>Codice sorgente...</Text></Container>
     <Container expand="dynamic" id="issues"><Text>Lista Issues</Text></Container>
     <Container expand="dynamic" id="pulls"><Text>Lista Pull Requests</Text></Container>
     <Container expand="dynamic" id="actions"><Text>Lista Pull Requests</Text></Container>
-    <Container expand="dynamic" id="project"><Text>Lista Pull Requests</Text></Container>
+    <Container expand="dynamic" id="project">
+        <Storekeeper method="gather" repository='notes' filter="project(eq: {'location':'{{query.owner.0}}/{{query.name.0}}'})" >
+            <Scrum location="{{query.owner.0}}/{{query.name.0}}" />
+        </Storekeeper>
+    </Container>
     <Container expand="dynamic" id="security"><Text>Security</Text></Container>
     <Container expand="dynamic" id="wiki"><Text>Security</Text></Container>
     <Container expand="dynamic" id="settings"><Text>Configurazioni repo</Text></Container>

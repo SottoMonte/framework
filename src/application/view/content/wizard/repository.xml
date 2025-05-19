@@ -17,11 +17,15 @@
     <Container id="step2" title="Opzioni Avanzate">
         <Group type="input">
             <Text>Inizializza con README</Text>
-            <Input type="checkbox" id="init-readme" value="true" placeholder="Inizializza con README" />
+            <Input type="checkbox" id="init-readme" identifier="readme" value="true" placeholder="Inizializza con README" />
             <Text>Aggiungi .gitignore</Text>
-            <Input type="checkbox" id="add-gitignore" value="true" placeholder="Aggiungi .gitignore" />
+            <Input type="checkbox" id="add-gitignore" identifier="gitignore" value="true" placeholder="Aggiungi .gitignore" />
             <Text>Aggiungi Licenza</Text>
-            <Input type="checkbox" id="add-license" value="true" placeholder="Aggiungi licenza" />
+            <Input type="checkbox" id="add-license" identifier="license" value="true" placeholder="Aggiungi licenza" />
+            <Text>Aggiungi product backlog con IA</Text>
+            <Input type="checkbox" identifier="backlog" value="true" placeholder="Aggiungi licenza" />
+            <Text>Aggiungi Framework</Text>
+            <Input type="checkbox" identifier="framework" value="true" placeholder="Aggiungi licenza" />
         </Group>
         <Group type="input-group">
             <Action type="button" click="tab(id:'step1')" ><Text>Indietro</Text></Action>

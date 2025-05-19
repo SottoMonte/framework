@@ -139,7 +139,7 @@
     <!-- Tab -->
     <Group type="tab" expand="full">
         <Container id="tab-plan" expand="full">
-            <Storekeeper method="gather" repository='notes' filter="project(eq: [('location', '{{component.repository.owner}}/{{component.repository.name}}')])" >
+            <Storekeeper method="gather" repository='notes' filter="project(eq: {'location':'{{component.repository.owner}}/{{component.repository.name}}'})" >
                 <Scrum location="{{component.repository.owner}}/{{component.repository.name}}" />
             </Storekeeper>
         </Container>
