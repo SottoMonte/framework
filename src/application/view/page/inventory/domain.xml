@@ -1,6 +1,6 @@
 {% extends "sidebar.xml" %}
 {% block start %}
-<Storekeeper method="gather" alignment-content="horizontal" repository='domains' filter="project(eq: [('id', '{{query.id.0}}')])" >
+<Storekeeper method="gather" alignment-content="horizontal" repository='domains' filter="project(eq: {'id':'{{query.id.0}}'})" >
 {% endblock %}
 {% block fine %}
 </Storekeeper>
@@ -8,10 +8,10 @@
 {% block breadcrumb %}
 <Action route="application/view/page/inventory/overview.xml" ><Graph icon="bi-speedometer2"/></Action>
 <Action route="application/view/page/inventory/domains.xml" space="1" ><Graph icon="bi-globe"/><Text>Domains</Text></Action>
-<Action space="1" ><Graph icon="bi-file-earmark-post-fill"/><Text storekeeper="result.0.name"/></Action>
+<Action space="1" ><Graph icon="bi-file-earmark-post-fill"/><Text storekeeper="result.0.domain"/></Action>
 {% endblock %}
-{% block title %}Domain{% endblock %}
-{% block subtitle %}domain #<Text storekeeper="result.0.name"/>{% endblock %}
+{% block title %}Domain <Text storekeeper="result.0.domain"/>{% endblock %}
+{% block subtitle %}domain #<Text storekeeper="result.0.description"/>{% endblock %}
 {% block bar %}
 <SideBar from="inventory" select="application/view/page/inventory/domains.xml"/>
 {% endblock %}
@@ -30,17 +30,15 @@
             <Text>Informazioni Generali</Text>
         </Container>
         <Group type="list" class="list-group-flush" expand="vertical">
-            <Column alignment-content="between"><Text type="text">Name:</Text><Text storekeeper="result.0.name"/></Column>
+            <Column alignment-content="between"><Text type="text">Domain:</Text><Text storekeeper="result.0.domain"/></Column>
             <Column alignment-content="between"><Text type="text">Description:</Text><Text storekeeper="result.0.description"/></Column>
             <Column alignment-content="between"><Text type="text">Registrar:</Text><Text storekeeper="result.0.registrar"/></Column>
             <Column alignment-content="between"><Text type="text">Registrant:</Text><Text storekeeper="result.0.registrant"/></Column>
-            <Column alignment-content="between"><Text type="text">State:</Text><Text storekeeper="result.0.registrant"/></Column>
         </Group>
         <Container class="card-footer">
             <Column alignment-content="between">
-                <Text type="text">Created:</Text><Text storekeeper="result.0.created_at"/>
-                <Text type="text">Updated:</Text><Text storekeeper="result.0.updated_at"/>
-                <Text type="text">Expires:</Text><Text storekeeper="result.0.expires"/>
+                <Text type="text">Created:</Text><Text type="data" storekeeper="result.0.created_at"/>
+                <Text type="text">Updated:</Text><Text type="data" storekeeper="result.0.updated_at"/>
             </Column>
         </Container>
     </Container>
@@ -96,6 +94,7 @@
         <Container class="card-footer">
             <Column alignment-content="between">
                 <Text type="text">Auto-renew:</Text><Text storekeeper="result.0.policy"/>
+                <Text type="text">Expires:</Text><Text type="data" storekeeper="result.0.expires"/>
             </Column>
         </Container>
     </Container>

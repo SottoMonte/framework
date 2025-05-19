@@ -40,25 +40,26 @@ class adapter:
 
         # Applica i filtri dinamicamente
         if 'eq' in filters:
-            for field, value in filters['eq']:
-                query += f'.eq("{field}", "{value}")'
+            for field in filters['eq']:
+                query += f'.eq("{field}", "{filters['eq'][field]}")'
         if 'neq' in filters:
             for field, value in filters['neq']:
-                query += f'.neq("{field}", "{value}")'
+                query += f'.neq("{field}", "{filters['neq'][field]}")'
         if 'like' in filters:
             for field, value in filters['like']:
-                query += f'.like("{field}", "{value}")'
+                query += f'.like("{field}", "{filters['like'][field]}")'
         if 'ilike' in filters:
             for field, value in filters['ilike']:
-                query += f'.ilike("{field}", "{value}")'
+                query += f'.ilike("{field}", "{filters['ilike'][field]}")'
         if 'pagination' in filters:
-            for tuple in filters['pagination']:
-                start, end = tuple
+            for field in filters['pagination']:
+                start = filters['pagination'][field].get('start', 1)
+                end = filters['pagination'][field].get('end', 10)
                 start, end = (start - 1) * end, start * end - 1
                 query += f'.range({start}, {end})'
         if 'in' in filters:
             for field, value in filters['in']:
-                query += f'.in("{field}", {value})'
+                query += f'.in("{field}", {filters['pagination'][field]})'
 
         return query
 

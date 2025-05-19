@@ -4,7 +4,7 @@ import js
 @flow.asynchronous(managers=('messenger','presenter'))
 async def tab(messenger, presenter, **constants):
     
-    tab_id = constants['tab']  # ID della nuova tab da mostrare
+    tab_id = constants['id']  # ID della nuova tab da mostrare
     print(constants)
     
     # Mostra la nuova tab

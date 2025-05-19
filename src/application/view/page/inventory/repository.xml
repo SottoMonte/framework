@@ -1,11 +1,18 @@
 {% extends "sidebar.xml" %}
+{% block start %}
+<!-- [('owner', '{{query.owner.0}}'),('name', '{{query.name.0}}')] -->
+<Storekeeper method="gather" alignment-content="horizontal" repository='repository' filter="project(eq: {'owner':'{{query.owner.0}}','name':'{{query.name.0}}'})" >
+{% endblock %}
+{% block fine %}
+</Storekeeper>
+{% endblock %}
 {% block breadcrumb %}
 <Action route="application/view/page/inventory/overview.xml" ><Graph icon="bi-speedometer2"/></Action>
 <Action route="application/view/page/inventory/repositories.xml" ><Graph icon="bi-bookmarks-fill"/><Text>Repositories</Text></Action>
-<Action><Graph icon="bi-bookmark-fill"/><Text>git-321</Text></Action>
+<Action><Graph icon="bi-bookmark-fill"/><Text storekeeper="result.0.name"/></Action>
 {% endblock %}
-{% block title %}Repository{% endblock %}
-{% block subtitle %}repository #git-321{% endblock %}
+{% block title %}Repository <Text storekeeper="result.0.name"/>{% endblock %}
+{% block subtitle %}repository #{{query.name.0}}<Text storekeeper="result.0.description"/>{% endblock %}
 {% block bar %}
 <SideBar from="inventory" select="application/view/page/inventory/repositories.xml"/>
 {% endblock %}
@@ -23,17 +30,20 @@
             <Text>Generali</Text>
         </Container>  
         <Group type="list" class="list-group-flush" expand="vertical">
-            <Text>ID: git-321</Text>
-            <Text>Name: backend-api</Text>
-            <Text>Description: Microservizio API per autenticazione</Text>
-            <Text>Platform: GitHub</Text>
-            <Text>Language: Python</Text>
-            <Text>Tags: api, auth, fastapi</Text>
-            <Text>Owner: devops-team</Text>
-            <Text>Visibility: Private</Text>
+            <Column alignment-content="between"><Text type="text">ID:</Text><Text storekeeper="result.0.id"/></Column>
+            <Column alignment-content="between"><Text type="text">Name:</Text><Text storekeeper="result.0.name"/></Column>
+            <Column alignment-content="between"><Text type="text">Description:</Text><Text storekeeper="result.0.description"/></Column>
+            <Column alignment-content="between"><Text type="text">Platform:</Text><Text storekeeper="result.0.driver"/></Column>
+            <Column alignment-content="between"><Text type="text">Language:</Text><Text storekeeper="result.0.language"/></Column>
+            <Column alignment-content="between"><Text type="text">Tags:</Text><Text storekeeper="result.0.tags"/></Column>
+            <Column alignment-content="between"><Text type="text">Owner:</Text><Text storekeeper="result.0.ownerr"/></Column>
+            <Column alignment-content="between"><Text type="text">Visibility:</Text><Text storekeeper="result.0.private"/></Column>
         </Group>
         <Container class="card-footer">
-            <Text>Created: 2023-05-20 | Last Updated: 2025-04-10</Text>
+            <Column alignment-content="between">
+                <Text type="text">Created:</Text><Text type="data" storekeeper="result.0.created_at"/>
+                <Text type="text">Updated:</Text><Text type="data" storekeeper="result.0.updated_at"/>
+            </Column>
         </Container>   
     </Container>
 

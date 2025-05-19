@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Group type="tab" expand="full">
+    <!-- Step 1: Informazioni Base -->
+    <Container id="step1" title="Informazioni Base">
+        <Group type="input">
+            <Input type="text" identifier="name" placeholder="Nome repository" required="true" />
+            <Input type="text" id="description" identifier="description" placeholder="Descrizione" />
+            <Input type="select" id="visibility" identifier="visibility" placeholder="Visibilità" required="true">
+                <Text value="public">Pubblica</Text>
+                <Text value="private">Privata</Text>
+            </Input>
+        </Group>
+        <Action type="button" click="tab(id:'step2')" ><Text>Avanti</Text></Action>
+    </Container>
+
+    <!-- Step 2: Opzioni Avanzate -->
+    <Container id="step2" title="Opzioni Avanzate">
+        <Group type="input">
+            <Text>Inizializza con README</Text>
+            <Input type="checkbox" id="init-readme" value="true" placeholder="Inizializza con README" />
+            <Text>Aggiungi .gitignore</Text>
+            <Input type="checkbox" id="add-gitignore" value="true" placeholder="Aggiungi .gitignore" />
+            <Text>Aggiungi Licenza</Text>
+            <Input type="checkbox" id="add-license" value="true" placeholder="Aggiungi licenza" />
+        </Group>
+        <Group type="input-group">
+            <Action type="button" click="tab(id:'step1')" ><Text>Indietro</Text></Action>
+            <Action type="button" click="tab(id:'step3')" ><Text>Avanti</Text></Action>
+        </Group>
+    </Container>
+
+    <!-- Step 3: Conferma -->
+    <Container id="step3" title="Conferma">
+        <Text>Riepilogo repository:</Text>
+        <Graph type="table.body">
+            <Graph type="table.row">
+                <Text>Nome:</Text>
+                <Text storekeeper="repo-name" />
+            </Graph>
+            <Graph type="table.row">
+                <Text>Descrizione:</Text>
+                <Text storekeeper="description" />
+            </Graph>
+            <Graph type="table.row">
+                <Text>Visibilità:</Text>
+                <Text storekeeper="visibility" />
+            </Graph>
+            <Graph type="table.row">
+                <Text>README:</Text>
+                <Text storekeeper="init-readme" />
+            </Graph>
+            <Graph type="table.row">
+                <Text>.gitignore:</Text>
+                <Text storekeeper="add-gitignore" />
+            </Graph>
+            <Graph type="table.row">
+                <Text>Licenza:</Text>
+                <Text storekeeper="add-license" />
+            </Graph>
+        </Graph>
+        <Group type="input-group">
+            <Action type="button" click="tab(id:'step2')" ><Text>Indietro</Text></Action>
+            <Action type="submit" value="Crea/Aggiorna Repository" click="submitRepository" />
+        </Group>
+    </Container>
+</Group>

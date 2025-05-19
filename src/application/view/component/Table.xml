@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Container color="light" id="{{ component.id }}" margin="m-0" padding="p-0" >
     <Row expand="full">
-        <Window id="window-create" position="centered" size="xl" title="Create" action="Create">
-            <View url="application/view/content/wizard/client.xml" />
+        {% if component.attributes.create %}
+        <Window id="window-create" type="modal" position="centered" size="xl" title="Create" action="Create">
+            <View url="application/view/content/wizard/{{component.attributes.repository}}.xml" />
         </Window>
-        <Window id="window-update" position="centered" size="xl" title="Update" action="Update">
+        {% endif %}
+        {% if component.attributes.update %}
+        <Window id="window-update" type="modal" position="centered" size="xl" title="Update" action="Update">
                     
         </Window>
-        <Window id="window-delete" position="centered" size="xl" title="Delete" action="Delete">
+        {% endif %}
+        {% if component.attributes.delete %}
+        <Window id="window-delete" type="modal" position="centered" size="xl" title="Delete" action="Delete">
+            <Text>Are you sure you want to delete the following items?</Text>
             {% for x in component.selected %}
             <Text color="dark">{{x}}</Text>
             {% endfor %}
         </Window>
+        {% endif %}
         <Column expand="auto" padding="py-2">
             <Column expand="dynamic">
             <Group type="input">
@@ -27,9 +34,15 @@
             </Column>
             <Column>
             <Group type="input">
-                <Action size="sm" background="success" target="#window-create" ><Graph icon="bi-plus-square"/>Create</Action>
-                <Action size="sm" background="warning" target="#window-update" ><Graph icon="bi-pencil"/>Update</Action>
-                <Action  size="sm" background="danger" target="#window-delete"><Graph icon="bi-trash"/>Delete</Action>
+                {% if component.attributes.create %}
+                <Action size="sm" background="success" route="modal:window-create" ><Graph icon="bi-plus-square"/>Create</Action>
+                {% endif %}
+                {% if component.attributes.update %}
+                <Action size="sm" background="warning" route="modal:window-update" ><Graph icon="bi-pencil"/>Update</Action>
+                {% endif %}
+                {% if component.attributes.delete %}
+                <Action  size="sm" background="danger" route="modal:window-delete"><Graph icon="bi-trash"/>Delete</Action>
+                {% endif %}
                 <Graph icon="bi-command"/>
                 <Input type="select" color="light" width="150px">
                     <Text>Select action</Text>
@@ -48,7 +61,7 @@
                     </Graph>
                 </Graph>
             {% else %}
-                <Graph id="{{ component.id }}-table" init="table(id:'{{ component.id }}',repository:'{{ component.attributes.repository }}')" type="table" class="table-striped">
+                <Graph id="{{ component.id }}-table" init="table(id:'{{ component.id }}',repository:'{{ component.attributes.repository }}'{% if 'payload' in component.attributes %},payload:{{ component.attributes.payload }}{% endif %})"  type="table" class="table-striped">
                     <Graph type="table.head">
                         {{ inner }}
                     </Graph>

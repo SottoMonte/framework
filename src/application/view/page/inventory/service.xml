@@ -1,6 +1,6 @@
 {% extends "sidebar.xml" %}
 {% block start %}
-<Storekeeper method="gather" alignment-content="horizontal" repository='services' filter="project(eq: [('id', '{{query.id.0}}')])" >
+<Storekeeper method="gather" alignment-content="horizontal" repository='services' filter="project(eq: {'id':'{{query.id.0}}'})" >
 {% endblock %}
 {% block fine %}
 </Storekeeper>

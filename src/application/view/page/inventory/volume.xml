@@ -1,6 +1,6 @@
 {% extends "sidebar.xml" %}
 {% block start %}
-<Storekeeper method="gather" alignment-content="horizontal" repository='volumes' filter="project(eq: [('id', '{{query.id.0}}')])" >
+<Storekeeper method="gather" alignment-content="horizontal" repository='volumes' filter="project(eq: {'id':'{{query.id.0}}'})" >
 {% endblock %}
 {% block fine %}
 </Storekeeper>
@@ -30,15 +30,16 @@
         </Container>
         <Group type="list" class="list-group-flush" expand="vertical">
             <Column alignment-content="between"><Text type="text">ID:</Text><Text storekeeper="result.0.id"/></Column>
-            <Text>Name: Volume dati principale</Text>
-            <Text>Description: Archivio persistente per database</Text>
-            <Text>Status: 🟢 Attivo</Text>
-            <Text>Created: 2024-11-22</Text>
-            <Text>Mount Point: /data/db</Text>
-            <Text>Filesystem: ext4</Text>
+            <Column alignment-content="between"><Text type="text">Name:</Text><Text storekeeper="result.0.name"/></Column>
+            <Column alignment-content="between"><Text type="text">Description:</Text><Text storekeeper="result.0.description"/></Column>
+            <Column alignment-content="between"><Text type="text">Mount:</Text><Text storekeeper="result.0.mount"/></Column>
+            <Column alignment-content="between"><Text type="text">Driver:</Text><Text storekeeper="result.0.driver"/></Column>
         </Group>
         <Container class="card-footer">
-            <Text>Attached to: LXC-1000, VM-2001</Text>
+            <Column alignment-content="between">
+                <Text type="text">Created:</Text><Text type="data" storekeeper="result.0.created_at"/>
+                <Text type="text">Updated:</Text><Text type="data" storekeeper="result.0.updated_at"/>
+            </Column>
         </Container>
     </Container>
 
@@ -47,15 +48,16 @@
             <Text>Capacità  Utilizzo</Text>
         </Container>
         <Group type="list" class="list-group-flush" expand="vertical">
-            <Text>Size: 100 GB</Text>
+            <Column alignment-content="between"><Text type="text">Size:</Text><Text storekeeper="result.0.size"/></Column>
             <Text>Used: 45.3 GB</Text>
             <Text>Available: 54.7 GB</Text>
             <Text>Usage: 45%</Text>
-            <Text>Inodes: 15.2k / 100k</Text>
             <Text>Compression: zstd</Text>
         </Group>
         <Container class="card-footer">
-            <Text>Last Check: 2025-04-10 08:22</Text>
+            <Column alignment-content="between">
+                <Text type="text">State:</Text><Text storekeeper="result.0.state"/>
+            </Column>
         </Container>
     </Container>
 
@@ -71,7 +73,10 @@
             <Text>Encryption: AES-256</Text>
         </Group>
         <Container class="card-footer">
-            <Text>Next Backup: 2025-04-17 02:00</Text>
+            <Column alignment-content="between">
+                <Text type="text">Last Backup:</Text><Text storekeeper="result.0.last"/>
+                <Text type="text">Next Backup:</Text><Text storekeeper="result.0.next"/>
+            </Column>
         </Container>
     </Container>
 
@@ -87,7 +92,10 @@
             <Text>Audit Log: Active</Text>
         </Group>
         <Container class="card-footer">
-            <Text>Compliant ✅</Text>
+            <Column alignment-content="between">
+                <Text type="text">Policy:</Text><Text storekeeper="result.0.last"/>
+                <Text type="text">Alerte:</Text><Text storekeeper="result.0.next"/>
+            </Column>
         </Container>
     </Container>
 

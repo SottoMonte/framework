@@ -1,6 +1,35 @@
 modules = {'flow': 'framework.service.flow'}
 
-code_test = """
+@flow.asynchronous(managers=('messenger', 'storekeeper'))
+async def create(messenger, storekeeper, **constants):
+    model = constants.get('type', 'repository')
+    match model:
+        case 'file':
+            payload = await file(**constants)
+        case 'repository':
+            payload = await repository(**constants)
+        case 'note':
+            payload = await note(**constants)
+
+    print(f"Payload: {payload} | Repository: {model}")
+    transaction = await storekeeper.store(repository=model, payload=payload)
+    # Notifica il risultato del salvataggio
+    if transaction.get('state', False):
+        await messenger.post(domain='success', message=f"Creato ")
+    else:
+        await messenger.post(domain='error', message=f"Errore creazione ")
+
+@flow.asynchronous(managers=('messenger', 'storekeeper'),inputs='file')
+async def file(messenger, storekeeper, **constants):
+    """
+    Funzione asincrona per creare un file e gestire la comunicazione con i servizi di archiviazione e messaggistica.
+
+    Args:
+        messenger: Servizio di messaggistica per notifiche.
+        storekeeper: Servizio di archiviazione per salvare i dati.
+        **constants: Dizionario di parametri costanti.
+    """
+    code_test = """
 import unittest
 import asyncio
 
@@ -17,17 +46,6 @@ class Test(unittest.IsolatedAsyncioTestCase):
     def test_valid(self):
         self.assertTrue(False)
         #self.assertEqual(count, 2)"""
-
-@flow.asynchronous(managers=('messenger', 'storekeeper'))
-async def create(messenger, storekeeper, **constants):
-    """
-    Funzione asincrona per creare un file e gestire la comunicazione con i servizi di archiviazione e messaggistica.
-
-    Args:
-        messenger: Servizio di messaggistica per notifiche.
-        storekeeper: Servizio di archiviazione per salvare i dati.
-        **constants: Dizionario di parametri costanti.
-    """
     # Recupera il nome dal dizionario `constants` o usa un valore predefinito
     name = constants.get('name', '')
 
@@ -58,8 +76,11 @@ async def create(messenger, storekeeper, **constants):
     else:
         await messenger.post(domain='error', message=f"Errore creazione {constants.get('path', '')}{constants.get('name', '')}")
 
+@flow.asynchronous(managers=('messenger', 'storekeeper'),inputs='repository')
+async def repository(messenger, storekeeper, **constants):
+    return constants|{"private": False}
 
-@flow.asynchronous(managers=('messenger', 'storekeeper','presenter'),)
+@flow.asynchronous(managers=('messenger', 'storekeeper','presenter'),inputs='note')
 async def note(messenger, storekeeper, presenter, **constants):
     print(f"Note: {constants}")
     target = constants.get('target', '')

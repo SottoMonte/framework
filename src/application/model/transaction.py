@@ -10,14 +10,13 @@ Log delle Modifiche: Un registro delle modifiche apportate ai dati durante la tr
 Durata: Il tempo totale impiegato per completare la transazione.'''
 
 transaction = (
-    {'name':'identifier','type':'string'},
+    {'name':'identifier','type':'string','default':''},
     {'name':'state','type':'boolean','default':False},
-    {'name':'action','type':'string'},
+    {'name':'action','type':'string','default':'unknown'},
     {'name':'time','type':'string','default':'yyyy-mm-dd hh:mm:ss'},
     #{'name':'user','model':user.user},
-    {'name':'remark','type':'string'},
-    {'name':'worker','type':'string'},
-
+    {'name':'remark','type':'string','default':''},
+    {'name':'worker','type':'string','default':'unknown'},
     #{'name':'event','model':event.event},
     {'name':'parameters','type':'dict','default':{}},
     #{'name':'transaction','type':'list','default':[],'iterable':True},

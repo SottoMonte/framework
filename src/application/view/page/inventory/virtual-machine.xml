@@ -1,6 +1,6 @@
 {% extends "sidebar.xml" %}
 {% block start %}
-<Storekeeper method="gather" alignment-content="horizontal" repository='servers' filter="project(eq: [('id', '{{query.id.0}}')])" >
+<Storekeeper method="gather" alignment-content="horizontal" repository='servers' filter="project(eq: {'id':'{{query.id.0}}'})" >
 {% endblock %}
 {% block fine %}
 </Storekeeper>
@@ -42,8 +42,8 @@
         </Group>
         <Container class="card-footer">
             <Column alignment-content="between">
-                <Text type="text">State:</Text><Text storekeeper="result.0.state"/>
-                <Text type="text">Uptime:</Text><Text storekeeper="result.0.state"/>
+                <Text type="text">Created:</Text><Text type="data" storekeeper="result.0.created_at"/>
+                <Text type="text">Updated:</Text><Text type="data" storekeeper="result.0.updated_at"/>
             </Column>
         </Container>
     </Container>
@@ -62,8 +62,8 @@
         </Group>
         <Container class="card-footer">
             <Column alignment-content="between">
-                <Text type="text">Created:</Text><Text storekeeper="result.0.created_at"/>
-                <Text type="text">Updated:</Text><Text storekeeper="result.0.updated_at"/>
+                <Text type="text">State:</Text><Text storekeeper="result.0.state"/>
+                <Text type="text">Uptime:</Text><Text storekeeper="result.0.state"/>
             </Column>
         </Container>
     </Container>

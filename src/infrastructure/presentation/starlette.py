@@ -2,6 +2,7 @@ import uuid
 import asyncio
 from html import escape
 import json
+from datetime import datetime
 
 modules = {'flow': 'framework.service.flow'}
 
@@ -928,13 +929,14 @@ class adapter():
                         return obj
                     case 'modal':
                         btn_act = self.code('button',{'class':'btn btn-success'},[action.capitalize()])
-                        self.att(btn_act,{'click':f"form(id:'form-{action}',action:'{action}')"})
+                        self.att(btn_act,{'click':f"form(id:'form-{action}',action:'{action.lower()}')"})
+                        form = self.code('form',{'id':f'form-{action}','action':'/'+action,'method':'POST'},inner)
                         # 'onclick':f'document.getElementById(\'form-{action}\').submit();'
                         return self.code('div',{'id':id,'class':'modal','data-bs-backdrop':'false'},[
                             self.code('div',{'class':f'modal-dialog modal-{size} modal-dialog-centered modal-dialog-scrollable'},[
                                 self.code('div',{'class':'modal-content'},[
                                     self.code('div',{'class':'modal-header'}),
-                                    self.code('div',{'class':'modal-body'},inner),
+                                    self.code('div',{'class':'modal-body'},[form]),
                                     self.code('div',{'class':'modal-footer'},[
                                         self.code('button',{'class':'btn btn-secondary','data-bs-dismiss':'modal'},['Close']),
                                         btn_act
@@ -971,6 +973,14 @@ class adapter():
                     case 'text':
                         if text:
                             text = escape(text)
+                        obj = self.code('p',{'class':'fw-lighter p-0 m-0','type':'data'},text)
+                        self.att(obj,att)
+                        return obj
+                    case 'data':
+                        if text:
+                            text = escape(text)
+                        dt = datetime.fromisoformat(text)
+                        text = dt.strftime('%Y-%m-%d %H:%M')
                         obj = self.code('p',{'class':'fw-lighter p-0 m-0','type':'data'},text)
                         self.att(obj,att)
                         return obj

@@ -84,7 +84,7 @@ class adapter():
         
     @flow.asynchronous(outputs='transaction')
     async def create(self, **constants):
-        return await self.request(**constants|{'method':'PUT'})
+        return await self.request(**constants|{'method':'POST'})
 
     @flow.asynchronous(outputs='transaction')
     async def delete(self, **constants):

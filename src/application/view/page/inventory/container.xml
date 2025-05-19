@@ -1,6 +1,6 @@
 {% extends "sidebar.xml" %}
 {% block start %}
-<Storekeeper method="gather" alignment-content="horizontal" repository='containers' filter="project(eq: [('id', '{{query.id.0}}')])" >
+<Storekeeper method="gather" alignment-content="horizontal" repository='containers' filter="project(eq: {'id':'{{query.id.0}}'})" >
 {% endblock %}
 {% block fine %}
 </Storekeeper>
@@ -8,10 +8,10 @@
 {% block breadcrumb %}
 <Action route="application/view/page/inventory/overview.xml" ><Graph icon="bi-speedometer2"/></Action>
 <Action route="application/view/page/inventory/containers.xml" space="1" ><Graph icon="bi-box-seam-fill"/><Text>Containers</Text></Action>
-<Action space="1" ><Graph icon="bi-box-seam-fill"/><Text>lxc-1001</Text></Action>
+<Action space="1" ><Graph icon="bi-box-seam-fill"/><Text storekeeper="result.0.name"/></Action>
 {% endblock %}
-{% block title %}Container{% endblock %}
-{% block subtitle %}container #lxc-1001{% endblock %}
+{% block title %}Container <Text storekeeper="result.0.name"/>{% endblock %}
+{% block subtitle %}<Text storekeeper="result.0.description"/>{% endblock %}
 {% block bar %}
 <SideBar from="inventory" select="application/view/page/inventory/containers.xml"/>
 {% endblock %}
@@ -31,16 +31,19 @@
             <Text>General</Text>
         </Container>
         <Group type="list" class="list-group-flush" expand="vertical">
-            <Text>ID: lxc-1001</Text>
-            <Text>Name: nginx-container</Text>
-            <Text>Description: Reverse proxy per servizi interni</Text>
-            <Text>Image: nginx:latest</Text>
-            <Text>Tags: Web, Proxy</Text>
-            <Text>Owner: admin</Text>
-            <Text>Location: node01</Text>
+            <Column alignment-content="between"><Text type="text">ID:</Text><Text storekeeper="result.0.id"/></Column>
+            <Column alignment-content="between"><Text type="text">Name:</Text><Text storekeeper="result.0.name"/></Column>
+            <Column alignment-content="between"><Text type="text">Description:</Text><Text storekeeper="result.0.description"/></Column>
+            <Column alignment-content="between"><Text type="text">Image:</Text><Text storekeeper="result.0.image"/></Column>
+            <Column alignment-content="between"><Text type="text">Tags:</Text><Text storekeeper="result.0.tags"/></Column>
+            <Column alignment-content="between"><Text type="text">Owner:</Text><Text storekeeper="result.0.owner"/></Column>
+            <Column alignment-content="between"><Text type="text">Location:</Text><Text storekeeper="result.0.location"/></Column>
         </Group>
         <Container class="card-footer">
-            <Text>State: 🟢 Running | Uptime: 2h 12m</Text>
+            <Column alignment-content="between">
+                <Text type="text">Created:</Text><Text type="data" storekeeper="result.0.created_at"/>
+                <Text type="text">Updated:</Text><Text type="data" storekeeper="result.0.updated_at"/>
+            </Column>
         </Container>
     </Container>
 
@@ -49,14 +52,15 @@
             <Text>Resources</Text>
         </Container>
         <Group type="list" class="list-group-flush" expand="vertical">
-            <Text>CPU: 2 vCPU</Text>
-            <Text>RAM: 512 MB</Text>
-            <Text>Disk: 3.1 GB / 10 GB</Text>
-            <Text>Snapshot: Nessuno</Text>
-            <Text>Firewall: Attivo</Text>
+            <Column alignment-content="between"><Text type="text">CPU:</Text><Text storekeeper="result.0.cpu"/></Column>
+            <Column alignment-content="between"><Text type="text">RAM:</Text><Text storekeeper="result.0.ram"/></Column>
+            <Column alignment-content="between"><Text type="text">Disk:</Text><Text storekeeper="result.0.disk"/></Column>
         </Group>
         <Container class="card-footer">
-            <Text>Created: 2025-04-12 09:50 | Updated: 2025-04-15 21:10</Text>
+            <Column alignment-content="between">
+                <Text type="text">State:</Text><Text storekeeper="result.0.state"/>
+                <Text type="text">Uptime:</Text><Text storekeeper="result.0.state"/>
+            </Column>
         </Container>
     </Container>
 
@@ -99,6 +103,8 @@
         </Container>
         <Group type="list" class="list-group-flush" expand="vertical">
             <Text>Security Profile: default</Text>
+            <Text>Snapshot: Nessuno</Text>
+            <Text>Firewall: Attivo</Text>
             <Text>Seccomp: enabled</Text>
             <Text>AppArmor: enforced</Text>
             <Text>Capabilities dropped: NET_RAW</Text>
