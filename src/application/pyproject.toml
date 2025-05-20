@@ -36,7 +36,7 @@ domain = "backlog.producer,test"
 url = "https://openrouter.ai/api/v1/chat/completions"
 authorization = "Bearer"
 accept = "application/json"
-token = "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"
+token = "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"
 
 [message.programmer]
 adapter = "api"

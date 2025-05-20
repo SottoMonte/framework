@@ -1,13 +1,30 @@
 modules = {'flow': 'framework.service.flow'}
 
 import asyncio
+import re
 
-async def handle_response(messenger):
-    while True:
-        print("In attesa di una risposta...")
-        response = await messenger.read(domain='backlog.producer')
-        print("Risposta ricevuta:", response)
-        await asyncio.sleep(1)
+async def handle_response(messenger, constants):
+    
+    print("In attesa di una risposta...")
+    response = await messenger.read(domain='backlog.producer')
+    print("Risposta ricevuta:", response)
+    # Estrae tutto il contenuto tra ```python e ```
+    match = re.search(r"```python\n(.*?)```", response.get('message'), re.DOTALL)
+
+    if match:
+        codice_estratto = match.group(1)
+        # 2. Esegui il codice in un namespace isolato
+        namespace = {}
+        exec(codice_estratto, {}, namespace)
+
+        # 3. Estrai la variabile
+        product_backlog = namespace.get("product_backlog")
+        if product_backlog:
+            for voce in product_backlog:
+                await note(text=voce['text'],location=f"SottoMonte/{constants.get('name')}",type="backlog.product",owner="99938d7a-ec20-4ad2-b319-60b3833be160")
+        print(codice_estratto)
+    else:
+        print("Nessun blocco di codice trovato.")
 
 @flow.asynchronous(managers=('messenger', 'storekeeper'))
 async def create(messenger, storekeeper, **constants):
@@ -18,21 +35,21 @@ async def create(messenger, storekeeper, **constants):
             payload = await file(**constants)
         case 'repository':
             if 'backlog' in constants:
-                await asyncio.create_task(handle_response(messenger))
-                await asyncio.sleep(3)
+                asyncio.create_task(handle_response(messenger,constants))
+                #await asyncio.sleep(3)
                 msg = await messenger.post(domain='backlog.producer', message=f"Rispondimi come se fossi un product owner che utilizza metologie agile framework SCRUM ! commando : creami una lista Product Backlog sottoforma di una lista dizionario con i seguneti campi (text,title,) in python  per :{constants.get('description', '')}")
                 print('msg:', msg)
             payload = await repository(**constants)
         case 'note':
             payload = await note(**constants)
 
-    print(f"Payload: {payload} | Repository: {model}")
-    '''transaction = await storekeeper.store(repository=model, payload=payload)
+    # Salva il file principale
+    transaction = await storekeeper.store(repository=model, payload=payload)
     # Notifica il risultato del salvataggio
     if transaction.get('state', False):
         await messenger.post(domain='success', message=f"Creato ")
     else:
-        await messenger.post(domain='error', message=f"Errore creazione ")'''
+        await messenger.post(domain='error', message=f"Errore creazione ")
 
 @flow.asynchronous(managers=('messenger', 'storekeeper'),inputs='file')
 async def file(messenger, storekeeper, **constants):
@@ -94,27 +111,15 @@ class Test(unittest.IsolatedAsyncioTestCase):
 @flow.asynchronous(managers=('messenger', 'storekeeper'),inputs='repository')
 async def repository(messenger, storekeeper, **constants):
     return constants|{"private": False}
-
+    
 @flow.asynchronous(managers=('messenger', 'storekeeper','presenter'),inputs='note')
 async def note(messenger, storekeeper, presenter, **constants):
     print(f"Note: {constants}")
-    target = constants.get('target', '')
-    component = await presenter.component(name=target)
-    print(f"Component: {component}")
-    id = language.get('attributes.identifier', component)
-    filters = {
-        'eq': [('id', id)],
-        #'neq': [('age', '30')],
-        #'like': [('email', '%example.com')],
-        #'ilike': [('city', '%rome%')]
-    }
-    #payload=constants
     
 
-    response = await storekeeper.change(repository='notes', filter=filters, payload={'type':constants.get('data', '')})
-    '''response = await storekeeper.store(repository='notes', payload=constants)
-
-    # Notifica il risultato del salvataggio
+    response = await storekeeper.store(repository='notes', payload=constants)
+    print(f"Response: {response}")
+    '''# Notifica il risultato del salvataggio
     if response.get('state', False):
         await messenger.post(domain='success', message=f"Creato {constants.get('path', '')}{constants.get('name', '')}")
     else:

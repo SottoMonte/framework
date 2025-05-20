@@ -119,6 +119,7 @@ class adapter():
         
     @flow.asynchronous(outputs='transaction')
     async def post(self, **constants):
+        print(f"DEBUG - Post: {constants}")
         return await self.request(**constants|{'method':'POST'})
 
     @flow.asynchronous()
