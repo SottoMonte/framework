@@ -100,16 +100,60 @@ SottoMonte prevede l'uso di TypeScript per lo sviluppo del frontend, sfruttando 
    python3 public/app.py
    ```
 
-
-
 ## 📁 Struttura del Progetto
 
-* `src/`: Contiene il codice sorgente principale del framework.
-* `public/`: File pubblici e punto di ingresso dell'applicazione (`app.py`).
-* `doc/`: Documentazione e risorse aggiuntive.
-* `Dockerfile`: Configurazione per la containerizzazione dell'applicazione.
-* `Procfile`: Specifiche per il deployment su piattaforme come Heroku.
-* `requirements.txt`: Elenco delle dipendenze Python necessarie.
+### `/src/`
+
+Contiene il codice sorgente principale suddiviso in tre macro-aree secondo l'architettura a port and adapter (Hexagonal Architecture):
+
+#### 📁 `framework/`
+
+* **`manager/`**: logiche di coordinamento e orchestrazione dei componenti.
+* **`service/`**: servizi di business logic, astratti dall’infrastruttura.
+* **`port/`**: porte (interfacce) per l’inversione di controllo.
+
+#### 📁 `infrastructure/`
+
+* **`encryption/`**: crittografia, hashing e firme digitali.
+* **`presentation/`**: interfacce utente o API esterne.
+* **`sensor/`**: raccolta dati da hardware o stream.
+* **`actuator/`**: componenti che agiscono nel mondo reale o simulato.
+* **`authentication/`**: autenticazione, gestione utenti e ruoli.
+* **`perception/`**: elaborazione dati e analisi (ML, AI).
+* **`message/`**: messaggistica asincrona, pub/sub.
+* **`persistence/`**: accesso a DB, file system e cache.
+* **`test/`**: mock e implementazioni per test.
+
+#### 📁 `application/`
+
+* **`model/`**: definizione entità e oggetti valore.
+* **`policy/`**: regole aziendali e vincoli di dominio.
+* **`repository/`**: pattern repository per la persistenza.
+* **`view/`**:
+
+  * **`layout/`**: template di layout condivisi.
+  * **`component/`**: componenti UI riutilizzabili.
+  * **`content/`**: contenuti visuali (form, modal, wizard, tab, card, table).
+  * **`page/`**: pagine applicative:
+
+    * `auth`, `inventory`, `erp`, `crm`, `plan`, `error`, `cms`
+* **`locales/`**: file di traduzione e internazionalizzazione.
+* **`action/`**: comandi e interazioni utente.
+
+### `/public/`
+
+Contiene il punto di ingresso (`app.py`) e asset statici.
+
+### `/doc/`
+
+Risorse aggiuntive e guide.
+
+### Radice del progetto
+
+* `Dockerfile`: containerizzazione.
+* `Procfile`: deployment (Heroku).
+* `requirements.txt`: dipendenze Python.
+
 
 ## 📌 Roadmap e TODO
 
