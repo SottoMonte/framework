@@ -10,7 +10,7 @@
 {% endblock %}
 {% block content %}
 <Container background="#fafafa" size="fluid" padding="p-4" expand="True" class="border-top border-bottom">
-    <Table repository="repository" payload="{'owner':'SottoMonte'}" view="repository" create="wizard" delete="wizard" update="wizard">
+    <Table repository="repository" filter="{'eq':{'owner':'SottoMonte'}}" view="repository" create="wizard" delete="wizard" update="wizard">
         <Text click="table(id:'{{ component or '' }}',sortField:'name')">Repository</Text>
         <Text>Description</Text>
         <Text>Type</Text>

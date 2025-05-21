@@ -34,13 +34,13 @@
             </Column>
             <Column>
             <Group type="input">
-                {% if component.attributes.create %}
+                {% if 'create' in component.attributes %}
                 <Action size="sm" background="success" route="modal:window-create" ><Graph icon="bi-plus-square"/>Create</Action>
                 {% endif %}
-                {% if component.attributes.update %}
+                {% if 'update' in component.attributes %}
                 <Action size="sm" background="warning" route="modal:window-update" ><Graph icon="bi-pencil"/>Update</Action>
                 {% endif %}
-                {% if component.attributes.delete %}
+                {% if 'delete' in component.attributes %}
                 <Action  size="sm" background="danger" route="modal:window-delete"><Graph icon="bi-trash"/>Delete</Action>
                 {% endif %}
                 <Graph icon="bi-command"/>
@@ -57,16 +57,25 @@
                         {{ inner }}
                     </Graph>
                     <Graph type="table.body" id="{{ component.id }}-body">
-                        <View url="application/view/content/table/{{ component.attributes.view }}.xml" />
+                        {% for row in storekeeper.result %}
+                        
+                        <View url="application/view/content/table/{{ component.attributes.view }}.xml" data="result.{{ loop.index0 }}" >
+                            <Graph type="table.cell">
+                                <Input type="checkbox" click="table(id:'{{ component.id }}',selected:'{{row.id}}')" identifier="id[]" />
+                            </Graph>
+                        </View>
+                        {% endfor %}
                     </Graph>
                 </Graph>
             {% else %}
-                <Graph id="{{ component.id }}-table" init="table(id:'{{ component.id }}',repository:'{{ component.attributes.repository }}'{% if 'payload' in component.attributes %},payload:{{ component.attributes.payload }}{% endif %})"  type="table" class="table-striped">
+                <Graph id="{{ component.id }}-table" init="table(id:'{{ component.id }}',repository:'{{ component.attributes.repository }}'{% if 'filter' in component.attributes %},filter:{{ component.attributes.filter }}{% endif %})"  type="table" class="table-striped">
                     <Graph type="table.head">
                         {{ inner }}
                     </Graph>
                     <Graph type="table.body" id="{{ component.id }}-body">
-                        <View url="application/view/content/table/{{ component.attributes.view }}.xml" />
+                        <View url="application/view/content/table/{{ component.attributes.view }}.xml" >
+                            <Text class="BOOOMTIC">CIAO</Text>
+                        </View>
                     </Graph>
                 </Graph>
                 <Action  />

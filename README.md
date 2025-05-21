@@ -12,6 +12,36 @@ Il **SottoMonte Framework** è una piattaforma modulare e flessibile progettata 
 
 ---
 
+### ⚙️ Configurazione Dichiarativa
+
+SottoMonte adotta un approccio dichiarativo per la configurazione delle applicazioni, riducendo la necessità di codice imperativo e facilitando la gestione centralizzata delle impostazioni. La configurazione avviene tramite file YAML o JSON, che descrivono:
+
+- **Moduli da caricare**: elenco dei moduli e delle dipendenze.
+- **Provider di servizi**: configurazione dei servizi (database, autenticazione, storage, ecc.).
+- **Routing**: definizione delle rotte e delle azioni associate.
+- **Parametri di ambiente**: variabili e segreti gestiti in modo sicuro.
+- **Internazionalizzazione**: lingue supportate e fallback.
+
+```toml
+[app]
+name = "hub"
+identifier = "cloud.colosso.app"
+key = "{{ SECRET_KEY }}"
+version = "0.0.1"
+readme = "README.md"
+requires-python = ">=3.8"
+
+# Configurazione della presentazione
+[presentation.web]
+adapter = "wasm"
+host = "0.0.0.0"
+port = "8000"
+view = "page/welcome.xml"
+routes = "policy/web.xml"
+```
+
+---
+
 ### 🧩 Architettura Modulare e Dinamica
 
 SottoMonte adotta un'architettura modulare, con una struttura ben organizzata delle cartelle e dei file. La directory principale `/src/` contiene sottocartelle come `core/`, `models/`, `services/` e `controllers/`, ciascuna con responsabilità specifiche. Questa separazione dei compiti facilita la manutenzione e l'estensibilità del codice.
@@ -42,6 +72,17 @@ SottoMonte integra Supabase come soluzione per la persistenza dei dati. Supabase
 
 ---
 
+### 🎨 Template Engine
+
+SottoMonte supporta **motori di template HTML** e il rendering dinamico attraverso WebAssembly (WASM). Le caratteristiche includono:
+
+- Separazione chiara tra logica e presentazione.
+- Supporto a linguaggi come Jinja2 o compatibilità simil-Vue/React.
+- **Binding dei dati bidirezionale** nei template client.
+- Supporto multilingua con interpolazione dinamica (`i18n`).
+
+---
+
 ### 🧪 Utilizzo di WebAssembly (WASM) per la Presentazione
 
 Il framework prevede l'uso di WebAssembly (WASM) per migliorare le prestazioni della presentazione dell'applicazione. WASM consente di eseguire codice ad alte prestazioni nel browser, offrendo un'esperienza utente più fluida e reattiva.
@@ -54,9 +95,42 @@ SottoMonte include strumenti per facilitare le pratiche DevOps, come l'automazio
 
 ---
 
+## 🧭 Pattern MVA (Model-View-Action)
+
+SottoMonte adotta un'evoluzione del classico MVC, definita **MVA - Model View Action**:
+
+- **Model**: Definisce le entità del dominio e la logica di accesso ai dati.
+- **View**: È gestita tramite template HTML o WASM con data-binding.
+- **Action**: Le azioni (anziché controller) sono unità indipendenti e modulari, caricate dinamicamente.
+
+Ogni **azione** rappresenta una singola funzionalità o endpoint, rendendo il codice molto più granularizzato rispetto a controller monolitici.
+
+---
+
 ### 📊 Binding dei Dati e Logging Avanzato
 
 Il framework offre meccanismi avanzati per il binding dei dati tra il frontend e il backend, migliorando la sincronizzazione delle informazioni. Inoltre, include un sistema di logging e messaggistica potenziato, utile per il monitoraggio e il debug dell'applicazione.
+
+---
+
+### 🧪 Testabilità Nativa
+
+* Ogni componente può essere testato in isolamento.
+* Il contenitore DI permette mocking e sostituzioni controllate.
+* Le azioni sono testabili come unità singole (senza il framework completo).
+* TTD
+
+---
+
+### 🧠 Dependency Injection (DI)
+
+Il framework implementa un **contenitore di iniezione delle dipendenze personalizzato** , con queste funzionalità:
+
+- Registrazione esplicita dei provider
+- Recupero delle istanze in modo lazy.
+- Supporto a dipendenze complesse e nidificate.
+- Controllo del ciclo di vita delle istanze (singleton, factory).
+- Estensione possibile tramite annotazioni o decorators.
 
 ---
 

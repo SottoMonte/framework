@@ -136,6 +136,11 @@ class adapter():
             text = await self.host(constants)
 
         template = self.env.from_string(text)
+        if 'data' not in constants:
+            constants['data'] = {}
+        if 'view' not in constants:
+            constants['view'] = {}
+
         content = template.render(constants)
         xml = ET.fromstring(content)
         view = await self.mount_view(xml,constants)
@@ -457,6 +462,36 @@ class adapter():
         else:
             return f'<{tag} {att} />'
 
+    def code_update(self, view, attr={}, inner=[], position='end'):
+        """
+        Modifica una vista HTML già esistente (stringa):
+        - aggiorna gli attributi secondo 'attr'
+        - aggiunge i figli di 'inner' (lista di stringhe HTML/XML) come figli del nodo root
+        in base a 'position': 'start' (inizio) o 'end' (fine, default)
+        """
+        soup = BeautifulSoup(view, 'html.parser')
+        root = soup.find()  # Prende il primo nodo root
+
+        # Aggiorna attributi
+        if root and attr:
+            for key, value in attr.items():
+                root[key] = value
+
+        # Aggiungi nuovi figli
+        if root and inner:
+            if position == 'start':
+                for item in reversed(inner):  # reversed per mantenere l'ordine originale
+                    child = BeautifulSoup(item, 'html.parser')
+                    for c in reversed(child.contents):
+                        root.insert(0, c)
+            else:  # 'end' (default)
+                for item in inner:
+                    child = BeautifulSoup(item, 'html.parser')
+                    for c in child.contents:
+                        root.append(c)
+
+        return str(soup)
+
     def att(self,element,attributes):
         pass
 
@@ -541,7 +576,7 @@ class adapter():
 
     @flow.asynchronous(managers=('storekeeper','messenger'))
     async def mount_view(self,root,data,storekeeper,messenger):
-        tags = ['Messenger','Graph','Message','Input','Action','Window','Text','Group','Layout']
+        tags = ['View','Messenger','Graph','Message','Input','Action','Window','Text','Group','Layout']
         inner = []
 
         tag = root.tag
@@ -698,10 +733,11 @@ class adapter():
                         tr = self.code('tr',{},row)
                         thead = self.code('thead',{},[tr])
                         return thead
-                    case 'table.body':
+                    case 'table.bodyy':
                         new = []
                         storekeeper = data.get('storekeeper', {})
                         results = storekeeper.get('result', {})
+                        #print('View:elements:',elements)
                         for result in results:
                             #print(result)
                             built = await self.mount_view(elements[0],{'storekeeper': result})
@@ -718,6 +754,11 @@ class adapter():
                         tbody = self.code('tbody', {}, new)
                         self.att(tbody, att)
                         return tbody
+                    case 'table.body':
+                        
+                        tbody = self.code('tbody', {}, inner)
+                        self.att(tbody, att)
+                        return tbody
                     case 'table.row':
                         row = []
                         for x in inner:
@@ -726,6 +767,10 @@ class adapter():
                         tr = self.code('tr',{},row)
                         self.att(tr,att)
                         return tr
+                    case 'table.cell':
+                        th = self.code('td',{},inner)
+                        self.att(th,att)
+                        return th
                     case 'carousel':
                         ind = []
                         for item in inner:
@@ -808,6 +853,7 @@ class adapter():
                         self.att(out,att)
                         return out
             case 'View':
+                
                 if 'storekeeper' in data and 'storekeeper' in att:
                     if type(data['storekeeper']) == type(dict()):
                         text = str(language.get(att['storekeeper'],data['storekeeper']))
@@ -818,7 +864,12 @@ class adapter():
                     print('View-data:',data)
                     view = await self.builder(**data|{'text':data['code']})
                 elif 'url' in att:
-                    view = await self.builder(**data|{'url':att['url']})
+                    dataview = None
+                    if 'data' in att:
+                        dataview = att['data']
+                        dataview = language.get(dataview,data['storekeeper'])
+                    view = await self.builder(**data|{'url':att['url'],'data':dataview})
+                    view = self.code_update(view, {}, inner,'start')
                 elif 'content' in att:
                     view = await self.builder(**data|{'url':'application/view/content/'+att['content']})
                 else:
@@ -830,6 +881,7 @@ class adapter():
                         self.components[id] = {'id': id}
                     a = self.code('div',{'class':'container-fluid d-flex flex-row p-0 m-0'},[view])
                     self.att(a,att)
+                    #print('View:',view,'inner',inner)
                     return a
                 else:
                     return view
@@ -837,6 +889,11 @@ class adapter():
                 tipo = att['type'] if 'type' in att else 'None'
                 tipi = ["button","checkbox","color","date","datetime-local","email","file","hidden","image","month","number","password","radio","range","reset","search","submit","tel","text","time","url","week"]
                 valor = att['value'] if 'value' in att else ''
+                if 'storekeeper' in data and 'storekeeper' in att:
+                    if type(data['storekeeper']) == type(dict()):
+                        valor = str(language.get(att['storekeeper'],data['storekeeper']))
+                    else:
+                        valor = str(data['storekeeper'])
                 placeholder = att['placeholder'] if 'placeholder' in att else ''
                 match tipo:
                     case 'select':
@@ -851,7 +908,7 @@ class adapter():
                         self.att(input,att)
                         return input
                     case 'checkbox':
-                        input = self.code('input',{'class':'form-check form-check-input','type':'checkbox'})
+                        input = self.code('input',{'class':'form-check form-check-input','type':'checkbox','value':valor})
                         self.att(input,att)
                         return input
                     case 'textarea':
@@ -859,7 +916,7 @@ class adapter():
                         self.att(input,att)
                         return input
                     case 'radio':
-                        input = self.code('input',{'class':'form-check form-check-input','type':'radio'})
+                        input = self.code('input',{'class':'form-check form-check-input','type':'radio','value':valor,})
                         self.att(input,att)
                         return input
                     case 'switch':
@@ -867,11 +924,11 @@ class adapter():
                         self.att(input,att)
                         return input
                     case 'color':
-                        input = self.code('input',{'class':'form-control form-control-color','type':'color'})
+                        input = self.code('input',{'class':'form-control form-control-color','type':'color','value':valor})
                         self.att(input,att)
                         return input
                     case 'range':
-                        input = self.code('input',{'class':'form-range','type':'range'})
+                        input = self.code('input',{'class':'form-range','type':'range','value':valor,})
                         self.att(input,att)
                         return input
                     case _:
@@ -1189,7 +1246,8 @@ class adapter():
 
                 self.att(view, att|{'component':tag})
                 return view
-                                 
+            
+                    
     def mount_route(self,routes,url):
         gg = untangle.parse(url)
         #print(gg)

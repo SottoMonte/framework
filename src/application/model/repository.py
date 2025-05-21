@@ -7,8 +7,8 @@ repository = (
     {'name': 'private', 'type': 'bool', 'default': False,},
     {'name': 'owner', 'type': 'string', 'default': '0000', 'regex': r'^[a-zA-Z0-9_-]+$'},
     {'name': 'location', 'type': 'string', 'default': '0000', 'regex': r'^[a-zA-Z0-9_-]+$'},
-    {'name': 'updated_at', 'type': 'string', 'default': '000', 'regex': r'^[a-zA-Z0-9_-]+$'},
-    {'name': 'created_at', 'type': 'string', 'default': '0000', 'regex': r'^[a-zA-Z0-9_-]+$'},
+    {'name': 'updated', 'type': 'string', 'default': '000', 'regex': r'^[a-zA-Z0-9_-]+$'},
+    {'name': 'created', 'type': 'string', 'default': '0000', 'regex': r'^[a-zA-Z0-9_-]+$'},
     {'name': 'tree', 'type': 'list', 'default': []},
     {'name': 'sha', 'type': 'string', 'default': ''},
 )

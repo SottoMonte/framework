@@ -663,6 +663,50 @@ class adapter(starlette.adapter):
 
               #routes.append(route)
 
+        def code_update(self, view, attr={}, inner=[], position='end'):
+          """
+          Modifica un elemento DOM esistente:
+          - aggiorna gli attributi secondo 'attr'
+          - aggiunge i figli di 'inner' (lista di elementi DOM o stringhe HTML)
+            in base a 'position': 'start' (inizio) o 'end' (fine, default)
+          """
+          # Aggiorna attributi
+          for key in attr:
+              view.setAttribute(key, attr[key])
+
+          # Aggiungi nuovi figli
+          if isinstance(inner, list):
+              if position == 'start':
+                  # Inserisci in ordine inverso per mantenere l'ordine originale
+                  for item in reversed(inner):
+                      if hasattr(item, 'nodeType'):
+                          view.insertBefore(item, view.firstChild)
+                      elif isinstance(item, str):
+                          temp = js.document.createElement('div')
+                          temp.innerHTML = item
+                          # Inserisci ogni nodo figlio all'inizio
+                          for child in reversed(list(temp.childNodes)):
+                              view.insertBefore(child, view.firstChild)
+              else:  # 'end' (default)
+                  for item in inner:
+                      if hasattr(item, 'nodeType'):
+                          view.append(item)
+                      elif isinstance(item, str):
+                          temp = js.document.createElement('div')
+                          temp.innerHTML = item
+                          for child in temp.childNodes:
+                              view.append(child)
+          elif isinstance(inner, str):
+              if position == 'start':
+                  temp = js.document.createElement('div')
+                  temp.innerHTML = inner
+                  for child in reversed(list(temp.childNodes)):
+                      view.insertBefore(child, view.firstChild)
+              else:
+                  view.innerHTML += inner
+
+          return view
+
         def code(self,tag,attr,inner=[]):
           tag = js.document.createElement(tag)
           for key in attr:
