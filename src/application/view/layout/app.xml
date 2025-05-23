@@ -8,21 +8,23 @@
                 <Graph src="static/text.png" height="40px" />
             </Column>
             <Column expand="dynamic" alignment-horizontal="center" >
+                <!-- 
                 <Action type="dropdown" border="end" id="lazio" >
                     <Action id="nn1" route="application/view/page/crm/overview.xml" click="move(target:'nn1',place:'lazio-btn')" alignment-content="horizontal" ><Graph icon="bi-buildings-fill"/><Text padding="px-1">Colosso</Text></Action>
                     <Action id="nn2" route="application/view/page/crm/overview.xml" click="move(target:'nn2',place:'lazio-btn')" alignment-content="horizontal" ><Graph icon="bi-person-fill"/><Text padding="px-1">SottoMonte</Text></Action>
                 </Action>
+                <Action route="application/view/page/cubute/overview.xml" class="d-inline-flex"><Graph icon="bi-shield-fill"/><Text padding="px-1">Security</Text></Action>
+                <Action route="application/view/page/cubute/overview.xml" class="d-inline-flex"><Graph icon="bi-gear-fill"/><Text padding="px-1">Operations</Text></Action>
+                -->
                 <Action route="application/view/page/inventory/overview.xml" class="d-inline-flex"><Graph icon="bi-basket3-fill"/><Text padding="px-1">Inventory</Text></Action>
                 <Action route="application/view/page/project/overview.xml" class="d-inline-flex"><Graph icon="bi-kanban-fill"/><Text padding="px-1">Planning</Text></Action>
                 <Action route="application/view/page/cms/overview.xml" class="d-inline-flex"><Graph icon="bi-code-slash"/><Text padding="px-1">Development</Text></Action>
-                <Action route="application/view/page/cubute/overview.xml" class="d-inline-flex"><Graph icon="bi-shield-fill"/><Text padding="px-1">Security</Text></Action>
-                <Action route="application/view/page/cubute/overview.xml" class="d-inline-flex"><Graph icon="bi-gear-fill"/><Text padding="px-1">Operations</Text></Action>
             </Column>
             <Column padding="pe-4" content="end" alignment-horizontal="center" >
                 <Messenger id="login-msg" domain="success,error" view="Toast" />
                 <Action size="sm" show="offcanvas:profile" padding="p-0">
-                    <Column alignment-vertical="center" >
-                        <Action route="tab:tab-notifications" click="tab(tab:'tab-notifications')" padding="p-0">
+                    <Column alignment-vertical="center" space="1">
+                        <Action route="tab:tab-notifications" click="tab(id:'tab-notifications')" padding="p-0">
                             <Graph icon="bi-inbox-fill" color="white"/> 
                         </Action>
                         <Graph icon="bi-question-circle-fill" color="white"/>

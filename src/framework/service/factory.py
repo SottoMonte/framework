@@ -6,6 +6,7 @@ class repository():
         self.mapper = constants.get('mapper',{})
         self.values = constants.get('values',{})
         self.payloads = constants.get('payloads',{})
+        self.functions = constants.get('functions',{})
         self.model = constants.get('model','')
         self.schema = None
 
@@ -131,7 +132,8 @@ class repository():
                 self.fields = [field['name'] for field in self.schema if 'name' in field]
 
             # Ottieni il payload iniziale
-            payload = inputs.get('payload', {'currentPage': '1', 'perPage': '5'})
+            payload = inputs.get('payload', {})
+            para = {}
 
             # Traduzione del payload
             translated_payload = language.translation(payload, self.fields, self.mapper, self.values, 'MODEL', profile)
@@ -141,6 +143,10 @@ class repository():
             func_payload = self.payloads.get(ops_crud, None)
             if func_payload:
                 payload = await func_payload(**inputs)
+
+            func_payload = self.functions.get(ops_crud, None)
+            if func_payload:
+                para = await func_payload(**inputs)
 
             # Combina inputs e payload
             combined_parameters = {**inputs, **payload}
@@ -156,9 +162,9 @@ class repository():
             # Format il percorso
             path = self.do_format(template, combined_parameters)
             
-
+            print("WEEEEEEE",inputs)
             # Restituisci i risultati
-            return {**inputs, 'location': path, 'provider': profile, 'payload': payload}
+            return para|{**inputs, 'location': path, 'provider': profile, 'payload': payload}
 
         except Exception as e:
             print(f"Errore in parameters: {e}")
@@ -174,10 +180,10 @@ class repository():
             #print("schema",self.schema)
             self.fields = [field['name'] for field in self.schema if 'name' in field]
         
-        payload = inputs.get('payload',{'currentPage':'1','perPage':'5'})
+        payload = inputs.get('payload',{})
         # Traduzione'
-        ttt = language.translation(payload,self.fields,self.mapper,self.values, 'MODEL',profile)
-        print("translated",ttt)
+        #ttt = language.translation(payload,self.fields,self.mapper,self.values, 'MODEL',profile)
+        #print("translated",ttt)
         func_payload = self.payloads.get(ops_crud,None)
         payload = await func_payload(**inputs) if func_payload else payload
 

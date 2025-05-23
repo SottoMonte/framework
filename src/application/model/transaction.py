@@ -13,7 +13,7 @@ transaction = (
     {'name':'identifier','type':'string','default':''},
     {'name':'state','type':'boolean','default':False},
     {'name':'action','type':'string','default':'unknown'},
-    {'name':'time','type':'string','default':'yyyy-mm-dd hh:mm:ss'},
+    {'name':'time','type':'string','default':'yyyy-mm-dd hh:mm:ss',"function": "time_now_utc",},
     #{'name':'user','model':user.user},
     {'name':'remark','type':'string','default':''},
     {'name':'worker','type':'string','default':'unknown'},

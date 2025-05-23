@@ -593,6 +593,9 @@ async def builder(schema, value=None, spread={}, mode='full', lang=None):
                             value[name] = [value[name]]
                         if var_type == 'NoneType':
                             value[name] = []
+                    case 'int':
+                        if var_type == schema["force_type"]:
+                            value[name] = int(value[name])
                 
             case "required":
                 if schema["required"] and name not in value:

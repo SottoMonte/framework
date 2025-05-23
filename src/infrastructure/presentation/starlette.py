@@ -908,7 +908,10 @@ class adapter():
                         self.att(input,att)
                         return input
                     case 'checkbox':
-                        input = self.code('input',{'class':'form-check form-check-input','type':'checkbox','value':valor})
+                        if 'selected' in att and att['selected'] == 'true':
+                            input = self.code('input',{'class':'form-check form-check-input','type':'checkbox','value':valor,'checked':'checked'})
+                        else:
+                            input = self.code('input',{'class':'form-check form-check-input','type':'checkbox','value':valor})
                         self.att(input,att)
                         return input
                     case 'textarea':

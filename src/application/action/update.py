@@ -1,13 +1,23 @@
-import application.service.flow as flow
+modules = {'flow': 'framework.service.flow'}
 
-@flow.asynchronous(managers=('messenger','storekeeper'))
-async def update(messenger,storekeeper,**constants):
-    payload = constants['payload']
-    model = payload['model']
-    value = payload['value']
-    response = await storekeeper.alter(model=model, identifier=value['identifier'], value=value)
-    if response['state']: msg = "transaction completed"
-    else: msg = "transaction failed"
-        
-    await messenger.post(name="log",value=f"Action on {model} {msg}")
-    #print(constants,response)
+@flow.asynchronous(managers=('messenger', 'storekeeper'))
+async def update(messenger, storekeeper, **constants):
+    print(f"update: {constants}")
+    model = constants.get('type', 'repository')
+    
+
+    match model:
+        case 'file':
+            #payload = await file(**constants)
+            pass
+        case 'repository':
+            for item in constants.get('items', []):
+                await repository(**item)
+            pass
+        case 'note':
+            pass
+
+@flow.asynchronous(managers=('messenger', 'storekeeper'),inputs='repository')
+async def repository(messenger, storekeeper, **constants):
+
+    await storekeeper.change(repository='repository', payload=constants)

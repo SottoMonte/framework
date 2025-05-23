@@ -116,6 +116,12 @@ async def view(storekeeper,**constants):
     
     return payload
 
+@flow.asynchronous(managers=('storekeeper',))
+async def update_payload(storekeeper,**constants):
+    #constants.pop('owner')
+    
+    return {'method':'PATCH'}
+
 repository = factory.repository(
     location = {'GITHUB':[
         "repos/{owner}/{name}/git/trees/{sha}?recursive=1",
@@ -138,20 +144,22 @@ repository = factory.repository(
         'sha':{'GITHUB':'commit.commit.tree.sha'},
         'name':{'GITHUB':'name'},
         'branch':{'GITHUB':'branch'},
-        'owner':{'GITHUB':'owner'},
+        'owner':{'GITHUB':'owner.login'},
         'type':{'REPOSITORY':'type'},
         'content':{'REPOSITORY':'content'},
         'updated':{'REPOSITORY':'updated_at'},
         'language':{'REPOSITORY':'language'},
         'description':{'REPOSITORY':'description'},
-        'visibility':{'REPOSITORY':'visibility'},
+        'visibility':{'GITHUB':'private'},
         'tree':{'GITHUB':'tree'},
     },
     payloads = {
     #'create':create_payload,
     #'delete':delete_payload,
-    #'update':write_payload,
-        #'read':view,
+        #'update':update_payload,
         'view':view,
-    }
+    },
+    functions = {
+        'update':update_payload,
+    },
 )

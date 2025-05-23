@@ -23,9 +23,11 @@ if sys.platform == 'emscripten':
     import pyodide
     import json
 
-    async def backend(method,url,headers,payload):
+    '''async def backend(method,url,headers,payload):
         match method:
             case 'GET':
+                response = await pyodide.http.pyfetch(url, method=method, headers=headers)
+            case 'DELETE':
                 response = await pyodide.http.pyfetch(url, method=method, headers=headers)
             case _:
                 if type(payload) == dict:
@@ -38,7 +40,31 @@ if sys.platform == 'emscripten':
             print(data)
             return {"state": True, "result": data}
         else:
-            return {"state": False, "result":[],"remark": f"Request failed with status {response.status}"}
+            return {"state": False, "result":[],"remark": f"Request failed with status {response.status}"}'''
+    async def backend(method, url, headers, payload=None):
+        method_upper = method.upper()
+
+        if method_upper in ['GET', 'DELETE']:
+            response = await pyodide.http.pyfetch(url, method=method_upper, headers=headers)
+        else:
+            if isinstance(payload, dict):
+                payload = json.dumps(payload)
+            else:
+                payload = json.dumps({})
+            response = await pyodide.http.pyfetch(url, method=method_upper, headers=headers, body=payload)
+
+        if response.status in [200, 201, 204]:
+            try:
+                data = await response.json()
+            except Exception:
+                data = {}
+            return {"state": True, "result": data}
+        else:
+            return {
+                "state": False,
+                "result": [],
+                "remark": f"Request failed with status {response.status}"
+            }
                 
 else:
     import aiohttp
@@ -84,20 +110,21 @@ class adapter():
         
     @flow.asynchronous(outputs='transaction')
     async def create(self, **constants):
-        return await self.request(**constants|{'method':'POST'})
+        return await self.request(**{'method':'POST'}|constants)
 
     @flow.asynchronous(outputs='transaction')
     async def delete(self, **constants):
-        return await self.request(**constants|{'method':'DELETE'})
+        return await self.request(**{'method':'DELETE'}|constants)
 
     @flow.asynchronous(outputs='transaction')
     async def read(self, **constants):
-        return await self.request(**constants|{'method':'GET'})
+        return await self.request(**{'method':'GET'}|constants)
 
     @flow.asynchronous(outputs='transaction')
     async def update(self, **constants):
-        return await self.request(**constants|{'method':'PUT'})
+        print('update:',constants)
+        return await self.request(**{'method':'PUT'}|constants)
 
     @flow.asynchronous(outputs='transaction')
     async def view(self,**constants):
-        return await self.request(**constants|{'method':'GET'})
+        return await self.request(**{'method':'GET'}|constants)

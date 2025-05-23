@@ -1,7 +1,30 @@
 modules = {'flow': 'framework.service.flow'}
 
+
 @flow.asynchronous(managers=('messenger', 'storekeeper'))
 async def delete(messenger, storekeeper, **constants):
+    print(f"Delete: {constants}")
+    model = constants.get('type', 'repository')
+    
+
+    match model:
+        case 'file':
+            #payload = await file(**constants)
+            pass
+        case 'repository':
+            for item in constants.get('items', []):
+                await repository(**item)
+            pass
+        case 'note':
+            pass
+
+@flow.asynchronous(managers=('messenger', 'storekeeper'),inputs='repository')
+async def repository(messenger, storekeeper, **constants):
+
+    await storekeeper.remove(repository='repository', filter={'eq': {'owner': constants.get('owner', ''), 'name': constants.get('name', '')}})
+
+@flow.asynchronous(managers=('messenger', 'storekeeper'))
+async def file(messenger, storekeeper, **constants):
     """
     Funzione asincrona per eliminare un file e il relativo file di test, se esiste.
 

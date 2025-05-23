@@ -20,7 +20,7 @@
             <Action route="tab:tab-build" class="d-inline-flex gap-2"><Graph icon="bi-tools"/><Text>Build</Text></Action>
             <Action route="tab:tab-test" class="d-inline-flex gap-2"><Graph icon="bi-play-fill"/><Text>Test</Text></Action>
             <Action route="tab:tab-release" class="d-inline-flex gap-2"><Graph icon="bi-box-seam-fill"/><Text>Package</Text></Action>
-            <Action route="tab:tab-release" class="d-inline-flex gap-2"><Graph icon="bi-rocket"/><Text>Deploy</Text></Action>
+            <Action route="tab:tab-release" class="d-inline-flex gap-2"><Graph icon="bi-rocket-fill"/><Text>Deploy</Text></Action>
         </Group>
     </Container>
 </Column>

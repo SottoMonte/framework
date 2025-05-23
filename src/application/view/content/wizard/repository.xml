@@ -1,70 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Group type="tab" expand="full">
+    {% set id = '{:0=8}'.format(range(0, 99999999) | random) %}
+
     <!-- Step 1: Informazioni Base -->
-    <Container id="step1" title="Informazioni Base">
+    <Container id="{{ id }}-step1-{{ data.id or '' }}" title="Informazioni Base">
         <Group type="input">
-            <Input type="text" identifier="name" placeholder="Nome repository" required="true" />
-            <Input type="text" id="description" identifier="description" placeholder="Descrizione" />
-            <Input type="select" id="visibility" identifier="visibility" placeholder="Visibilità" required="true">
-                <Text value="public">Pubblica</Text>
-                <Text value="private">Privata</Text>
+            <Input type="text" identifier="name[]" value="{{ data.name }}" placeholder="Nome repository" required="true" />
+            <Input type="text" identifier="owner[]" value="{{ data.owner or 'SottoMonte' }}" placeholder="Proprietario" required="true" />
+            <Input type="text" identifier="description[]" value="{{ data.description }}" placeholder="Descrizione repository" />
+            <Input type="select" identifier="visibility[]" placeholder="Visibilità" required="true">
+                <Text value="false">Pubblica</Text>
+                <Text value="true">Privata</Text>
             </Input>
         </Group>
-        <Action type="button" click="tab(id:'step2')" ><Text>Avanti</Text></Action>
+        <Action type="button" click="tab(id:'{{ id }}-step2-{{ data.id or '' }}')"><Text>Avanti</Text></Action>
     </Container>
 
     <!-- Step 2: Opzioni Avanzate -->
-    <Container id="step2" title="Opzioni Avanzate">
+    <Container id="{{ id }}-step2-{{ data.id or '' }}" title="Opzioni Avanzate">
         <Group type="input">
-            <Text>Inizializza con README</Text>
-            <Input type="checkbox" id="init-readme" identifier="readme" value="true" placeholder="Inizializza con README" />
-            <Text>Aggiungi .gitignore</Text>
-            <Input type="checkbox" id="add-gitignore" identifier="gitignore" value="true" placeholder="Aggiungi .gitignore" />
-            <Text>Aggiungi Licenza</Text>
-            <Input type="checkbox" id="add-license" identifier="license" value="true" placeholder="Aggiungi licenza" />
-            <Text>Aggiungi product backlog con IA</Text>
-            <Input type="checkbox" identifier="backlog" value="true" placeholder="Aggiungi licenza" />
-            <Text>Aggiungi Framework</Text>
-            <Input type="checkbox" identifier="framework" value="true" placeholder="Aggiungi licenza" />
+            <Input type="checkbox" id="init-readme" identifier="readme[]" value="true" placeholder="Inizializza con README" />
+            <Input type="checkbox" id="add-gitignore" identifier="gitignore[]" value="true" placeholder="Aggiungi .gitignore" />
+            <Input type="checkbox" id="add-license" identifier="license[]" value="true" placeholder="Aggiungi licenza" />
+            <Input type="checkbox" id="add-backlog" identifier="backlog[]" value="true" placeholder="Aggiungi backlog con AI" />
+            <Input type="checkbox" id="add-framework" identifier="framework[]" value="true" placeholder="Aggiungi framework" />
         </Group>
         <Group type="input-group">
-            <Action type="button" click="tab(id:'step1')" ><Text>Indietro</Text></Action>
-            <Action type="button" click="tab(id:'step3')" ><Text>Avanti</Text></Action>
+            <Action type="button" click="tab(id:'{{ id }}-step1-{{ data.id or '' }}')"><Text>Indietro</Text></Action>
+            <Action type="button" click="tab(id:'{{ id }}-step3-{{ data.id or '' }}')"><Text>Avanti</Text></Action>
         </Group>
     </Container>
 
     <!-- Step 3: Conferma -->
-    <Container id="step3" title="Conferma">
-        <Text>Riepilogo repository:</Text>
+    <Container id="{{ id }}-step3-{{ data.id or '' }}" title="Conferma">
+        <Text>Riepilogo repository</Text>
         <Graph type="table.body">
-            <Graph type="table.row">
-                <Text>Nome:</Text>
-                <Text storekeeper="repo-name" />
-            </Graph>
-            <Graph type="table.row">
-                <Text>Descrizione:</Text>
-                <Text storekeeper="description" />
-            </Graph>
-            <Graph type="table.row">
-                <Text>Visibilità:</Text>
-                <Text storekeeper="visibility" />
-            </Graph>
-            <Graph type="table.row">
-                <Text>README:</Text>
-                <Text storekeeper="init-readme" />
-            </Graph>
-            <Graph type="table.row">
-                <Text>.gitignore:</Text>
-                <Text storekeeper="add-gitignore" />
-            </Graph>
-            <Graph type="table.row">
-                <Text>Licenza:</Text>
-                <Text storekeeper="add-license" />
-            </Graph>
+            <Graph type="table.row"><Text>Nome:</Text><Text>{{ data.name }}</Text></Graph>
+            <Graph type="table.row"><Text>Proprietario:</Text><Text>{{ data.owner or 'SottoMonte' }}</Text></Graph>
+            <Graph type="table.row"><Text>Descrizione:</Text><Text>{{ data.description or '—' }}</Text></Graph>
+            <Graph type="table.row"><Text>Visibilità:</Text><Text>{% if data.visibility == 'true' %}Privata{% else %}Pubblica{% endif %}</Text></Graph>
+            <Graph type="table.row"><Text>README:</Text><Text storekeeper="init-readme" /></Graph>
+            <Graph type="table.row"><Text>.gitignore:</Text><Text storekeeper="add-gitignore" /></Graph>
+            <Graph type="table.row"><Text>Licenza:</Text><Text storekeeper="add-license" /></Graph>
+            <Graph type="table.row"><Text>Backlog AI:</Text><Text storekeeper="add-backlog" /></Graph>
+            <Graph type="table.row"><Text>Framework:</Text><Text storekeeper="add-framework" /></Graph>
         </Graph>
         <Group type="input-group">
-            <Action type="button" click="tab(id:'step2')" ><Text>Indietro</Text></Action>
-            <Action type="submit" value="Crea/Aggiorna Repository" click="submitRepository" />
+            <Action type="button" click="tab(id:'{{ id }}-step2-{{ data.id or '' }}')"><Text>Indietro</Text></Action>
+            <Action type="submit" value="Aggiorna Repository" click="submitRepository" />
         </Group>
     </Container>
 </Group>
