@@ -141,6 +141,9 @@ class adapter():
         if 'view' not in constants:
             constants['view'] = {}
 
+        if self.user:
+            constants['user'] = self.user
+
         content = template.render(constants)
         xml = ET.fromstring(content)
         view = await self.mount_view(xml,constants)

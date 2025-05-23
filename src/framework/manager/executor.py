@@ -22,7 +22,7 @@ class executor:
         #await self.all_completed(tasks=tasks)
         
 
-    @flow.asynchronous(managers=('messenger',))
+    '''@flow.asynchronous(managers=('messenger',))
     async def act(self, messenger, **constants) -> Dict[str, Any]:
         """Esegue un'azione specifica caricando dinamicamente il modulo corrispondente."""
         action = constants.get('action', '')
@@ -39,6 +39,30 @@ class executor:
         result = await act(**constants)
 
         await messenger.post(domain='debug',message=f"✅ Azione '{action}' eseguita con successo.")
+        return {"state": True, "result": result, "error": None}'''
+    @flow.asynchronous(managers=('messenger',))
+    async def act(self, messenger, **constants) -> Dict[str, Any]:
+        """Esegue un'azione specifica caricando dinamicamente il modulo corrispondente."""
+        action = constants.get('action', '')
+        await messenger.post(domain='debug', message=f"🔄 Caricamento dell'azione: {action}")
+
+        # Gestione action tipo 'create' o 'create.note'
+        parts = action.split('.')
+        module_path = f"application.action.{parts[0]}"
+        adapter = parts[0]
+        func_name = parts[1] if len(parts) > 1 else parts[0]
+
+        module = await language.load_module(
+            language,
+            path=module_path,
+            area='application',
+            service='action',
+            adapter=adapter
+        )
+        act_func = getattr(module, func_name)
+        result = await act_func(**constants)
+
+        await messenger.post(domain='debug', message=f"✅ Azione '{action}' eseguita con successo.")
         return {"state": True, "result": result, "error": None}
 
     @flow.asynchronous(managers=('messenger',))

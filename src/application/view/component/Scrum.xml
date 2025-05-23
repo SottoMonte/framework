@@ -15,8 +15,8 @@
             </Action>
         </Column>
         <Column background="#3498DB" alignment-content="between" >
-            <Window id="modal-note-{{ component.id }}" type="modal" size="xl" title="chat" action="note" >
-                <Input identifier="owner" collapse="full" type="text" value="99938d7a-ec20-4ad2-b319-60b3833be160" />
+            <Window id="modal-note-{{ component.id }}" type="modal" size="xl" title="chat" action="create.note" >
+                <Input identifier="owner" collapse="full" type="text" value="{{ user.id }}" />
                 <Input identifier="location" collapse="full" type="text" value="{{ component.attributes.location }}" />
                 <Input identifier="type" collapse="full" type="text" value="backlog.product" />
                 <Input identifier="color" type="color" />
@@ -25,7 +25,7 @@
             <Window id="modal-producer-{{ component.id }}" type="modal" size="xl" title="chat" action="chat" >
                 <Messenger id="chat-producer" domain="backlog.producer" view="Chat" />
                 <Input identifier="sender" collapse="full" type="text" value="user" />
-                <Input identifier="owner" collapse="full" type="text" value="99938d7a-ec20-4ad2-b319-60b3833be160" />
+                <Input identifier="owner" collapse="full" type="text" value="{{ user.id }}" />
                 <Input identifier="location" collapse="full" type="text" value="{{ component.attributes.location }}" />
                 <Input identifier="domain" collapse="full" type="text" value="chat" />
                 <Input identifier="message" type="textarea" class="rounded-0" />

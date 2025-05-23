@@ -99,12 +99,15 @@ class adapter(starlette.adapter):
               # Verifica se la transazione è riuscita
               transaction = {'state':False} if transaction == None else transaction
               user = transaction.get('result', {})[0] if transaction.get('state') else {}
+              print(user,':USER')
               
-              
+              self.user = user
 
               # Costruisce l'HTML con i dati dell'utente
-              html_template = await self.builder(user=user,session=session)
-              html_page = await self.builder(url=self.views[js.window.location.pathname],user=user,session=session)
+              #html_template = await self.builder(user=user,session=session)
+              html_template = await self.builder()
+              #html_page = await self.builder(url=self.views[js.window.location.pathname],user=user,session=session)
+              html_page = await self.builder(url=self.views[js.window.location.pathname])
 
               # Rimuove l'elemento di caricamento
               loading_element = self.document.getElementById('loading')
