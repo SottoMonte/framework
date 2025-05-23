@@ -10,8 +10,8 @@ repository = (
     {'name': 'updated', 'type': 'string', 'default': None, 'regex': r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$'},
     {'name': 'created', 'type': 'string', 'default': None, 'regex': r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$'},
     {'name': 'stars', 'type': 'integer', 'default': 0},
-    {'name': 'commits', 'type': 'integer', 'default': 0},
     {'name': 'forks', 'type': 'integer', 'default': 0},
+    #{'name': 'commits', 'type': 'integer', 'default': 0},
     {'name': 'tree', 'type': 'list', 'default': []},
     {'name': 'sha', 'type': 'string', 'default': ''},
 )

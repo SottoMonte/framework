@@ -37,7 +37,8 @@ async def form(messenger,presenter,executor,**constants):
         items.append(item)
 
     print('items:', items)
-
-    await executor.act(action=action,**form_data|{'items':items})
+    #await executor.act(action=action,**form_data|{'items':items})
+    for item in items:
+        await executor.act(action=action,**item)
 
     

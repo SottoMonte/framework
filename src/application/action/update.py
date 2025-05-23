@@ -11,8 +11,8 @@ async def update(messenger, storekeeper, **constants):
             #payload = await file(**constants)
             pass
         case 'repository':
-            for item in constants.get('items', []):
-                await repository(**item)
+            #for item in constants.get('items', []):
+            await repository(**constants)
             pass
         case 'note':
             pass

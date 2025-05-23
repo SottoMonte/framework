@@ -12,9 +12,7 @@ async def delete(messenger, storekeeper, **constants):
             #payload = await file(**constants)
             pass
         case 'repository':
-            for item in constants.get('items', []):
-                await repository(**item)
-            pass
+            await repository(**constants)
         case 'note':
             pass
 
