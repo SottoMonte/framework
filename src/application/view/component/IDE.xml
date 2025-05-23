@@ -114,15 +114,13 @@
                 </Row>
             </Container>
             <!-- AI -->
-            <Window id="modal-ia" type="modal" size="xl" title="chat" action="chat" >
+            <Window id="modal-ia" type="modal" size="xl" title="chat" action="chat.programmer" >
                 <Messenger id="chat-ai" domain="chat" view="Chat" />
-                <Action type="form" id="form-chat" action="/chat" method="POST">
-                    <Input identifier="sender" collapse="full" type="text" value="user" />
-                    <Input identifier="domain" collapse="full" type="text" value="chat" />
-                    <Input id="window-ai-file" identifier="file" collapse="full" type="text" value="" />
-                    <Input id="window-ai-location" identifier="location" collapse="full" type="text" value="" />
-                    <Input identifier="message" type="textarea" class="rounded-0" />
-                </Action>
+                <Input identifier="sender" collapse="full" type="text" value="user" />
+                <Input identifier="domain" collapse="full" type="text" value="chat" />
+                <Input id="window-ai-file" identifier="file" collapse="full" type="text" value="" />
+                <Input id="window-ai-location" identifier="location" collapse="full" type="text" value="" />
+                <Input identifier="message" type="textarea" class="rounded-0" />
             </Window>
             <Container id="tab-assistant" expand="vertical" width="250px" border="start">
                 <View content="tab/assistant.xml" />

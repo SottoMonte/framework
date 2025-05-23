@@ -49,21 +49,21 @@
                     <Container class="border-top" padding="p-0">
                         <!-- TabNav -->
                         <Group type="nav" margin="m-0" padding="p-0" class="border-bottom">
-                            <Action route="tab:contracts"><Graph icon="bi-person-fill-gear"/><Text class="text-uppercase">Profile</Text></Action>
-                            <Action route="tab:credit-notes"><Graph icon="bi-wallet-fill"/><Text class="text-uppercase">Wallet</Text></Action>
-                            <Action route="tab:invoices"><Graph icon="bi-key-fill"/><Text class="text-uppercase">API</Text></Action>
+                            <Action route="tab:tab-profile"><Graph icon="bi-person-fill-gear"/><Text class="text-uppercase">Profile</Text></Action>
+                            <Action route="tab:tab-wallet"><Graph icon="bi-wallet-fill"/><Text class="text-uppercase">Wallet</Text></Action>
+                            <Action route="tab:tab-api"><Graph icon="bi-key-fill"/><Text class="text-uppercase">API</Text></Action>
                             <Action route="tab:tab-notifications"><Graph icon="bi-inbox-fill"/><Text class="text-uppercase">Box</Text></Action>
                         </Group>
                         <!-- Tab -->
                         <Group type="tab">
-                            <Container id="contracts">
-                                <Text>1</Text>
+                            <Container id="tab-profile">
+                                <View url="application/view/content/tab/profile.xml" />
                             </Container>
-                            <Container id="invoices">
-                                <Text>2</Text>
+                            <Container id="tab-wallet">
+                                <View url="application/view/content/tab/wallet.xml" />
                             </Container>
-                            <Container id="credit-notes">
-                                <Text>3</Text>
+                            <Container id="tab-api">
+                                <View url="application/view/content/tab/api.xml" />
                             </Container>
                             <Container id="calls">
                                 <Text>4</Text>

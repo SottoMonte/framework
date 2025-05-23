@@ -64,4 +64,5 @@ async def programmer(messenger, presenter, storekeeper, **constants):
         doc += ''.join(f['content'] for f in result.get('result', []))
 
     component.setdefault('messenger', []).append(constants)
+    print(doc,'component:',constants)
     await messenger.post(domain='chat', message=f"Usa il seguente documento come base per rispondere alle domande dell'utente:\n\n{doc} Utente msg:{message}")

@@ -38,7 +38,13 @@ async def form(messenger,presenter,executor,**constants):
 
     print('items:', items)
     #await executor.act(action=action,**form_data|{'items':items})
-    for item in items:
-        await executor.act(action=action,**item)
+    '''for item in items:
+        await executor.act(action=action,**item)'''
+
+    if not any(isinstance(v, list) for v in form_data.values()):
+        await executor.act(action=action, **form_data)
+    else:
+        for item in items:
+            await executor.act(action=action, **item)
 
     

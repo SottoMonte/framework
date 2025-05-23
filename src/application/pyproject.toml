@@ -28,7 +28,7 @@ domain = "assistant,chat"
 url = "https://openrouter.ai/api/v1/chat/completions"
 authorization = "Bearer"
 accept = "application/json"
-token = "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"
+token = "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"
 
 [message.producer]
 adapter = "api"
@@ -36,7 +36,7 @@ domain = "backlog.producer,test"
 url = "https://openrouter.ai/api/v1/chat/completions"
 authorization = "Bearer"
 accept = "application/json"
-token = "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"
+token = "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"
 
 [message.programmer]
 adapter = "api"
@@ -44,7 +44,7 @@ domain = "assistant,bom"
 url = "https://openrouter.ai/api/v1/chat/completions"
 authorization = "Bearer"
 accept = "application/json"
-token = "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"
+token = "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"
 
 [amessage.backend]
 adapter = "redis"
