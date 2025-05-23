@@ -17,10 +17,15 @@
 <SideBar from="inventory" select="application/view/page/inventory/repositories.xml"/>
 {% endblock %}
 {% block action %}
+<Window id="window-delete" type="modal" position="centered" size="xl" title="Delete" action="delete">
+    <View url="application/view/content/wizard/repository.xml" data="result.0" />
+</Window>
+<Window id="window-update" type="modal" position="centered" size="xl" title="Delete" action="update">
+    <View url="application/view/content/wizard/repository.xml" data="result.0" />
+</Window>
 <Group type="button">
-    <Action type="button" route="tab:settings" class="d-inline-flex btn-outline-success"><Graph icon="bi-git"/><Text class="text-uppercase">Clone</Text></Action>
-    <Action type="button" route="tab:settings" class="d-inline-flex btn-outline-warning"><Graph icon="bi-arrow-repeat"/><Text class="text-uppercase">Sync</Text></Action>
-    <Action type="button" route="tab:settings" class="d-inline-flex btn-outline-danger"><Graph icon="bi-trash3"/><Text class="text-uppercase">Delete</Text></Action>
+    <Action type="button" route="modal:window-update" class="d-inline-flex btn-outline-warning" space="2"><Graph icon="bi-pencil-fill"/><Text class="text-uppercase">Update</Text></Action>
+    <Action type="button" route="modal:window-delete" class="d-inline-flex btn-outline-danger" space="2"><Graph icon="bi-trash3"/><Text class="text-uppercase">Delete</Text></Action>
 </Group> 
 {% endblock %}
 {% block content %}

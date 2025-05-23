@@ -7,7 +7,6 @@
             <Action ><Graph icon="bi-speedometer2"/></Action>
             <Action click="ide(id:'{{component.id}}',repository:'')" space="1" ><Graph icon="bi-bookmarks-fill"/><Text>Repositories</Text></Action>
             {% if component.repository and component.repository != '' %}
-            <Text>{{ component.repository.owner }}</Text>
             <Action space="1" ><Graph icon="bi-bookmark-fill"/><Text>{{ component.repository.name }}</Text></Action>
             {% endif %}
         </Breadcrumb>
