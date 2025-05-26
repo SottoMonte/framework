@@ -162,7 +162,7 @@ class repository():
             # Format il percorso
             path = self.do_format(template, combined_parameters)
             
-            print("WEEEEEEE",inputs)
+            
             # Restituisci i risultati
             return para|{**inputs, 'location': path, 'provider': profile, 'payload': payload}
 

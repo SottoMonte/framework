@@ -233,7 +233,8 @@ class adapter(starlette.adapter):
                   if component and 'opacity-25' in component.className:
                       component.className = component.className.replace(' opacity-25', '')
 
-        async def on_drop(self,event,**constants):
+        @flow.asynchronous(managers=('executor',))
+        async def on_drop(self,event,executor,**constants):
           event.preventDefault()
           #print('on_drop',self.drag)
           draggable_element = js.document.getElementById(self.drag)
@@ -249,7 +250,7 @@ class adapter(starlette.adapter):
             
             #component.className = component.className.replace('highlight','')
             if draggable_element.getAttribute('draggable-event'):
-              await self.act(value=draggable_element.getAttribute('draggable-event').replace(')',",data:'"+str(data_drag)+"')"))
+              await executor.act(action=draggable_element.getAttribute('draggable-event').replace(')',",data:'"+str(data_drag)+"')"))
           
           if self.drag_type == 'true' and self.drag in self.components:
             self.components.pop(self.drag)
@@ -325,7 +326,8 @@ class adapter(starlette.adapter):
                   else:
                     event.target.appendChild(component)    '''     
         
-        async def event(self,event,**constants):
+        @flow.asynchronous(managers=('executor',))
+        async def event(self,event,executor,**constants):
           action = event.target.getAttribute('click')
           currentElement = event.target
           attributeValue = None
@@ -334,35 +336,10 @@ class adapter(starlette.adapter):
             attributeValue = currentElement.getAttribute('click')
             currentElement = currentElement.parentElement
 
-          _ = await self.act(value=attributeValue)
+          _ = await executor.act(action=attributeValue)
         
-        
-        async def act(self,**constants):
-          # Divisione della stringa in base al separatore '|'
-          functions = constants['value'].split('|')
-          # Creazione del dizionario
-          lista = []
-
-          # Iterazione su ogni funzione per estrarre chiave e parametri
-          for func in functions:
-            result = {}
-            # Estrai il nome della funzione (prima della parentesi)
-            key = re.match(r"(\w+)\(", func).group(1)
-            
-              
-            
-            # Aggiungi la funzione e i suoi parametri come dizionario
-            result[key] = language.extract_params(func)
-            lista.append(result)
-          
-          for n in lista:
-            for name in n:
-              #module = await language.get_module(f'application/action/{name}.py',language)
-              module = await language.load_module(language,path=f'application.action.{name}',area='application',service='action',adapter=name)
-              act = getattr(module,name)
-              _ = await act(**n[name])
-        
-        def att(self,element,attributes):
+        @flow.synchronous(managers=('executor',))
+        def att(self,element,attributes,executor):
           # 'property'
           base = ['id','opacity','color','shadow','border','class','width','height','visibility','position','padding','margin','expand','style','matter'],
           tt = {
@@ -568,7 +545,7 @@ class adapter(starlette.adapter):
                 element.addEventListener('onchange',pyodide.ffi.create_proxy(self.event))
               case 'init':
                 element.setAttribute(key,value)
-                asyncio.create_task(self.act(value=value))
+                asyncio.create_task(executor.act(action=value))
               case 'droppable':
                 element.setAttribute('ondragover','allowDrop(event)')
                 element.setAttribute('draggable-domain',value)

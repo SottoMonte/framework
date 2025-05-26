@@ -1,5 +1,7 @@
 import asyncio
 from typing import List, Dict, Any, Callable
+import re
+
 
 modules = {'flow': 'framework.service.flow'}
 
@@ -41,7 +43,7 @@ class executor:
         await messenger.post(domain='debug',message=f"✅ Azione '{action}' eseguita con successo.")
         return {"state": True, "result": result, "error": None}'''
     @flow.asynchronous(managers=('messenger',))
-    async def act(self, messenger, **constants) -> Dict[str, Any]:
+    async def act2(self, messenger, **constants) -> Dict[str, Any]:
         """Esegue un'azione specifica caricando dinamicamente il modulo corrispondente."""
         action = constants.get('action', '')
         await messenger.post(domain='debug', message=f"🔄 Caricamento dell'azione: {action}")
@@ -64,6 +66,53 @@ class executor:
 
         await messenger.post(domain='debug', message=f"✅ Azione '{action}' eseguita con successo.")
         return {"state": True, "result": result, "error": None}
+
+    @flow.asynchronous(managers=('messenger',))
+    async def act(self, messenger, **constants) -> Dict[str, Any]:
+        """
+        Esegue una o più azioni (separate da '|') caricando dinamicamente i moduli corrispondenti.
+        Supporta sia chiamate con parametri (es: create.note(param=1)) sia solo nome funzione (es: create.note).
+        """
+        value = constants.get('action', '') or constants.get('action', '')
+        functions = value.split('|')
+        lista = []
+
+        for func in functions:
+            func = func.strip()
+            result = {}
+            match = re.match(r"(\w+(?:\.\w+)*)(?:\((.*)\))?", func)
+            if not match:
+                continue
+            key = match.group(1)
+            params_str = match.group(2)
+            if params_str:
+                params = language.extract_params(f"{key}({params_str})")
+            else:
+                params = {}
+            result[key] = params
+            lista.append(result)
+
+        results = []
+        for n in lista:
+            for name in n:
+                await messenger.post(domain='debug', message=f"🔄 Caricamento dell'azione: {name}")
+                parts = name.split('.')
+                module_path = f"application.action.{parts[0]}"
+                adapter = parts[0]
+                func_name = parts[1] if len(parts) > 1 else parts[0]
+                module = await language.load_module(
+                    language,
+                    path=module_path,
+                    area='application',
+                    service='action',
+                    adapter=adapter
+                )
+                act_func = getattr(module, func_name)
+                res = await act_func(**n[name])
+                results.append({name: res})
+                await messenger.post(domain='debug', message=f"✅ Azione '{name}' eseguita con successo.")
+
+        return {"state": True, "result": results, "error": None}
 
     @flow.asynchronous(managers=('messenger',))
     async def first_completed(self, messenger, **constants):

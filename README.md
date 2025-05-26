@@ -202,6 +202,8 @@ Contiene il codice sorgente principale suddiviso in tre macro-aree secondo l'arc
 
 * **`model/`**: definizione entità e oggetti valore.
 * **`policy/`**: regole aziendali e vincoli di dominio.
+
+    * `authentication`, `presentation`, `message`, `persistence`
 * **`repository/`**: pattern repository per la persistenza.
 * **`view/`**:
 
@@ -209,8 +211,8 @@ Contiene il codice sorgente principale suddiviso in tre macro-aree secondo l'arc
   * **`component/`**: componenti UI riutilizzabili.
   * **`content/`**: contenuti visuali (form, modal, wizard, tab, card, table).
   * **`page/`**: pagine applicative:
-
-    * `auth`, `inventory`, `erp`, `crm`, `plan`, `error`, `cms`
+  
+    * `auth`, `error`
 * **`locales/`**: file di traduzione e internazionalizzazione.
 * **`action/`**: comandi e interazioni utente.
 

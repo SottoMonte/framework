@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Row id="{% set id = '{:0=8}'.format(range(0, 99999999) | random) %}{{ id }}" padding="p-0" draggable="element" expand="dynamic" >
+<Row id="{% set id = '{:0=8}'.format(range(0, 99999999) | random) %}{{ id }}" click="editor.ide(selected:'{{id}}')" padding="p-0" draggable="element" expand="dynamic" >
     {% macro file_icon(path) %}
         {% set icon_map = {
             '.test.py': 'bi-file-earmark-check',

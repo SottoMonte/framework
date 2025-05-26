@@ -234,14 +234,11 @@
 {% block east %}
 {% if component.repository and component.repository != '' %}
 <Row>
-    {% if false %}
-    <!-- <Storekeeper model="file" repo='{{ component.repository or "SottoMonte/framework" }}' file_path="{{ component.selected or 'src/infrastructure/presentation/starlette.py' }}">
-        <Tree expand="dynamic">
-
-        </Tree>
-    </Storekeeper>-->
-    {% endif %}
-    <Editor expand="dynamic">
+    <Storekeeper height="400px" flow="auto" repository='file' filter="project(eq: {'path':'src/infrastructure/presentation/','name':'starlette.py','location':'{{component.repository.owner}}/{{component.repository.name}}'})">
+        <Tru/>
+    </Storekeeper>
+    
+    <Editor >
 
     </Editor>
 </Row>

@@ -23,7 +23,7 @@ if sys.platform == 'emscripten':
     import pyodide
     import json
 
-    '''async def backend(method,url,headers,payload):
+    async def backend(method,url,headers,payload):
         match method:
             case 'GET':
                 response = await pyodide.http.pyfetch(url, method=method, headers=headers)
@@ -40,8 +40,8 @@ if sys.platform == 'emscripten':
             print(data)
             return {"state": True, "result": data}
         else:
-            return {"state": False, "result":[],"remark": f"Request failed with status {response.status}"}'''
-    async def backend(method, url, headers, payload=None):
+            return {"state": False, "result":[],"remark": f"Request failed with status {response.status}"}
+    '''async def backend(method, url, headers, payload=None):
         method_upper = method.upper()
 
         if method_upper in ['GET', 'DELETE']:
@@ -64,7 +64,7 @@ if sys.platform == 'emscripten':
                 "state": False,
                 "result": [],
                 "remark": f"Request failed with status {response.status}"
-            }
+            }'''
                 
 else:
     import aiohttp

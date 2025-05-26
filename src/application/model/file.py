@@ -5,4 +5,5 @@ file = (
     {'name':'location','type':'string','default':'None','required':True},
     {'name':'content','type':'string','default':'None','required':True},
     {'name':'sha','type':'string','default':'None','regex':r'^[a-zA-Z0-9_-]+$'},
+    {'name': 'tree', 'type': 'list', 'default': []},
 )

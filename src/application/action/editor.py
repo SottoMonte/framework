@@ -104,5 +104,29 @@ async def editor(messenger,presenter,**constants):
     except Exception as e:
         print(e)
         console.log(e)
+
+@flow.asynchronous(managers=('messenger','presenter','storekeeper'),)
+async def ide(messenger,presenter,storekeeper,**constants):
     
     
+    component = await presenter.component(name='ide')
+    #print('target',target)
+    print('component',constants)
+    for key in constants:
+        print(key)
+        component[key] = constants[key]
+        #language.put(component,constants[key])
+        print('component',constants)
+
+@flow.asynchronous(managers=('messenger','presenter'))
+async def move(messenger,presenter,**constants):
+    row = constants.get('row', 0)
+    col = constants.get('column', 0)
+    print('move',constants)
+    component = await presenter.component(name='ide')
+    selected = component.get('selected', None)
+    #target = constants.get('targetr','ide')
+    component = await presenter.component(name=selected)
+    print('move component:',component)
+    component['block-editor-'].gotoLine(int(row), int(col), True)
+    #component['block-editor-'].selection.selectLine()
