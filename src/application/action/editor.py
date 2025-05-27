@@ -1,9 +1,224 @@
 modules = {'flow':'framework.service.flow'}
 
 import js
-from js import ace,console
+from js import ace,console, setTimeout, clearTimeout
 import pyodide
 import asyncio
+from pyodide.ffi import create_proxy
+
+
+import re
+
+def xml_tag_to_dict(tag_str):
+    # Rimuovi spazi extra e assicura che ci sia una sola riga
+    tag_str = tag_str.strip()
+
+    # Match del nome del tag e della stringa di attributi
+    tag_match = re.match(r"<(\w+)(.*?)\/?>", tag_str)
+    if not tag_match:
+        return {}
+
+    tag_name = tag_match.group(1)
+    attr_string = tag_match.group(2)
+
+    # Supporta anche attributi con trattini: alignment-vertical, data-id, aria-label, ecc.
+    attr_pattern = re.findall(r'([\w\-]+)\s*=\s*"([^"]*)"', attr_string)
+
+    attrs = {k: v for k, v in attr_pattern}
+    attrs["tag"] = tag_name
+    return attrs
+
+'''def find_opening_tag_at_cursor(text, offset):
+    # Match di tag aperti, con attributi opzionali, ma non chiusi
+    tag_pattern = re.compile(r"<(?P<name>\w+)(?P<attrs>[^>]*)>", re.DOTALL)
+
+    matches = list(tag_pattern.finditer(text))
+
+    open_stack = []
+    for match in matches:
+        start, end = match.span()
+        tag_name = match.group("name")
+
+        if start > offset:
+            break  # siamo oltre il cursore
+
+        # Stack per gestire annidamenti
+        if text[end - 2:end] == "/>":
+            continue  # tag autochiuso
+        else:
+            open_stack.append((tag_name, match.group(0), start, end))
+
+        # Ora cerchiamo se c'è una chiusura dopo
+        closing_tag = f"</{tag_name}>"
+        close_pos = text.find(closing_tag, end)
+        if close_pos != -1 and close_pos < offset:
+            open_stack = open_stack[:-1]  # chiuso prima del cursore
+
+    return open_stack[-1][1] if open_stack else None'''
+
+def find_opening_tag_at_cursor(text, offset):
+    tag_pattern = re.compile(r"<(?P<name>\w+)(?P<attrs>[^>]*)\/?>", re.DOTALL)
+
+    matches = list(tag_pattern.finditer(text))
+    open_stack = []
+
+    for match in matches:
+        start, end = match.span()
+        tag_name = match.group("name")
+        tag_str = match.group(0)
+
+        if offset < start:
+            break  # oltre il cursore
+
+        if tag_str.endswith("/>"):
+            # Tag autoconclusivo → controlla se offset è dentro
+            if start <= offset <= end:
+                return tag_str  # es. <Input id="email" />
+        else:
+            # Stack per gestire apertura/chiusura normale
+            open_stack.append((tag_name, tag_str, start, end))
+
+            # Cerca chiusura
+            closing_tag = f"</{tag_name}>"
+            close_pos = text.find(closing_tag, end)
+            if close_pos != -1 and close_pos < offset:
+                open_stack.pop()
+
+    return open_stack[-1][1] if open_stack else None
+
+import xml.etree.ElementTree as ET
+
+def build_xml_tree_dict(file_path):
+    root_elem = ET.fromstring(file_path)
+
+    def parse_element(elem):
+        node = {
+            "type": elem.tag,
+            "name": elem.attrib.get('id', elem.tag),
+            "lineno": elem.sourceline if hasattr(elem, 'sourceline') else '0',
+            "col_offset": elem.sourcecolumn if hasattr(elem, 'sourcecolumn') else '0',
+            #"attributes": elem.attrib,
+            #"text": (elem.text or "").strip(),
+            "children": [parse_element(child) for child in elem]
+        }
+        return node
+
+    root_dict = {
+        "type": "xml_string",
+        "name": 'name',
+        "children": [parse_element(root_elem)]
+    }
+
+    return root_dict
+
+import ast
+
+def build_python_tree_dict(file_path):
+    source = file_path
+    tree = ast.parse(source)
+    filename = 'python'
+
+    def get_node_name(node):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            return node.name
+        elif isinstance(node, ast.ClassDef):
+            return node.name
+        elif isinstance(node, ast.Import):
+            return ", ".join([alias.name for alias in node.names])
+        elif isinstance(node, ast.ImportFrom):
+            return f"from {node.module} import " + ", ".join([alias.name for alias in node.names])
+        elif isinstance(node, ast.Assign):
+            targets = [t.id for t in node.targets if isinstance(t, ast.Name)]
+            return ", ".join(targets)
+        return "unknown"
+
+    root = {
+        "type": "module",
+        "name": filename,
+        "path": "",
+        "children": []
+    }
+
+    categories = {
+        "imports": [],
+        "classes": [],
+        "functions": [],
+        "async_functions": [],
+        "constants": []
+    }
+
+    for node in tree.body:
+        if isinstance(node, (ast.Import, ast.ImportFrom)):
+            categories["imports"].append({
+                "type": "import",
+                "name": get_node_name(node),
+                "lineno": node.lineno,
+                "col_offset": node.col_offset,
+                "source": ast.get_source_segment(source, node)
+            })
+        elif isinstance(node, ast.ClassDef):
+            class_node = {
+                "type": "class",
+                "name": node.name,
+                "lineno": node.lineno,
+                "col_offset": node.col_offset,
+                "source": ast.get_source_segment(source, node),
+                "children": []
+            }
+            for item in node.body:
+                if isinstance(item, ast.FunctionDef):
+                    class_node["children"].append({
+                        "type": "method",
+                        "name": item.name,
+                        "lineno": item.lineno,
+                        "col_offset": item.col_offset,
+                        "source": ast.get_source_segment(source, item)
+                    })
+                elif isinstance(item, ast.AsyncFunctionDef):
+                    class_node["children"].append({
+                        "type": "async_method",
+                        "name": item.name,
+                        "lineno": item.lineno,
+                        "col_offset": item.col_offset,
+                        "source": ast.get_source_segment(source, item)
+                    })
+            categories["classes"].append(class_node)
+        elif isinstance(node, ast.FunctionDef):
+            categories["functions"].append({
+                "type": "function",
+                "name": node.name,
+                "lineno": node.lineno,
+                "col_offset": node.col_offset,
+                "source": ast.get_source_segment(source, node)
+            })
+        elif isinstance(node, ast.AsyncFunctionDef):
+            categories["async_functions"].append({
+                "type": "async_function",
+                "name": node.name,
+                "lineno": node.lineno,
+                "col_offset": node.col_offset,
+                "source": ast.get_source_segment(source, node)
+            })
+        elif isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name) and target.id.isupper():
+                    categories["constants"].append({
+                        "type": "constant",
+                        "name": target.id,
+                        "lineno": node.lineno,
+                        "col_offset": node.col_offset,
+                        "source": ast.get_source_segment(source, node)
+                    })
+
+    for key, items in categories.items():
+        if items:
+            root["children"].append({
+                "type": key,
+                "name": key.replace("_", " ").capitalize(),
+                "children": items
+            })
+
+    return root
 
 @flow.asynchronous(managers=('messenger','presenter'))
 async def editor(messenger,presenter,**constants):
@@ -67,7 +282,47 @@ async def editor(messenger,presenter,**constants):
     component = await presenter.component(name=target)
     component[field] = ace_editor
 
-    
+    # Variabile per debounce timer (salvata in JS globale)
+    js.debounce_timer = None
+
+    # Funzione asincrona Python da chiamare dopo debounce
+    @flow.asynchronous(managers=('messenger','presenter','storekeeper'),)
+    async def on_editor_change(messenger,presenter,storekeeper):
+        await asyncio.sleep(0.1)
+        content = ace_editor.getValue()
+        match mode:
+            case 'ace/mode/python':
+                code = build_python_tree_dict(content)
+            case 'ace/mode/xml':
+                code = build_xml_tree_dict(content)
+                cursor = ace_editor.getCursorPosition()
+                row, column = cursor.row, cursor.column
+                lines = content.splitlines()
+                offset = sum(len(line) + 1 for line in lines[:row]) + column
+
+                tag = find_opening_tag_at_cursor(content, offset)
+                print("➡️ Sei dentro il tag:", tag)
+                info = xml_tag_to_dict(tag)
+                await presenter.rebuild(id='editor-property',view='application/view/component/Editor.xml',data={'info':info})
+            case _:
+                return None
+            
+        await presenter.rebuild(id='preview-content',view='application/view/component/Tru.xml',data={'info':code})
+
+
+    # Wrapper sincrono per il debounce (usato in .on)
+    def debounced_wrapper(*args, **kwargs):
+        if js.debounce_timer is not None:
+            clearTimeout(js.debounce_timer)
+        js.debounce_timer = setTimeout(
+            create_proxy(lambda: asyncio.ensure_future(on_editor_change())),
+            1000
+        )
+
+    # Crea proxy della funzione e collegalo a Ace
+    change_proxy = create_proxy(debounced_wrapper)
+    ace_editor.session.on("change", change_proxy)
+
     def printEditorDetails():
         print('printEditorDetails')
         '''cursorPosition = ace_editor.getCursorPosition()
@@ -118,6 +373,13 @@ async def ide(messenger,presenter,storekeeper,**constants):
         #language.put(component,constants[key])
         print('component',constants)
 
+    if 'selected' in constants:
+        component = await presenter.component(name=constants.get('selected'))
+        
+        code = component['block-editor-'].getValue()
+        code = build_python_tree_dict(code)
+        await presenter.rebuild(id='preview-content',view='application/view/component/Tru.xml',data={'info':code})
+
 @flow.asynchronous(managers=('messenger','presenter'))
 async def move(messenger,presenter,**constants):
     row = constants.get('row', 0)
@@ -130,3 +392,5 @@ async def move(messenger,presenter,**constants):
     print('move component:',component)
     component['block-editor-'].gotoLine(int(row), int(col), True)
     #component['block-editor-'].selection.selectLine()
+    #view=component.get('view','')
+    

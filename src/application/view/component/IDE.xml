@@ -233,14 +233,9 @@
 {% endblock %}
 {% block east %}
 {% if component.repository and component.repository != '' %}
-<Row>
-    <Storekeeper height="400px" flow="auto" repository='file' filter="project(eq: {'path':'src/infrastructure/presentation/','name':'starlette.py','location':'{{component.repository.owner}}/{{component.repository.name}}'})">
-        <Tru/>
-    </Storekeeper>
-    
-    <Editor >
-
-    </Editor>
+<Row expand="full">
+    <Tru class="h-50" flow="auto" id="preview-content"/>
+    <Editor class="h-50" id="editor-property" />
 </Row>
 {% endif %}
 {% endblock %}

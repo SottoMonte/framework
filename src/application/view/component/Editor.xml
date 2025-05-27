@@ -21,11 +21,12 @@
     </Group>
     <!-- Tab -->
     <Group type="tab" width="285px">
-        <!-- property -->
+        <!-- Property -->
         <Container id="tab-property">
             <Group type="input">
                 <Graph icon="bi-layers-half" />
-                <Input type="select">
+                <Input type="select" value="{{info|get('type')}}">
+                    <Text>None</Text>
                     <Text>Background</Text>
                     <Text>Content</Text>
                     <Text>Navbar</Text>
@@ -40,8 +41,8 @@
             </Group>
             <Group type="input">
                 <Graph icon="bi-arrows" />
-                <Input></Input>
-                <Input type="select" width="70px">
+                <Input value="{{info|get('width')}}" placeholder="width"/>
+                <Input type="select" width="70px" value="{{info|get('width_unit')}}">
                     <Text>px</Text>
                     <Text>%</Text>
                     <Text>enum</Text>
@@ -49,8 +50,8 @@
             </Group>
             <Group type="input">
                 <Graph icon="bi-arrows-vertical" />
-                <Input></Input>
-                <Input type="select" width="70px">
+                <Input value="{{info|get('height')}}" placeholder="height"/>
+                <Input type="select" width="70px" value="{{info|get('height_unit')}}">
                     <Text>px</Text>
                     <Text>%</Text>
                     <Text>enum</Text>
@@ -68,38 +69,23 @@
             <Group type="input">
                 <Graph icon="bi-bounding-box" />
                 <Container expand="dynamic" class="position-relative" height="200px" margin="m-1">
-                    <Input type="radio" identifier="position"
-                        class="position-absolute top-0 start-0" />
-                    <Input type="radio" identifier="position"
-                        class="position-absolute top-0 start-50" />
+                    <!-- 16 posizioni radio -->
+                    <Input type="radio" identifier="position" class="position-absolute top-0 start-0" />
+                    <Input type="radio" identifier="position" class="position-absolute top-0 start-50" />
                     <Input type="radio" identifier="position" class="position-absolute top-0 end-0" />
                     <Input type="radio" identifier="position" class="position-absolute top-0 end-50" />
-
-                    <Input type="radio" identifier="position"
-                        class="position-absolute top-50 start-0" />
-                    <Input type="radio" identifier="position"
-                        class="position-absolute top-50 start-50" />
+                    <Input type="radio" identifier="position" class="position-absolute top-50 start-0" />
+                    <Input type="radio" identifier="position" class="position-absolute top-50 start-50" />
                     <Input type="radio" identifier="position" class="position-absolute top-50 end-0" />
-                    <Input type="radio" identifier="position"
-                        class="position-absolute top-50 end-50" />
-
-                    <Input type="radio" identifier="position"
-                        class="position-absolute bottom-0 start-0" />
-                    <Input type="radio" identifier="position"
-                        class="position-absolute bottom-0 start-50" />
-                    <Input type="radio" identifier="position"
-                        class="position-absolute bottom-0 end-0" />
-                    <Input type="radio" identifier="position"
-                        class="position-absolute bottom-0 end-50" />
-
-                    <Input type="radio" identifier="position"
-                        class="position-absolute bottom-50 start-0" />
-                    <Input type="radio" identifier="position"
-                        class="position-absolute bottom-50 start-50" />
-                    <Input type="radio" identifier="position"
-                        class="position-absolute bottom-50 end-0" />
-                    <Input type="radio" identifier="position"
-                        class="position-absolute bottom-50 end-50" />
+                    <Input type="radio" identifier="position" class="position-absolute top-50 end-50" />
+                    <Input type="radio" identifier="position" class="position-absolute bottom-0 start-0" />
+                    <Input type="radio" identifier="position" class="position-absolute bottom-0 start-50" />
+                    <Input type="radio" identifier="position" class="position-absolute bottom-0 end-0" />
+                    <Input type="radio" identifier="position" class="position-absolute bottom-0 end-50" />
+                    <Input type="radio" identifier="position" class="position-absolute bottom-50 start-0" />
+                    <Input type="radio" identifier="position" class="position-absolute bottom-50 start-50" />
+                    <Input type="radio" identifier="position" class="position-absolute bottom-50 end-0" />
+                    <Input type="radio" identifier="position" class="position-absolute bottom-50 end-50" />
                 </Container>
             </Group>
             <Group type="input">
@@ -112,48 +98,46 @@
             </Group>
             <Group type="input">
                 <Graph icon="bi-border-width" />
-                <Input expand="dynamic" />
-                <Input expand="dynamic" />
-                <Input expand="dynamic" />
-                <Input expand="dynamic" />
-                <Input expand="dynamic" />
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-border-width" />
-                <Input expand="dynamic" />
-                <Input expand="dynamic" />
-                <Input expand="dynamic" />
-                <Input expand="dynamic" />
-                <Input expand="dynamic" />
+                <Input expand="dynamic" placeholder="border-top" value="{{info|get('border_top')}}" />
+                <Input expand="dynamic" placeholder="border-right" value="{{info|get('border_right')}}" />
+                <Input expand="dynamic" placeholder="border-bottom" value="{{info|get('border_bottom')}}" />
+                <Input expand="dynamic" placeholder="border-left" value="{{info|get('border_left')}}" />
+                <Input expand="dynamic" placeholder="border-all" value="{{info|get('border_all')}}" />
             </Group>
         </Container>
-        <!-- Tab Matter -->
+        <!-- Matter -->
         <Container id="tab-matter">
             <Group type="input">
                 <Graph icon="bi-fingerprint" />
-                <Input placeholder="id" />
+                <Input placeholder="id" value="{{info|get('id')}}" />
             </Group>
             <Group type="input">
                 <Graph icon="bi-fingerprint" />
-                <Input placeholder="identifier" />
+                <Input placeholder="identifier" value="{{info|get('identifier')}}" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-tags" />
+                <Input placeholder="value" value="{{info|get('value')}}" />
             </Group>
             <Group type="input">
                 <Graph icon="bi-symmetry-horizontal" />
-                <Graph expand="dynamic" icon="bi-align-bottom" />
-                <Graph expand="dynamic" icon="bi-align-center" />
-                <Graph expand="dynamic" icon="bi-align-end" />
-                <Graph expand="dynamic" icon="bi bi-align-middle" />
-                <Graph expand="dynamic" icon="bi-align-start" />
-                <Graph expand="dynamic" icon="bi-align-top" />
+                {% for align in [('start','bi-align-start'), ('center','bi-align-center'), ('end','bi-align-end'), ('stretch','bi-align-middle') ] %}
+                    {% if info|get('alignment-horizontal') == align[0] %}
+                        <Graph expand="dynamic" icon="{{align[1]}}" color="#fff" />
+                    {% else %}
+                        <Graph expand="dynamic" icon="{{align[1]}}" />
+                    {% endif %}
+                {% endfor %}
             </Group>
             <Group type="input">
                 <Graph icon="bi-symmetry-vertical" />
-                <Graph expand="dynamic" icon="bi-align-bottom" />
-                <Graph expand="dynamic" icon="bi-align-center" />
-                <Graph expand="dynamic" icon="bi-align-end" />
-                <Graph expand="dynamic" icon="bi bi-align-middle" />
-                <Graph expand="dynamic" icon="bi-align-start" />
-                <Graph expand="dynamic" icon="bi-align-top" />
+                {% for align in [('start','bi-align-top'), ('center','bi-align-middle'), ('end','bi-align-bottom'), ('stretch','bi-align-middle') ] %}
+                    {% if info|get('alignment-vertical') == align[0] %}
+                        <Icon expand="dynamic" name="{{align[1]}}" color="#fff" />
+                    {% else %}
+                        <Icon expand="dynamic" name="{{align[1]}}" />
+                    {% endif %}
+                {% endfor %}
             </Group>
             <Group type="input">
                 <Graph icon="bi-binoculars-fill" />
@@ -166,24 +150,25 @@
             <Column>
                 <Group type="input" expand="dynamic">
                     <Graph icon="bi-paint-bucket" />
-                    <Input expand="dynamic" type="color" />
+                    <Input expand="dynamic" type="color" value="{{info|get('background')}}" placeholder="background"/>
                 </Group>
                 <Group type="input" expand="dynamic">
                     <Graph icon="bi-border-style" />
-                    <Input expand="dynamic" type="color" />
+                    <Input expand="dynamic" type="color" value="{{info|get('color')}}" placeholder="color"/>
                 </Group>
                 <Group type="input" expand="dynamic">
                     <Graph icon="bi-body-text" />
-                    <Input expand="dynamic" class="rounded-0" type="color" />
+                    <Input expand="dynamic" class="rounded-0" type="color" value="{{info|get('color')}}" placeholder="text color"/>
                 </Group>
             </Column>
             <Group type="input">
                 <Graph tooltip="class or tag" icon="bi-tag-fill" />
-                <Input class="rounded-0" />
+                <Input class="rounded-0" value="{{info|get('class')}}" placeholder="class"/>
             </Group>
             <Group type="input">
                 <Graph icon="bi-fonts" />
-                <Input type="select" expand="dynamic" class="rounded-0" >
+                <Input type="select" expand="dynamic" class="rounded-0" value="{{info|get('font_style')}}">
+                    <Text>None</Text>
                     <Text>solid</Text>
                     <Text>hidden</Text>
                     <Text>dotted</Text>
@@ -199,8 +184,8 @@
             </Group>
             <Group type="input">
                 <Graph icon="bi-paragraph" />
-                <Input expand="dynamic" class="rounded-0" />
-                <Input type="select" width="70px">
+                <Input expand="dynamic" class="rounded-0" value="{{info|get('font_size')}}" placeholder="font size"/>
+                <Input type="select" width="70px" value="{{info|get('font_size_unit')}}">
                     <Text>px</Text>
                     <Text>%</Text>
                     <Text>enum</Text>
@@ -208,16 +193,15 @@
             </Group>
             <Group type="input">
                 <Graph icon="bi-shadows" />
-                <Input expand="dynamic" class="rounded-0" type="range" />
-                
+                <Input expand="dynamic" class="rounded-0" type="range" value="{{info|get('shadow')}}" placeholder="shadow"/>
             </Group>
             <Group type="input">
                 <Graph icon="bi-transparency" />
-                <Input expand="dynamic" class="rounded-0" type="range" />
+                <Input expand="dynamic" class="rounded-0" type="range" value="{{info|get('opacity')}}" placeholder="opacity"/>
             </Group>
             <Group type="input">
                 <Graph icon="bi-asterisk" />
-                <Input class="rounded-0" />
+                <Input class="rounded-0" value="{{info|get('custom')}}" placeholder="custom"/>
             </Group>
             <Group type="input">
                 <Graph icon="bi-border" />
@@ -229,15 +213,16 @@
             </Group>
             <Group type="input">
                 <Graph icon="bi-border-width" />
-                <Input expand="dynamic" />
-                <Input expand="dynamic" />
-                <Input expand="dynamic" />
-                <Input expand="dynamic" />
-                <Input expand="dynamic" />
+                <Input expand="dynamic" placeholder="border-top" value="{{info|get('border_top')}}" />
+                <Input expand="dynamic" placeholder="border-right" value="{{info|get('border_right')}}" />
+                <Input expand="dynamic" placeholder="border-bottom" value="{{info|get('border_bottom')}}" />
+                <Input expand="dynamic" placeholder="border-left" value="{{info|get('border_left')}}" />
+                <Input expand="dynamic" placeholder="border-all" value="{{info|get('border_all')}}" />
             </Group>
             <Group type="input">
                 <Graph icon="bi-border-style" />
-                <Input type="select" class="form-select-sm">
+                <Input type="select" class="form-select-sm" value="{{info|get('border_style')}}">
+                    <Text>None</Text>
                     <Text>solid</Text>
                     <Text>hidden</Text>
                     <Text>dotted</Text>
@@ -260,7 +245,7 @@
                 <Container>
                     <Group type="input">
                         <Graph icon="bi-window" />
-                        <Input placeholder="" />
+                        <Input placeholder="onresize" value="{{info|get('onresize')}}" />
                     </Group>
                 </Container>
                 <!-- Mouse -->
@@ -268,35 +253,35 @@
                 <Container>
                     <Group type="input">
                         <Graph icon="bi-mouse" />
-                        <Input placeholder="onclick" />
+                        <Input placeholder="onclick" value="{{info|get('click')}}" />
                     </Group>
                     <Group type="input">
                         <Graph icon="bi-mouse" />
-                        <Input placeholder="ondblclick" />
+                        <Input placeholder="ondblclick" value="{{info|get('dblclick')}}" />
                     </Group>
                     <Group type="input">
                         <Graph icon="bi-mouse" />
-                        <Input placeholder="onmousedown" />
+                        <Input placeholder="onmousedown" value="{{info|get('mousedown')}}" />
                     </Group>
                     <Group type="input">
                         <Graph icon="bi-mouse" />
-                        <Input placeholder="onmousemove" />
+                        <Input placeholder="onmousemove" value="{{info|get('mousemove')}}" />
                     </Group>
                     <Group type="input">
                         <Graph icon="bi-mouse" />
-                        <Input placeholder="onmouseout" />
+                        <Input placeholder="onmouseout" value="{{info|get('mouseout')}}" />
                     </Group>
                     <Group type="input">
                         <Graph icon="bi-mouse" />
-                        <Input placeholder="onmouseover" />
+                        <Input placeholder="onmouseover" value="{{info|get('mouseover')}}" />
                     </Group>
                     <Group type="input">
                         <Graph icon="bi-mouse" />
-                        <Input placeholder="onmouseup" />
+                        <Input placeholder="onmouseup" value="{{info|get('mouseup')}}" />
                     </Group>
                     <Group type="input">
                         <Graph icon="bi-mouse" />
-                        <Input placeholder="onwheel" />
+                        <Input placeholder="onwheel" value="{{info|get('wheel')}}" />
                     </Group>
                 </Container>
                 <!-- Keyboard -->
@@ -304,7 +289,7 @@
                 <Container>
                     <Group type="input">
                         <Graph icon="bi-keyboard" />
-                        <Input />
+                        <Input placeholder="onkeydown" value="{{info|get('keydown')}}" />
                     </Group>
                 </Container>
                 <!-- Input -->
@@ -312,7 +297,7 @@
                 <Container>
                     <Group type="input">
                         <Graph icon="bi-input-cursor" />
-                        <Input />
+                        <Input placeholder="oninput" value="{{info|get('input')}}" />
                     </Group>
                 </Container>
                 <!-- Drag -->
@@ -320,7 +305,7 @@
                 <Container>
                     <Group type="input">
                         <Graph icon="bi-arrows-move" />
-                        <Input />
+                        <Input placeholder="ondrag" value="{{info|get('drag')}}" />
                     </Group>
                 </Container>
                 <!-- Clipboard -->
@@ -328,7 +313,7 @@
                 <Container>
                     <Group type="input">
                         <Graph icon="bi-clipboard" />
-                        <Input />
+                        <Input placeholder="oncopy" value="{{info|get('copy')}}" />
                     </Group>
                 </Container>
                 <!-- Media -->
@@ -336,7 +321,7 @@
                 <Container>
                     <Group type="input">
                         <Graph icon="bi-collection" />
-                        <Input />
+                        <Input placeholder="onplay" value="{{info|get('play')}}" />
                     </Group>
                 </Container>
             </Group>

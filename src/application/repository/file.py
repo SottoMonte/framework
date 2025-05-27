@@ -421,13 +421,13 @@ repository = factory.repository(
     values = {
         'content':{'GITHUB':encode,'MODEL':decode},
         'path':{'GITHUB':rimuovi_ultimo_slash,'MODEL':rimuovi_ultimo_slash},
-        'tree':{'MODEL':build_python_tree_dict},
+        #'tree':{'MODEL':build_python_tree_dict},
     },
     mapper = {
         'name':{'GITHUB':'name'},
         'type':{'GITHUB':'type'},
         'content':{'GITHUB':'content'},
-        'tree':{'GITHUB':'content'},
+        #'tree':{'GITHUB':'content'},
     },
     payloads = {
         'create':create_payload,
