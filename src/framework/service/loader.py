@@ -33,6 +33,7 @@ async def bootstrap() -> None:
             "jinja2",
             "untangle",
             "bs4",
+            "lxml",
             #"webassets",
         ]
         

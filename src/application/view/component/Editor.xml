@@ -25,8 +25,8 @@
         <Container id="tab-property">
             <Group type="input">
                 <Graph icon="bi-layers-half" />
-                <Input type="select" value="{{info|get('type')}}">
-                    <Text>None</Text>
+                <Input type="select" value="{{info|get('index')}}">
+                    <Text>Auto</Text>
                     <Text>Background</Text>
                     <Text>Content</Text>
                     <Text>Navbar</Text>
@@ -41,17 +41,17 @@
             </Group>
             <Group type="input">
                 <Graph icon="bi-arrows" />
-                <Input value="{{info|get('width')}}" placeholder="width"/>
-                <Input type="select" width="70px" value="{{info|get('width_unit')}}">
-                    <Text>px</Text>
-                    <Text>%</Text>
-                    <Text>enum</Text>
+                <Input id="{{ component.id }}-width" identifier="width" value="{{info|get('width')}}" click="editor.replace_tag" placeholder="width"/>
+                <Input type="select" width="70px" value="%">
+                    {% for unit in ['px','%'] %}
+                    <Text>{{unit}}</Text>
+                    {% endfor %}
                 </Input>
             </Group>
             <Group type="input">
                 <Graph icon="bi-arrows-vertical" />
-                <Input value="{{info|get('height')}}" placeholder="height"/>
-                <Input type="select" width="70px" value="{{info|get('height_unit')}}">
+                <Input value="{{info|get('height')}}" placeholder="height" click="editor.replace_tag" />
+                <Input type="select" width="70px" value="{{info|get('height')}}">
                     <Text>px</Text>
                     <Text>%</Text>
                     <Text>enum</Text>
@@ -116,9 +116,50 @@
                 <Input placeholder="identifier" value="{{info|get('identifier')}}" />
             </Group>
             <Group type="input">
-                <Graph icon="bi-tags" />
+                <Graph icon="bi-tag" />
+                <Input type="select" id="{{ component.id }}-tag" identifier="tag" expand="dynamic" class="rounded-0" value="{{info|get('tag')}}">
+                <Text>{{info|get('tag')}}</Text>
+                {% for tag in ['Layout','View','Presenter','Messenger','Storekeeper','Input','Action','Window','Icon','Text','Group','Media'] %}
+                    {% if info|get('tag') != tag %}
+                        <Text>{{tag}}</Text>
+                    {% endif %}
+                {% endfor %}
+                </Input>
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-ui-checks" />
+                <Input placeholder="value" value="{{info|get('type')}}" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-input-cursor-text" />
                 <Input placeholder="value" value="{{info|get('value')}}" />
             </Group>
+            {% if info|get('tag') == 'Text' %}
+            <Group type="input">
+                <Graph icon="bi bi-type" />
+                <Action><Graph icon="bi-type-bold" /></Action>
+                <Action><Graph icon="bi-type-italic" /></Action>
+                <Action><Graph icon="bi-type-underline" /></Action>
+                <Action><Graph icon="bi-type-strikethrough" /></Action>
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-body-text" />
+                <Action><Graph icon="bi-text-left" /></Action>
+                <Action><Graph icon="bi-text-center" /></Action>
+                <Action><Graph icon="bi-text-right" /></Action>
+                <Action><Graph icon="bi-text-wrap" /></Action>
+            </Group>
+            <Group type="input">
+                <Graph icon="bi bi-type" />
+                <Action><Graph icon="bi-paragraph" /></Action>
+                <Action><Graph icon="bi-type-h1" /></Action>
+                <Action><Graph icon="bi-type-h2" /></Action>
+                <Action><Graph icon="bi-type-h3" /></Action>
+                <Action><Graph icon="bi-type-h4" /></Action>
+                <Action><Graph icon="bi-type-h5" /></Action>
+                <Action><Graph icon="bi-type-h6" /></Action>
+            </Group>
+            {% endif %}
             <Group type="input">
                 <Graph icon="bi-symmetry-horizontal" />
                 {% for align in [('start','bi-align-start'), ('center','bi-align-center'), ('end','bi-align-end'), ('stretch','bi-align-middle') ] %}
@@ -157,7 +198,7 @@
                     <Input expand="dynamic" type="color" value="{{info|get('color')}}" placeholder="color"/>
                 </Group>
                 <Group type="input" expand="dynamic">
-                    <Graph icon="bi-body-text" />
+                    <Graph icon="bi-highlighter" />
                     <Input expand="dynamic" class="rounded-0" type="color" value="{{info|get('color')}}" placeholder="text color"/>
                 </Group>
             </Column>
@@ -167,19 +208,31 @@
             </Group>
             <Group type="input">
                 <Graph icon="bi-fonts" />
-                <Input type="select" expand="dynamic" class="rounded-0" value="{{info|get('font_style')}}">
-                    <Text>None</Text>
-                    <Text>solid</Text>
-                    <Text>hidden</Text>
-                    <Text>dotted</Text>
-                    <Text>dashed</Text>
-                    <Text>double</Text>
-                    <Text>groove</Text>
-                    <Text>ridge</Text>
-                    <Text>inset</Text>
-                    <Text>outset</Text>
-                    <Text>initial</Text>
-                    <Text>inherit</Text>
+                <Input type="select" expand="dynamic" class="rounded-0" value="{{info|get('font-style')}}">
+                    <Text style="font-family: Arial;">Arial</Text>
+                    <Text style="font-family: Helvetica;">Helvetica</Text>
+                    <Text style="font-family: Verdana;">Verdana</Text>
+                    <Text style="font-family: Tahoma;">Tahoma</Text>
+                    <Text style="font-family: 'Trebuchet MS';">Trebuchet MS</Text>
+                    <Text style="font-family: 'Times New Roman';">Times New Roman</Text>
+                    <Text style="font-family: Georgia;">Georgia</Text>
+                    <Text style="font-family: Garamond;">Garamond</Text>
+                    <Text style="font-family: 'Courier New';">Courier New</Text>
+                    <Text style="font-family: 'Lucida Console';">Lucida Console</Text>
+                    <Text style="font-family: Monaco;">Monaco</Text>
+                    <Text style="font-family: Consolas;">Consolas</Text>
+                    <Text style="font-family: 'Comic Sans MS';">Comic Sans MS</Text>
+                    <Text style="font-family: Impact;">Impact</Text>
+                    <Text style="font-family: 'Palatino Linotype';">Palatino Linotype</Text>
+                    <Text style="font-family: 'Segoe UI';">Segoe UI</Text>
+                    <Text style="font-family: Roboto;">Roboto</Text>
+                    <Text style="font-family: 'Open Sans';">Open Sans</Text>
+                    <Text style="font-family: Lato;">Lato</Text>
+                    <Text style="font-family: Montserrat;">Montserrat</Text>
+                    <Text style="font-family: 'Source Sans Pro';">Source Sans Pro</Text>
+                    <Text style="font-family: Ubuntu;">Ubuntu</Text>
+                    <Text style="font-family: Raleway;">Raleway</Text>
+                    <Text style="font-family: Nunito;">Nunito</Text>
                 </Input>
             </Group>
             <Group type="input">
@@ -193,11 +246,11 @@
             </Group>
             <Group type="input">
                 <Graph icon="bi-shadows" />
-                <Input expand="dynamic" class="rounded-0" type="range" value="{{info|get('shadow')}}" placeholder="shadow"/>
+                <Input expand="dynamic" class="rounded-0" type="range" min="0" max="3" value="{{info|get('shadow')}}" placeholder="shadow"/>
             </Group>
             <Group type="input">
                 <Graph icon="bi-transparency" />
-                <Input expand="dynamic" class="rounded-0" type="range" value="{{info|get('opacity')}}" placeholder="opacity"/>
+                <Input expand="dynamic" class="rounded-0" type="range" min="0" step="25" max="100" value="{{info|get('opacity')}}" placeholder="opacity"/>
             </Group>
             <Group type="input">
                 <Graph icon="bi-asterisk" />
@@ -213,15 +266,15 @@
             </Group>
             <Group type="input">
                 <Graph icon="bi-border-width" />
-                <Input expand="dynamic" placeholder="border-top" value="{{info|get('border_top')}}" />
-                <Input expand="dynamic" placeholder="border-right" value="{{info|get('border_right')}}" />
-                <Input expand="dynamic" placeholder="border-bottom" value="{{info|get('border_bottom')}}" />
-                <Input expand="dynamic" placeholder="border-left" value="{{info|get('border_left')}}" />
-                <Input expand="dynamic" placeholder="border-all" value="{{info|get('border_all')}}" />
+                <Input expand="dynamic" placeholder="border-top" value="{{info|get('border-top')}}" />
+                <Input expand="dynamic" placeholder="border-right" value="{{info|get('border-right')}}" />
+                <Input expand="dynamic" placeholder="border-bottom" value="{{info|get('border-bottom')}}" />
+                <Input expand="dynamic" placeholder="border-left" value="{{info|get('border-left')}}" />
+                <Input expand="dynamic" placeholder="border-all" value="{{info|get('border-all')}}" />
             </Group>
             <Group type="input">
                 <Graph icon="bi-border-style" />
-                <Input type="select" class="form-select-sm" value="{{info|get('border_style')}}">
+                <Input type="select" class="form-select-sm" value="{{info|get('border-style')}}">
                     <Text>None</Text>
                     <Text>solid</Text>
                     <Text>hidden</Text>
@@ -314,6 +367,14 @@
                     <Group type="input">
                         <Graph icon="bi-clipboard" />
                         <Input placeholder="oncopy" value="{{info|get('copy')}}" />
+                    </Group>
+                </Container>
+                <!-- Special -->
+                <Action><Text>Special</Text></Action>
+                <Container>
+                    <Group type="input">
+                        <Graph icon="bi-router" />
+                        <Input placeholder="oncopy" value="{{info|get('route')}}" />
                     </Group>
                 </Container>
                 <!-- Media -->

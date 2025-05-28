@@ -934,7 +934,14 @@ class adapter():
                         self.att(input,att)
                         return input
                     case 'range':
-                        input = self.code('input',{'class':'form-range','type':'range','value':valor,})
+                        plus = {}
+                        if 'min' in att:
+                            plus['min'] = att['min']
+                        if 'max' in att:
+                            plus['max'] = att['max']
+                        if 'step' in att:
+                            plus['step'] = att['step']
+                        input = self.code('input',{'class':'form-range','type':'range','value':valor}|plus)
                         self.att(input,att)
                         return input
                     case _:

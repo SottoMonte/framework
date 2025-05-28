@@ -86,19 +86,22 @@ def find_opening_tag_at_cursor(text, offset):
 
     return open_stack[-1][1] if open_stack else None
 
-import xml.etree.ElementTree as ET
 
-def build_xml_tree_dict(file_path):
-    root_elem = ET.fromstring(file_path)
+from lxml import etree as ET  # Usa lxml invece di xml.etree.ElementTree
+
+'''def build_xml_tree_dict(xml_string):
+    parser = ET.XMLParser(recover=True)
+    # Se la stringa contiene dichiarazione di encoding, passa bytes
+    if xml_string.lstrip().startswith("<?xml"):
+        xml_string = xml_string.encode("utf-8")
+    root_elem = ET.fromstring(xml_string, parser=parser)
 
     def parse_element(elem):
         node = {
             "type": elem.tag,
             "name": elem.attrib.get('id', elem.tag),
-            "lineno": elem.sourceline if hasattr(elem, 'sourceline') else '0',
-            "col_offset": elem.sourcecolumn if hasattr(elem, 'sourcecolumn') else '0',
-            #"attributes": elem.attrib,
-            #"text": (elem.text or "").strip(),
+            "lineno": elem.sourceline if hasattr(elem, 'sourceline') and elem.sourceline else 0,
+            "col_offset": elem.position[1] if hasattr(elem, 'position') else 0,
             "children": [parse_element(child) for child in elem]
         }
         return node
@@ -109,6 +112,38 @@ def build_xml_tree_dict(file_path):
         "children": [parse_element(root_elem)]
     }
 
+    return root_dict'''
+
+def build_xml_tree_dict(xml_string):
+    parser = ET.XMLParser(recover=True)
+    if xml_string.lstrip().startswith("<?xml"):
+        xml_string = xml_string.encode("utf-8")
+    root_elem = ET.fromstring(xml_string, parser=parser)
+    lines = xml_string.decode("utf-8").splitlines() if isinstance(xml_string, bytes) else xml_string.splitlines()
+
+    def parse_element(elem):
+        row = elem.sourceline if hasattr(elem, 'sourceline') and elem.sourceline else 0
+        col = 0
+        if row > 0:
+            tag = f"<{elem.tag}"
+            line = lines[row-1]
+            col = line.find(tag)
+            if col == -1:
+                col = 0
+        node = {
+            "type": elem.tag,
+            "name": elem.attrib.get('id', elem.tag),
+            "lineno": row,
+            "col_offset": col,
+            "children": [parse_element(child) for child in elem]
+        }
+        return node
+
+    root_dict = {
+        "type": "xml_string",
+        "name": 'name',
+        "children": [parse_element(root_elem)]
+    }
     return root_dict
 
 import ast
@@ -220,6 +255,33 @@ def build_python_tree_dict(file_path):
 
     return root
 
+# Funzione asincrona Python da chiamare dopo debounce
+@flow.asynchronous(managers=('messenger','presenter','storekeeper'),)
+async def on_editor_change(ace_editor,messenger,presenter,storekeeper):
+    await asyncio.sleep(0.1)
+    content = ace_editor.getValue()
+    mode_obj = ace_editor.session.getMode()
+    mode = getattr(mode_obj, "$id", None)
+    
+    match mode:
+        case 'ace/mode/python':
+            code = build_python_tree_dict(content)
+        case 'ace/mode/xml':
+            code = build_xml_tree_dict(content)
+            cursor = ace_editor.getCursorPosition()
+            row, column = cursor.row, cursor.column
+            lines = content.splitlines()
+            offset = sum(len(line) + 1 for line in lines[:row]) + column
+
+            tag = find_opening_tag_at_cursor(content, offset)
+            print("➡️ Sei dentro il tag:", tag)
+            info = xml_tag_to_dict(tag)
+            await presenter.rebuild(id='editor-property',view='application/view/component/Editor.xml',data={'info':info})
+        case _:
+            return None
+        
+    await presenter.rebuild(id='preview-content',view='application/view/component/Tru.xml',data={'info':code})
+
 @flow.asynchronous(managers=('messenger','presenter'))
 async def editor(messenger,presenter,**constants):
     target = constants.get('target','')
@@ -285,44 +347,20 @@ async def editor(messenger,presenter,**constants):
     # Variabile per debounce timer (salvata in JS globale)
     js.debounce_timer = None
 
-    # Funzione asincrona Python da chiamare dopo debounce
-    @flow.asynchronous(managers=('messenger','presenter','storekeeper'),)
-    async def on_editor_change(messenger,presenter,storekeeper):
-        await asyncio.sleep(0.1)
-        content = ace_editor.getValue()
-        match mode:
-            case 'ace/mode/python':
-                code = build_python_tree_dict(content)
-            case 'ace/mode/xml':
-                code = build_xml_tree_dict(content)
-                cursor = ace_editor.getCursorPosition()
-                row, column = cursor.row, cursor.column
-                lines = content.splitlines()
-                offset = sum(len(line) + 1 for line in lines[:row]) + column
-
-                tag = find_opening_tag_at_cursor(content, offset)
-                print("➡️ Sei dentro il tag:", tag)
-                info = xml_tag_to_dict(tag)
-                await presenter.rebuild(id='editor-property',view='application/view/component/Editor.xml',data={'info':info})
-            case _:
-                return None
-            
-        await presenter.rebuild(id='preview-content',view='application/view/component/Tru.xml',data={'info':code})
-
-
     # Wrapper sincrono per il debounce (usato in .on)
     def debounced_wrapper(*args, **kwargs):
         if js.debounce_timer is not None:
             clearTimeout(js.debounce_timer)
         js.debounce_timer = setTimeout(
-            create_proxy(lambda: asyncio.ensure_future(on_editor_change())),
+            create_proxy(lambda: asyncio.ensure_future(on_editor_change(ace_editor))),
             1000
         )
 
     # Crea proxy della funzione e collegalo a Ace
     change_proxy = create_proxy(debounced_wrapper)
     ace_editor.session.on("change", change_proxy)
-
+    #ace_editor.getSession().selection.on("changeCursor", change_proxy)
+    ace_editor.session.selection.on("changeCursor", change_proxy)
     def printEditorDetails():
         print('printEditorDetails')
         '''cursorPosition = ace_editor.getCursorPosition()
@@ -357,7 +395,7 @@ async def editor(messenger,presenter,**constants):
         #ace_editor.session.selection.on("changeCursor",component['proxy'])
         pass
     except Exception as e:
-        print(e)
+        print('Errore',e)
         console.log(e)
 
 @flow.asynchronous(managers=('messenger','presenter','storekeeper'),)
@@ -373,17 +411,17 @@ async def ide(messenger,presenter,storekeeper,**constants):
         #language.put(component,constants[key])
         print('component',constants)
 
-    if 'selected' in constants:
+    '''if 'selected' in constants:
         component = await presenter.component(name=constants.get('selected'))
         
         code = component['block-editor-'].getValue()
         code = build_python_tree_dict(code)
-        await presenter.rebuild(id='preview-content',view='application/view/component/Tru.xml',data={'info':code})
+        await presenter.rebuild(id='preview-content',view='application/view/component/Tru.xml',data={'info':code})'''
 
 @flow.asynchronous(managers=('messenger','presenter'))
 async def move(messenger,presenter,**constants):
     row = constants.get('row', 0)
-    col = constants.get('column', 0)
+    col = constants.get('col', 0)
     print('move',constants)
     component = await presenter.component(name='ide')
     selected = component.get('selected', None)
@@ -391,6 +429,135 @@ async def move(messenger,presenter,**constants):
     component = await presenter.component(name=selected)
     print('move component:',component)
     component['block-editor-'].gotoLine(int(row), int(col), True)
+    #component['block-editor-'].moveCursorTo(int(row), int(col))
+    component['block-editor-'].focus()
+
+    on_editor_change(component['block-editor-'])
+
+    '''# Forza il movimento del cursore per scatenare l'evento
+    cursor = component['block-editor-'].getCursorPosition()
+    component['block-editor-'].moveCursorTo(cursor.row, cursor.column + 1)
+    component['block-editor-'].moveCursorTo(cursor.row, cursor.column)
+    #component['block-editor-'].getSession().selection._emit("changeCursor")
+    component['block-editor-'].session.selection._emit("changeCursor")
     #component['block-editor-'].selection.selectLine()
-    #view=component.get('view','')
-    
+    #view=component.get('view','')'''
+
+def build_combined_input_tag(self_closing=True):
+    """
+    Costruisce il tag combinato.
+    Se self_closing è True: <Tag ... />
+    Se self_closing è False: <Tag ...></Tag>
+    """
+    ids = ['editor-property-tag', 'editor-property-width', 'editor-property-height', 'editor-property-id']
+    attrs = []
+    tag_name = "Input"
+    for input_id in ids:
+        el = js.document.getElementById(input_id)
+        if el is not None:
+            name = el.name or input_id
+            value = el.value
+            if input_id == 'editor-property-tag':
+                tag_name = value or "Input"
+            else:
+                attrs.append(f'{name}="{value}"')
+    if self_closing:
+        return f'<{tag_name} {" ".join(attrs)} />'
+    else:
+        return f'<{tag_name} {" ".join(attrs)}>'
+
+@flow.asynchronous(managers=('messenger','presenter'))
+async def replace_tag(messenger,presenter,**constants):
+    component = await presenter.component(name='ide')
+    selected = component.get('selected', None)
+    component = await presenter.component(name=selected)
+    editor = component['block-editor-']
+    session = editor.getSession()
+    cursor = editor.getCursorPosition()
+    lines = session.getDocument().getAllLines()
+
+    # Calcola offset assoluto
+    offset = 0
+    for i in range(cursor.row):
+        offset += len(lines[i]) + 1  # +1 per newline
+    offset += cursor.column
+
+    full_text = "\n".join(lines)
+
+    # Cerca tutti i tag (aperti o autochiusi)
+    tag_pattern = re.compile(r"<(\w+)([^<>]*)\/?>", re.DOTALL)
+    matches = list(tag_pattern.finditer(full_text))
+
+    for match in matches:
+        start, end = match.span()
+        if start <= offset <= end:
+            tag_text = match.group(0)
+            # Verifica se il tag è autochiuso
+            self_closing = tag_text.strip().endswith("/>")
+            # Costruisci il nuovo tag in base al tipo
+            new_tag = build_combined_input_tag(self_closing)
+            # Sostituisci il tag trovato con quello nuovo
+            new_text = full_text[:start] + new_tag + full_text[end:]
+            session.setValue(new_text)
+            # Riporta il cursore dov’era
+            editor.moveCursorToPosition(cursor)
+            return True
+
+    return False  # Nessun tag trovato
+
+'''@flow.asynchronous(managers=('messenger','presenter'))
+async def replace_tag(messenger,presenter,**constants):
+    def build_combined_input_tag():
+        """
+        ids: lista di id degli input da combinare
+        Ritorna una stringa tipo: <TagName name1="val1" name2="val2" ... />
+        Il nome del tag viene preso dal valore di 'editor-property-tag'
+        """
+        ids = ['editor-property-tag', 'editor-property-width', 'editor-property-height', 'editor-property-id']
+        attrs = []
+        tag_name = "Input"
+        for input_id in ids:
+            el = js.document.getElementById(input_id)
+            if el is not None:
+                name = el.name or input_id
+                value = el.value
+                if input_id == 'editor-property-tag':
+                    tag_name = value or "Input"
+                else:
+                    attrs.append(f'{name}="{value}"')
+        return f'<{tag_name} {" ".join(attrs)} />'
+
+    component = await presenter.component(name='ide')
+    selected = component.get('selected', None)
+    component = await presenter.component(name=selected)
+    editor = component['block-editor-']
+    session = editor.getSession()
+    cursor = editor.getCursorPosition()
+    lines = session.getDocument().getAllLines()
+
+    new_tag = build_combined_input_tag()
+
+    # Calcola offset assoluto
+    offset = 0
+    for i in range(cursor.row):
+        offset += len(lines[i]) + 1  # +1 per newline
+    offset += cursor.column
+
+    full_text = "\n".join(lines)
+
+    # Cerca tutti i tag (aperti o autochiusi)
+    tag_pattern = re.compile(r"<(\w+)([^<>]*)\/?>", re.DOTALL)
+    matches = list(tag_pattern.finditer(full_text))
+
+    for match in matches:
+        start, end = match.span()
+        if start <= offset <= end:
+            # Sostituisce il tag trovato con quello nuovo
+            new_text = full_text[:start] + new_tag + full_text[end:]
+            session.setValue(new_text)
+
+            # Riporta il cursore dov’era
+            editor.moveCursorToPosition(cursor)
+            return True
+
+    return False  # Nessun tag trovato'''

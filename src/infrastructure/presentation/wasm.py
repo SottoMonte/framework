@@ -542,7 +542,7 @@ class adapter(starlette.adapter):
                 element.addEventListener('click',pyodide.ffi.create_proxy(self.event))
               case 'onchange':
                 element.setAttribute(key,value)
-                element.addEventListener('onchange',pyodide.ffi.create_proxy(self.event))
+                element.addEventListener('change',pyodide.ffi.create_proxy(self.event))
               case 'init':
                 element.setAttribute(key,value)
                 asyncio.create_task(executor.act(action=value))
