@@ -443,28 +443,97 @@ async def move(messenger,presenter,**constants):
     #component['block-editor-'].selection.selectLine()
     #view=component.get('view','')'''
 
-def build_combined_input_tag(self_closing=True):
+
+def build_combined_input_tag2(self_closing=True):
     """
-    Costruisce il tag combinato.
-    Se self_closing è True: <Tag ... />
-    Se self_closing è False: <Tag ...></Tag>
+    Costruisce il tag combinato usando tutti gli input/select/textarea dentro un contenitore.
+    Unisce width e width-unit (es: width="100px"), e ignora width-unit come attributo separato.
+    Stesso discorso per height/height-unit.
+    Per i radio button, prende solo quello checked.
     """
-    ids = ['editor-property-tag', 'editor-property-width', 'editor-property-height', 'editor-property-id']
-    attrs = []
+    container = js.document.getElementById('editor-property')
+    if container is None:
+        return ""
+
+    elements = container.querySelectorAll("input, select, textarea")
+    values = {}
     tag_name = "Input"
-    for input_id in ids:
-        el = js.document.getElementById(input_id)
-        if el is not None:
-            name = el.name or input_id
-            value = el.value
-            if input_id == 'editor-property-tag':
-                tag_name = value or "Input"
+    attrs = []
+
+    # Prima raccogli tutti i valori
+    for el in elements:
+        name = el.name or el.id or ""
+        value = el.value
+        # Solo radio checked
+        if hasattr(el, "type") and el.type == "radio":
+            if not el.checked:
+                continue
+        values[name] = value
+        # Gestione tag dinamico
+        if name == "tag" or el.id == "editor-property-tag":
+            tag_name = value or "Input"
+
+    # Poi costruisci gli attributi, gestendo le coppie
+    for name, value in values.items():
+        if value == '' or value == '#808080':
+            continue
+        # Unisci width + width-unit
+        if name == "width":
+            unit = values.get("width-unit", "")
+            if unit:
+                attrs.append(f'width="{value}{unit}"')
             else:
-                attrs.append(f'{name}="{value}"')
+                attrs.append(f'width="{value}"')
+        # Unisci height + height-unit
+        elif name == "height":
+            unit = values.get("height-unit", "")
+            if unit:
+                attrs.append(f'height="{value}{unit}"')
+            else:
+                attrs.append(f'height="{value}"')
+        # Ignora width-unit e height-unit come attributi separati
+        elif name in ("width-unit", "height-unit"):
+            continue
+        else:
+            attrs.append(f'{name}="{value}"')
+
     if self_closing:
         return f'<{tag_name} {" ".join(attrs)} />'
     else:
         return f'<{tag_name} {" ".join(attrs)}>'
+
+def build_combined_input_tag(self_closing=True):
+    """
+    Costruisce il tag combinato usando tutti gli input/select/textarea dentro un contenitore.
+    Per i radio button, prende solo quello checked.
+    """
+    container = js.document.getElementById('editor-property')
+    if container is None:
+        return ""
+
+    elements = container.querySelectorAll("input, select, textarea")
+    attrs = []
+    tag_name = "Input"
+    for el in elements:
+        name = el.name or el.id or ""
+        value = el.value
+        # Gestione radio: solo quello checked
+        if hasattr(el, "type") and el.type == "radio":
+            if not el.checked:
+                continue
+        # Usa il campo 'tag' per il nome del tag
+        if name == "tag" or el.id == "editor-property-tag":
+            tag_name = value or "Input"
+        elif value == '' or value == '#808080' or value == '0':
+            continue
+        else:
+            attrs.append(f'{name}="{value}"')
+    if self_closing:
+        return f'<{tag_name} {" ".join(attrs)} />'
+    else:
+        return f'<{tag_name} {" ".join(attrs)}>'
+    
+
 
 @flow.asynchronous(managers=('messenger','presenter'))
 async def replace_tag(messenger,presenter,**constants):

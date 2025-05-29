@@ -889,6 +889,7 @@ class adapter():
                 else:
                     return view
             case 'Input':
+                id = att['id'] if 'id' in att else str(uuid.uuid4())
                 tipo = att['type'] if 'type' in att else 'None'
                 tipi = ["button","checkbox","color","date","datetime-local","email","file","hidden","image","month","number","password","radio","range","reset","search","submit","tel","text","time","url","week"]
                 valor = att['value'] if 'value' in att else ''
@@ -922,8 +923,14 @@ class adapter():
                         self.att(input,att)
                         return input
                     case 'radio':
-                        input = self.code('input',{'class':'form-check form-check-input','type':'radio','value':valor,})
+                        if 'selected' in att and att['selected'] == 'true':
+                            input = self.code('input',{'class':'form-check form-check-input','type':'radio','value':valor,'checked':'checked'})
+                        else:
+                            input = self.code('input',{'class':'form-check form-check-input','type':'radio','value':valor})
                         self.att(input,att)
+                        if inner and len(inner) > 0:
+                            label = self.code('label',{'class':'btn','for':id},inner)
+                            return self.code('div',{'class':''},[input,label])
                         return input
                     case 'switch':
                         input = self.code('input',{'class':'form-check form-switch form-check-input','type':'checkbox','role':'switch'})

@@ -44,6 +44,7 @@ class adapter(starlette.adapter):
 
           # Inizializza le variabili di istanza
           self.components = {}
+          self.attributes = {}
           self.config = constants.get('config', {})  # Evita KeyError con .get()
           self.cash = {}
           self.cookies = {}
@@ -56,6 +57,98 @@ class adapter(starlette.adapter):
           
           # Riferimento al documento JavaScript
           self.document = js.document
+
+          # Attributi HTML diretti
+          self.attributes['matter'] = {
+                'id', 'type', 'name', 'component', 'draggable-event','height', 'width',
+                'draggable-maker', 'droppable-data', 'identifier','draggable-component'
+            }
+
+          # Mappatura eventi
+          self.attributes['event'] = {
+                'click': ('click', self.event),
+                'change': ('change', self.event),
+                'route': ('click', self.route),
+                'ddd': ('contextmenu', self.open_dropdown),
+                'draggable': ('dragstart', self.on_drag_start),
+                'droppable': ('drop', self.on_drop),
+                'init': ('init', self.event),
+            }
+          
+          # Mappatura eventi
+          self.attributes['layout'] = {
+            'space': lambda v: f"gap-{v}",
+            'border': lambda v: f"border-{v}",
+            'border-top': lambda v: f"border-top-{v}",
+            'border-bottom': lambda v: f"border-bottom-{v}",
+            'border-left': lambda v: f"border-start-{v}",
+            'border-right': lambda v: f"border-end-{v}",
+            'border-radius': lambda v: f"rounded-{v}",
+
+            'margin': lambda v: ' '.join(v.strip() for v in v.split(';')),
+            'margin-top': lambda v: 'mt-' + v,
+            'margin-bottom': lambda v: 'mb-' + v,
+            'margin-left': lambda v: 'ms-' + v,
+            'margin-right': lambda v: 'me-' + v,
+
+            'padding-top': lambda v: 'pt-' + v,
+            'padding-bottom': lambda v: 'pb-' + v,
+            'padding-left': lambda v: 'ps-' + v,
+            'padding-right': lambda v: 'pe-' + v,
+            'padding': lambda v: ' '.join(v.strip() for v in v.split(';')),
+
+            'position': lambda v: {
+                'static': 'position-static',
+                'relative': 'position-relative',
+                'absolute': 'position-absolute',
+                'fixed': 'position-fixed',
+                'sticky': 'position-sticky',
+            }.get(v,''),
+            'expand': lambda v: {
+                'vertical': 'h-100',
+                'horizontal': 'w-100',
+                'full': 'w-100 h-100',
+                'auto': 'col-auto',
+                'dynamic': 'col'
+            }.get(v, f"col-{v}"),
+            'collapse': lambda v: 'd-none' if v == 'full' else 'invisible',
+            'alignment-horizontal': lambda v: f"justify-content-{v}" if v in ['start', 'end', 'center', 'between', 'around', 'evenly'] else '',
+            'alignment-vertical': lambda v: f"align-items-{v}" if v in ['start', 'end', 'center', 'baseline', 'stretch'] else '',
+            'alignment-content': lambda v: {
+                    'vertical': 'd-flex flex-column',
+                    'horizontal': 'd-flex flex-row',
+                    'center': 'd-flex justify-content-center align-items-center',
+                    'between': 'd-flex justify-content-between align-items-center',
+                    'around': 'd-flex justify-content-around align-items-center',
+                    'evenly': 'd-flex justify-content-evenly align-items-center',    
+                }.get(v, ''),
+          }
+
+          # Mappatura classi CSS
+          self.attributes['style'] = {
+                'background': lambda v: f"bg-{v}" if not v.startswith('#') else None,
+                'background-color': lambda v: f"bg-{v}" if not v.startswith('#') else None,
+                'text-color': lambda v: f"text-{v}",
+                'text-size': lambda v: f"fs-{v}" if v.isdigit() else None,
+                'shadow': lambda v: {
+                    'none': 'shadow-none', 'sm': 'shadow-sm',
+                    'md': 'shadow', 'lg': 'shadow-lg'
+                }.get(v, ''),
+                'border': lambda v: f"border-{v}",
+                'border-thickness': lambda v: f"border-{v}",
+                'border-radius-size': lambda v: f"rounded-{v}",
+                'border-color': lambda v: f"border-{v}",
+                'border-radius': lambda v: {
+                    'pill': "rounded-pill", 'circle': "rounded-circle",
+                    'top': "rounded-top", 'bottom': "rounded-bottom",
+                    'right': "rounded-start", 'left': "rounded-end"
+                }.get(v, ''),
+                'border-position': lambda v: {
+                    'outer': "border", 'top': "border-top", 'bottom': "border-bottom",
+                    'right': "border-start", 'left': "border-end"
+                }.get(v, ''),
+                'class': lambda v: v
+            }
 
           print("✅ Modulo WASM inizializzato correttamente.")
 
@@ -183,7 +276,7 @@ class adapter(starlette.adapter):
           attributeValue = None
 
           while not attributeValue: 
-            attributeValue = currentElement.getAttribute('url')
+            attributeValue = currentElement.getAttribute('route')
             currentElement = currentElement.parentElement
 
           # Parsing dell'URL
@@ -328,18 +421,20 @@ class adapter(starlette.adapter):
         
         @flow.asynchronous(managers=('executor',))
         async def event(self,event,executor,**constants):
-          action = event.target.getAttribute('click')
+          #action = event.target.getAttribute('click')
+          event_type = event.type
+          print("Tipo di evento:", event_type)
           currentElement = event.target
           attributeValue = None
 
           while not attributeValue: 
-            attributeValue = currentElement.getAttribute('click')
+            attributeValue = currentElement.getAttribute(event_type)
             currentElement = currentElement.parentElement
 
           _ = await executor.act(action=attributeValue)
         
         @flow.synchronous(managers=('executor',))
-        def att(self,element,attributes,executor):
+        def att2(self,element,attributes,executor):
           # 'property'
           base = ['id','opacity','color','shadow','border','class','width','height','visibility','position','padding','margin','expand','style','matter'],
           tt = {
@@ -359,9 +454,10 @@ class adapter(starlette.adapter):
             value = attributes[key]
             match key:
               # Property
-              case 'layer':pass
               case 'identifier':
                 element.setAttribute('name',value)
+              case 'name':
+                element.setAttribute(key,value)
               case 'space':
                 element.className += f" gap-{value}"
               case 'id':
@@ -567,7 +663,82 @@ class adapter(starlette.adapter):
               case 'droppable-data':
                 element.setAttribute(key,value)
               
-        
+        @flow.synchronous(managers=('executor',))
+        def att(self, element, attributes, executor):
+
+            def set_style(css):
+                style = element.getAttribute('style') or ''
+                style += f" {css}"
+                element.setAttribute('style', style)
+
+            def add_class(cls):
+                element.className += f" {cls}"
+
+            for key, value in attributes.items():
+                if key in self.attributes['matter']:
+                    if key == 'width':
+                      set_style(f'max-width:{value};width:{value};')
+                    elif key == 'height':
+                      set_style(f'max-height:{value};height:{value};')
+                    else:
+                      element.setAttribute(key, value)
+
+                elif key in self.attributes['event']:
+                    if key == 'init':
+                        #print(f"[DEBUG] Executor: {executor}",value,key)
+                        asyncio.create_task(executor.act(action=value))
+                    elif key == 'hide':
+                        mode, _ = map(str.strip, value.split(':'))
+                        element.setAttribute('data-bs-dismiss', mode)
+                    elif key == 'show':
+                        mode, target = map(str.strip, value.split(':'))
+                        element.setAttribute('data-bs-target', f'#{target}')
+                        element.setAttribute('data-bs-toggle', mode)
+                    elif key == 'route' and ':' in value:
+                        mode, target = map(str.strip, value.split(':', 1))
+                        if mode == 'link':
+                            element.setAttribute('href', target)
+                        else:
+                            element.setAttribute('data-bs-toggle', mode)
+                            element.setAttribute('href', f'#{target}')
+                    elif key == 'link':
+                        element.setAttribute('href', value)
+                    elif key == 'draggable':
+                        element.setAttribute(key,'true')
+                        element.setAttribute('ondragstart','drag(event)')
+                        element.setAttribute('draggable-domain',value)
+                        element.addEventListener('dragstart',pyodide.ffi.create_proxy(self.on_drag_start))
+                        element.addEventListener('dragend',pyodide.ffi.create_proxy(self.on_drag_end))
+                    elif key == 'droppable':
+                        element.setAttribute('ondragover','allowDrop(event)')
+                        element.setAttribute('draggable-domain',value)
+                        element.addEventListener('drop',pyodide.ffi.create_proxy(self.on_drop))
+                        element.addEventListener('dragover',pyodide.ffi.create_proxy(self.on_drag_over))
+                        element.addEventListener('dragleave',pyodide.ffi.create_proxy(self.on_drag_leave))
+                    else:
+                      event_name, handler_fn = self.attributes['event'][key]
+                      #element.setAttribute('event', value)
+                      element.setAttribute(key, value)
+                      element.addEventListener(event_name, pyodide.ffi.create_proxy(handler_fn))
+
+                elif key in self.attributes['style']:
+                    mapping = self.attributes['style'][key]
+                    cls = mapping(value) if callable(mapping) else mapping.get(value, f"{key}-{value}")
+                    if cls:
+                        add_class(cls)
+                    elif key == 'background-color' and value.startswith('#'):
+                        set_style(f'background-color:{value};')
+                    elif key == 'text-size' and 'px' in value:
+                        set_style(f'font-size: {value};')
+                    elif key == 'style':
+                        set_style(value)
+                elif key in self.attributes['layout']:
+                    mapping = self.attributes['layout'][key]
+                    cls = mapping(value) if callable(mapping) else mapping.get(value, f"{key}-{value}")
+                    if cls:
+                        add_class(cls)
+                       
+
         async def rebuild(self, id, tag, **data):
           try:
               #url = f"application/view/component/{tag}.xml"

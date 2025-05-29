@@ -4,7 +4,7 @@
     <Group type="nav" margin="m-0" padding="p-0" border="bottom">
         <Action route="tab:tab-property" data-bs-toggle="tab">
             <Graph icon="bi-rulers" />
-            <Text>Property</Text>
+            <Text>Layout</Text>
         </Action>
         <Action route="tab:tab-matter" data-bs-toggle="tab">
             <Graph icon="bi bi-grid-1x2-fill" />
@@ -25,7 +25,7 @@
         <Container id="tab-property">
             <Group type="input">
                 <Graph icon="bi-layers-half" />
-                <Input type="select" value="{{info|get('index')}}">
+                <Input type="select" id="{{ component.id }}-index" name="index" value="{{info|get('index','')}}">
                     <Text>Auto</Text>
                     <Text>Background</Text>
                     <Text>Content</Text>
@@ -41,83 +41,110 @@
             </Group>
             <Group type="input">
                 <Graph icon="bi-arrows" />
-                <Input id="{{ component.id }}-width" identifier="width" value="{{info|get('width')}}" click="editor.replace_tag" placeholder="width"/>
-                <Input type="select" width="70px" value="%">
+                <Input id="{{ component.id }}-width" name="width" value="{{info|get('width','')}}" change="editor.replace_tag" placeholder="width"/>
+                <!--<Input type="select" id="{{ component.id }}-width-unit" name="width-unit" width="70px" value="%">
                     {% for unit in ['px','%'] %}
                     <Text>{{unit}}</Text>
                     {% endfor %}
-                </Input>
+                </Input>-->
             </Group>
             <Group type="input">
                 <Graph icon="bi-arrows-vertical" />
-                <Input value="{{info|get('height')}}" placeholder="height" click="editor.replace_tag" />
-                <Input type="select" width="70px" value="{{info|get('height')}}">
+                <Input id="{{ component.id }}-height" name="height" value="{{info|get('height','')}}" placeholder="height" change="editor.replace_tag" />
+                <!--<Input type="select" id="{{ component.id }}-height-unit" name="height-unit" width="70px" value="{{info|get('height')}}">
                     <Text>px</Text>
                     <Text>%</Text>
                     <Text>enum</Text>
-                </Input>
+                </Input>-->
             </Group>
             <Group type="input">
                 <Graph icon="bi-arrows-move" />
-                <Graph icon="bi-arrows-angle-contract" />
-                <Graph icon="bi-arrows-collapse" />
-                <Graph icon="bi-arrows-collapse-vertical" />
-                <Graph icon="bi-arrows-angle-expand" />
-                <Graph icon="bi-arrows-expand" />
-                <Graph icon="bi-arrows-expand-vertical" />
+                {% for value,icon in [
+                    ('vertical','bi-arrows-expand-vertical'),
+                    ('horizontal', 'bi bi-arrows-expand'),
+                    ('full', 'bi-arrows-fullscreen'),
+                    ('auto', 'bi-arrows-angle-expand'),
+                    ('dynamic', 'bi-magic')] 
+                %}
+                    <Input type="radio" id="{{ component.id }}-position-{{value}}" class="btn-check" name="expand" value="{{value}}" selected="{% if info|get('expand','') == value %}true{% endif %}" change="editor.replace_tag">
+                        <Graph icon="{{icon}}" />
+                    </Input>
+                {% endfor %}
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-arrows-move" />
+                {% for value,icon in [
+                    ('vertical','bi-arrows-collapse-vertical'),
+                    ('horizontal', 'bi bi-arrows-collapse'),
+                    ('full', 'bi-fullscreen-exit'),
+                    ('auto', 'bi-arrows-angle-contract'),
+                    ('dynamic', 'bi-magic')] 
+                %}
+                    <Input type="radio" id="{{ component.id }}-position-{{value}}" class="btn-check" name="collapse" value="{{value}}" selected="{% if info|get('expand','') == value %}true{% endif %}" change="editor.replace_tag">
+                        <Graph icon="{{icon}}" />
+                    </Input>
+                {% endfor %}
             </Group>
             <Group type="input">
                 <Graph icon="bi-bounding-box" />
                 <Container expand="dynamic" class="position-relative" height="200px" margin="m-1">
                     <!-- 16 posizioni radio -->
-                    <Input type="radio" identifier="position" class="position-absolute top-0 start-0" />
-                    <Input type="radio" identifier="position" class="position-absolute top-0 start-50" />
-                    <Input type="radio" identifier="position" class="position-absolute top-0 end-0" />
-                    <Input type="radio" identifier="position" class="position-absolute top-0 end-50" />
-                    <Input type="radio" identifier="position" class="position-absolute top-50 start-0" />
-                    <Input type="radio" identifier="position" class="position-absolute top-50 start-50" />
-                    <Input type="radio" identifier="position" class="position-absolute top-50 end-0" />
-                    <Input type="radio" identifier="position" class="position-absolute top-50 end-50" />
-                    <Input type="radio" identifier="position" class="position-absolute bottom-0 start-0" />
-                    <Input type="radio" identifier="position" class="position-absolute bottom-0 start-50" />
-                    <Input type="radio" identifier="position" class="position-absolute bottom-0 end-0" />
-                    <Input type="radio" identifier="position" class="position-absolute bottom-0 end-50" />
-                    <Input type="radio" identifier="position" class="position-absolute bottom-50 start-0" />
-                    <Input type="radio" identifier="position" class="position-absolute bottom-50 start-50" />
-                    <Input type="radio" identifier="position" class="position-absolute bottom-50 end-0" />
-                    <Input type="radio" identifier="position" class="position-absolute bottom-50 end-50" />
+                    <Input type="radio" id="{{ component.id }}-position-1" name="position" class="position-absolute top-0 start-0" change="editor.replace_tag" />
+                    <Input type="radio" id="{{ component.id }}-position-2" name="position" class="position-absolute top-0 start-50" change="editor.replace_tag" />
+                    <Input type="radio" id="{{ component.id }}-position-3" name="position" class="position-absolute top-0 end-0" change="editor.replace_tag" />
+                    <Input type="radio" id="{{ component.id }}-position-4" name="position" class="position-absolute top-0 end-50" change="editor.replace_tag" />
+                    <Input type="radio" id="{{ component.id }}-position-5" name="position" class="position-absolute top-50 start-0" change="editor.replace_tag" />
+                    <Input type="radio" id="{{ component.id }}-position-6" name="position" class="position-absolute top-50 start-50" change="editor.replace_tag" />
+                    <Input type="radio" id="{{ component.id }}-position-7" name="position" class="position-absolute top-50 end-0" change="editor.replace_tag" />
+                    <Input type="radio" id="{{ component.id }}-position-8" name="position" class="position-absolute top-50 end-50" change="editor.replace_tag" />
+                    <Input type="radio" id="{{ component.id }}-position-9" name="position" class="position-absolute bottom-0 start-0" change="editor.replace_tag" />
+                    <Input type="radio" id="{{ component.id }}-position-10" name="position" class="position-absolute bottom-0 start-50" change="editor.replace_tag" />
+                    <Input type="radio" id="{{ component.id }}-position-11" name="position" class="position-absolute bottom-0 end-0" change="editor.replace_tag" />
+                    <Input type="radio" id="{{ component.id }}-position-12" name="position" class="position-absolute bottom-0 end-50" change="editor.replace_tag" />
+                    <Input type="radio" id="{{ component.id }}-position-13" name="position" class="position-absolute bottom-50 start-0" change="editor.replace_tag" />
+                    <Input type="radio" id="{{ component.id }}-position-14" name="position" class="position-absolute bottom-50 start-50" change="editor.replace_tag" />
+                    <Input type="radio" id="{{ component.id }}-position-15" name="position" class="position-absolute bottom-50 end-0" change="editor.replace_tag" />
+                    <Input type="radio" id="{{ component.id }}-position-16" name="position" class="position-absolute bottom-50 end-50" change="editor.replace_tag" />
                 </Container>
             </Group>
             <Group type="input">
                 <Graph icon="bi-border" />
                 <Graph expand="dynamic" icon="bi-border-outer" />
-                <Graph expand="dynamic" icon="bi-border-bottom" />
                 <Graph expand="dynamic" icon="bi-border-left" />
                 <Graph expand="dynamic" icon="bi-border-right" />
                 <Graph expand="dynamic" icon="bi-border-top" />
+                <Graph expand="dynamic" icon="bi-border-bottom" />
             </Group>
             <Group type="input">
                 <Graph icon="bi-border-width" />
-                <Input expand="dynamic" placeholder="border-top" value="{{info|get('border_top')}}" />
-                <Input expand="dynamic" placeholder="border-right" value="{{info|get('border_right')}}" />
-                <Input expand="dynamic" placeholder="border-bottom" value="{{info|get('border_bottom')}}" />
-                <Input expand="dynamic" placeholder="border-left" value="{{info|get('border_left')}}" />
-                <Input expand="dynamic" placeholder="border-all" value="{{info|get('border_all')}}" />
+                <Input id="{{ component.id }}-border" name="border" expand="dynamic" placeholder="border" value="{{info|get('border','')}}" change="editor.replace_tag" />
+                <Input id="{{ component.id }}-border-left" name="border-left" expand="dynamic" placeholder="border-left" value="{{info|get('border-left','')}}" change="editor.replace_tag" />
+                <Input id="{{ component.id }}-border-right" name="border-right" expand="dynamic" placeholder="border-right" value="{{info|get('border-right','')}}" change="editor.replace_tag" />
+                <Input id="{{ component.id }}-border-top" name="border-top" expand="dynamic" placeholder="border-top" value="{{info|get('border-top','')}}" change="editor.replace_tag" />
+                <Input id="{{ component.id }}-border-bottom" name="border-bottom" expand="dynamic" placeholder="border-bottom" value="{{info|get('border-bottom','')}}" change="editor.replace_tag" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-border-width" />
+                <Input id="{{ component.id }}-margin" name="margin" expand="dynamic" placeholder="margin" value="{{info|get('margin','')}}" change="editor.replace_tag" />
+                <Input id="{{ component.id }}-margin-left" name="margin-left" expand="dynamic" placeholder="margin-left" value="{{info|get('margin-left','')}}" change="editor.replace_tag" />
+                <Input id="{{ component.id }}-margin-right" name="margin-right" expand="dynamic" placeholder="margin-right" value="{{info|get('margin-right','')}}" change="editor.replace_tag" />
+                <Input id="{{ component.id }}-margin-top" name="margin-top" expand="dynamic" placeholder="margin-top" value="{{info|get('margin-top','')}}" change="editor.replace_tag" />
+                <Input id="{{ component.id }}-margin-bottom" name="margin-bottom" expand="dynamic" placeholder="margin-bottom" value="{{info|get('margin-bottom','')}}" change="editor.replace_tag" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-border-width" />
+                <Input id="{{ component.id }}-padding" name="padding" expand="dynamic" placeholder="padding" value="{{info|get('padding','')}}" change="editor.replace_tag" />
+                <Input id="{{ component.id }}-padding-left" name="padding-left" expand="dynamic" placeholder="padding-left" value="{{info|get('padding-left','')}}" change="editor.replace_tag" />
+                <Input id="{{ component.id }}-padding-right" name="padding-right" expand="dynamic" placeholder="padding-right" value="{{info|get('padding-right','')}}" change="editor.replace_tag" />
+                <Input id="{{ component.id }}-padding-top" name="padding-top" expand="dynamic" placeholder="padding-top" value="{{info|get('padding-top','')}}" change="editor.replace_tag" />
+                <Input id="{{ component.id }}-padding-bottom" name="padding-bottom" expand="dynamic" placeholder="padding-bottom" value="{{info|get('padding-bottom','')}}" change="editor.replace_tag" />
             </Group>
         </Container>
         <!-- Matter -->
         <Container id="tab-matter">
             <Group type="input">
-                <Graph icon="bi-fingerprint" />
-                <Input placeholder="id" value="{{info|get('id')}}" />
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-fingerprint" />
-                <Input placeholder="identifier" value="{{info|get('identifier')}}" />
-            </Group>
-            <Group type="input">
                 <Graph icon="bi-tag" />
-                <Input type="select" id="{{ component.id }}-tag" identifier="tag" expand="dynamic" class="rounded-0" value="{{info|get('tag')}}">
+                <Input type="select" id="{{ component.id }}-tag" name="tag" onchange="editor.replace_tag" expand="dynamic" class="rounded-0" value="{{info|get('tag')}}">
                 <Text>{{info|get('tag')}}</Text>
                 {% for tag in ['Layout','View','Presenter','Messenger','Storekeeper','Input','Action','Window','Icon','Text','Group','Media'] %}
                     {% if info|get('tag') != tag %}
@@ -127,23 +154,37 @@
                 </Input>
             </Group>
             <Group type="input">
-                <Graph icon="bi-ui-checks" />
-                <Input placeholder="value" value="{{info|get('type')}}" />
+                <Graph icon="bi-fingerprint" />
+                <Input id="{{ component.id }}-id" name="id" placeholder="id" onchange="editor.replace_tag" value="{{info|get('id','')}}" />
             </Group>
             <Group type="input">
-                <Graph icon="bi-input-cursor-text" />
-                <Input placeholder="value" value="{{info|get('value')}}" />
+                <Graph icon="bi-fingerprint" />
+                <Input id="{{ component.id }}-identifier" name="identifier" onchange="editor.replace_tag" placeholder="identifier" value="{{info|get('identifier','')}}" />
             </Group>
+            <Group type="input">
+                <Graph icon="bi-ui-checks" />
+                <Input id="{{ component.id }}-type" name="type" onchange="editor.replace_tag" placeholder="value" value="{{info|get('type','')}}" />
+            </Group>
+            {% if info|get('tag') == 'Input' %}
+            <Group type="input">
+                <Graph icon="bi-input-cursor-text" />
+                <Input id="{{ component.id }}-value" name="value" onchange="editor.replace_tag" placeholder="value" value="{{info|get('value','')}}" />
+            </Group>
+            {% endif %}
             {% if info|get('tag') == 'Text' %}
             <Group type="input">
                 <Graph icon="bi bi-type" />
+                <Graph icon="bi-type-bold" />
+                <Input id="{{ component.id }}-text" name="text" expand="dynamic" class="rounded-0" value="{{info|get('text')}}" placeholder="text"/>
                 <Action><Graph icon="bi-type-bold" /></Action>
+
                 <Action><Graph icon="bi-type-italic" /></Action>
                 <Action><Graph icon="bi-type-underline" /></Action>
                 <Action><Graph icon="bi-type-strikethrough" /></Action>
             </Group>
             <Group type="input">
                 <Graph icon="bi-body-text" />
+                <Input id="{{ component.id }}-text-left" name="text-left" expand="dynamic" class="rounded-0" value="{{info|get('text')}}" placeholder="text"/>
                 <Action><Graph icon="bi-text-left" /></Action>
                 <Action><Graph icon="bi-text-center" /></Action>
                 <Action><Graph icon="bi-text-right" /></Action>
@@ -191,24 +232,29 @@
             <Column>
                 <Group type="input" expand="dynamic">
                     <Graph icon="bi-paint-bucket" />
-                    <Input expand="dynamic" type="color" value="{{info|get('background')}}" placeholder="background"/>
+                    <Input id="{{ component.id }}-background-color" name="background-color" expand="dynamic" type="color" value="{{info|get('background-color','#808080')}}" change="editor.replace_tag" placeholder="background"/>
                 </Group>
                 <Group type="input" expand="dynamic">
                     <Graph icon="bi-border-style" />
-                    <Input expand="dynamic" type="color" value="{{info|get('color')}}" placeholder="color"/>
+                    <Input id="{{ component.id }}-border-color" name="border-color" expand="dynamic" type="color" value="{{info|get('border-color','#808080')}}" change="editor.replace_tag"  placeholder="color"/>
                 </Group>
                 <Group type="input" expand="dynamic">
                     <Graph icon="bi-highlighter" />
-                    <Input expand="dynamic" class="rounded-0" type="color" value="{{info|get('color')}}" placeholder="text color"/>
+                    <Input id="{{ component.id }}-text-color" name="text-color" expand="dynamic" class="rounded-0" type="color" value="{{info|get('text-color','#808080')}}" change="editor.replace_tag"  placeholder="text color"/>
                 </Group>
             </Column>
             <Group type="input">
                 <Graph tooltip="class or tag" icon="bi-tag-fill" />
-                <Input class="rounded-0" value="{{info|get('class')}}" placeholder="class"/>
+                <Input id="{{ component.id }}-class" name="class" class="rounded-0" value="{{info|get('class','')}}" placeholder="class"/>
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-asterisk" />
+                <Input id="{{ component.id }}-style" name="style" class="rounded-0" value="{{info|get('style','')}}" placeholder="style"/>
             </Group>
             <Group type="input">
                 <Graph icon="bi-fonts" />
-                <Input type="select" expand="dynamic" class="rounded-0" value="{{info|get('font-style')}}">
+                <Input type="select" id="{{ component.id }}-font-style" name="font-style" expand="dynamic" class="rounded-0" value="{{info|get('font-style')}}">
+                    <Text value="" ></Text>
                     <Text style="font-family: Arial;">Arial</Text>
                     <Text style="font-family: Helvetica;">Helvetica</Text>
                     <Text style="font-family: Verdana;">Verdana</Text>
@@ -237,45 +283,29 @@
             </Group>
             <Group type="input">
                 <Graph icon="bi-paragraph" />
-                <Input expand="dynamic" class="rounded-0" value="{{info|get('font_size')}}" placeholder="font size"/>
-                <Input type="select" width="70px" value="{{info|get('font_size_unit')}}">
+                <Input id="{{ component.id }}-text-size" name="text-size" expand="dynamic" class="rounded-0" value="{{info|get('text-size','')}}" placeholder="font size" change="editor.replace_tag"/>
+                <!--<Input type="select" id="{{ component.id }}-font-size-unit" name="font_size_unit" width="70px" value="{{info|get('font_size_unit')}}">
                     <Text>px</Text>
                     <Text>%</Text>
                     <Text>enum</Text>
-                </Input>
+                </Input>-->
             </Group>
             <Group type="input">
                 <Graph icon="bi-shadows" />
-                <Input expand="dynamic" class="rounded-0" type="range" min="0" max="3" value="{{info|get('shadow')}}" placeholder="shadow"/>
+                <Input id="{{ component.id }}-shadow" name="shadow" expand="dynamic" class="rounded-0" type="range" min="0" max="3" value="{{info|get('shadow','0')}}" placeholder="shadow" change="editor.replace_tag" />
             </Group>
             <Group type="input">
                 <Graph icon="bi-transparency" />
-                <Input expand="dynamic" class="rounded-0" type="range" min="0" step="25" max="100" value="{{info|get('opacity')}}" placeholder="opacity"/>
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-asterisk" />
-                <Input class="rounded-0" value="{{info|get('custom')}}" placeholder="custom"/>
-            </Group>
-            <Group type="input">
-                <Graph icon="bi-border" />
-                <Graph expand="dynamic" icon="bi-border-outer" />
-                <Graph expand="dynamic" icon="bi-border-bottom" />
-                <Graph expand="dynamic" icon="bi-border-left" />
-                <Graph expand="dynamic" icon="bi-border-right" />
-                <Graph expand="dynamic" icon="bi-border-top" />
+                <Input id="{{ component.id }}-opacity" name="opacity" expand="dynamic" class="rounded-0" type="range" min="0" step="25" max="100" value="{{info|get('opacity','0')}}" placeholder="opacity" change="editor.replace_tag" />
             </Group>
             <Group type="input">
                 <Graph icon="bi-border-width" />
-                <Input expand="dynamic" placeholder="border-top" value="{{info|get('border-top')}}" />
-                <Input expand="dynamic" placeholder="border-right" value="{{info|get('border-right')}}" />
-                <Input expand="dynamic" placeholder="border-bottom" value="{{info|get('border-bottom')}}" />
-                <Input expand="dynamic" placeholder="border-left" value="{{info|get('border-left')}}" />
-                <Input expand="dynamic" placeholder="border-all" value="{{info|get('border-all')}}" />
+                <Input id="{{ component.id }}-border-radius" name="border-radius" expand="dynamic" placeholder="border-radius" value="{{info|get('border-radius','0')}}" change="editor.replace_tag" />
             </Group>
-            <Group type="input">
+            <!--<Group type="input">
                 <Graph icon="bi-border-style" />
-                <Input type="select" class="form-select-sm" value="{{info|get('border-style')}}">
-                    <Text>None</Text>
+                <Input type="select" id="{{ component.id }}-border-style" name="border-style" class="form-select-sm" value="{{info|get('border-style','')}}">
+                    <Text value="{{info|get('border-style','')}}" >{{info|get('border-style','')}}</Text>
                     <Text>solid</Text>
                     <Text>hidden</Text>
                     <Text>dotted</Text>
@@ -288,7 +318,7 @@
                     <Text>initial</Text>
                     <Text>inherit</Text>
                 </Input>
-            </Group>
+            </Group>-->
         </Container>
         <!-- Event -->
         <Container id="tab-event" alignment-vertical="center" expand="horizontal">
@@ -298,7 +328,7 @@
                 <Container>
                     <Group type="input">
                         <Graph icon="bi-window" />
-                        <Input placeholder="onresize" value="{{info|get('onresize')}}" />
+                        <Input id="{{ component.id }}-onresize" name="onresize" placeholder="onresize" value="{{info|get('onresize','')}}" />
                     </Group>
                 </Container>
                 <!-- Mouse -->
@@ -306,35 +336,35 @@
                 <Container>
                     <Group type="input">
                         <Graph icon="bi-mouse" />
-                        <Input placeholder="onclick" value="{{info|get('click')}}" />
+                        <Input id="{{ component.id }}-onclick" name="onclick" placeholder="onclick" value="{{info|get('click','')}}" />
                     </Group>
                     <Group type="input">
                         <Graph icon="bi-mouse" />
-                        <Input placeholder="ondblclick" value="{{info|get('dblclick')}}" />
+                        <Input id="{{ component.id }}-ondblclick" name="ondblclick" placeholder="ondblclick" value="{{info|get('dblclick','')}}" />
                     </Group>
                     <Group type="input">
                         <Graph icon="bi-mouse" />
-                        <Input placeholder="onmousedown" value="{{info|get('mousedown')}}" />
+                        <Input id="{{ component.id }}-onmousedown" name="onmousedown" placeholder="onmousedown" value="{{info|get('mousedown','')}}" />
                     </Group>
                     <Group type="input">
                         <Graph icon="bi-mouse" />
-                        <Input placeholder="onmousemove" value="{{info|get('mousemove')}}" />
+                        <Input id="{{ component.id }}-onmousemove" name="onmousemove" placeholder="onmousemove" value="{{info|get('mousemove','')}}" />
                     </Group>
                     <Group type="input">
                         <Graph icon="bi-mouse" />
-                        <Input placeholder="onmouseout" value="{{info|get('mouseout')}}" />
+                        <Input id="{{ component.id }}-onmouseout" name="onmouseout" placeholder="onmouseout" value="{{info|get('mouseout','')}}" />
                     </Group>
                     <Group type="input">
                         <Graph icon="bi-mouse" />
-                        <Input placeholder="onmouseover" value="{{info|get('mouseover')}}" />
+                        <Input id="{{ component.id }}-onmouseover" name="onmouseover" placeholder="onmouseover" value="{{info|get('mouseover','')}}" />
                     </Group>
                     <Group type="input">
                         <Graph icon="bi-mouse" />
-                        <Input placeholder="onmouseup" value="{{info|get('mouseup')}}" />
+                        <Input id="{{ component.id }}-onmouseup" name="onmouseup" placeholder="onmouseup" value="{{info|get('mouseup','')}}" />
                     </Group>
                     <Group type="input">
                         <Graph icon="bi-mouse" />
-                        <Input placeholder="onwheel" value="{{info|get('wheel')}}" />
+                        <Input id="{{ component.id }}-onwheel" name="onwheel" placeholder="onwheel" value="{{info|get('wheel','')}}" />
                     </Group>
                 </Container>
                 <!-- Keyboard -->
@@ -342,7 +372,7 @@
                 <Container>
                     <Group type="input">
                         <Graph icon="bi-keyboard" />
-                        <Input placeholder="onkeydown" value="{{info|get('keydown')}}" />
+                        <Input id="{{ component.id }}-onkeydown" name="onkeydown" placeholder="onkeydown" value="{{info|get('keydown','')}}" />
                     </Group>
                 </Container>
                 <!-- Input -->
@@ -350,7 +380,7 @@
                 <Container>
                     <Group type="input">
                         <Graph icon="bi-input-cursor" />
-                        <Input placeholder="oninput" value="{{info|get('input')}}" />
+                        <Input id="{{ component.id }}-oninput" name="oninput" placeholder="oninput" value="{{info|get('input','')}}" />
                     </Group>
                 </Container>
                 <!-- Drag -->
@@ -358,7 +388,7 @@
                 <Container>
                     <Group type="input">
                         <Graph icon="bi-arrows-move" />
-                        <Input placeholder="ondrag" value="{{info|get('drag')}}" />
+                        <Input id="{{ component.id }}-ondrag" name="ondrag" placeholder="ondrag" value="{{info|get('drag','')}}" />
                     </Group>
                 </Container>
                 <!-- Clipboard -->
@@ -366,7 +396,7 @@
                 <Container>
                     <Group type="input">
                         <Graph icon="bi-clipboard" />
-                        <Input placeholder="oncopy" value="{{info|get('copy')}}" />
+                        <Input id="{{ component.id }}-oncopy" name="oncopy" placeholder="oncopy" value="{{info|get('copy','')}}" />
                     </Group>
                 </Container>
                 <!-- Special -->
@@ -374,7 +404,7 @@
                 <Container>
                     <Group type="input">
                         <Graph icon="bi-router" />
-                        <Input placeholder="oncopy" value="{{info|get('route')}}" />
+                        <Input id="{{ component.id }}-route" name="route" placeholder="oncopy" value="{{info|get('route','')}}" />
                     </Group>
                 </Container>
                 <!-- Media -->
@@ -382,7 +412,7 @@
                 <Container>
                     <Group type="input">
                         <Graph icon="bi-collection" />
-                        <Input placeholder="onplay" value="{{info|get('play')}}" />
+                        <Input id="{{ component.id }}-onplay" name="onplay" placeholder="onplay" value="{{info|get('play','')}}" />
                     </Group>
                 </Container>
             </Group>

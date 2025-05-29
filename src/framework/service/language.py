@@ -172,15 +172,23 @@ def get_module_os(path, lang):
         print(f"Error loading 'infrastructure module': {str(e)}")
 
 
-def get_var(accessor_string,input_dict):
-          """Gets data from a dictionary using a dotted accessor-string"""
-          current_data = input_dict
-          for chunk in accessor_string.split('.'):
-              if type([]) == type(current_data):
+def get_var(accessor_string, input_dict, default=None):
+    """Gets data from a dictionary using a dotted accessor-string"""
+    current_data = input_dict
+    for chunk in accessor_string.split('.'):
+        if isinstance(current_data, list):
+            try:
                 current_data = current_data[int(chunk)]
-              else:
-                current_data = current_data.get(chunk, {})
-          return current_data
+            except (IndexError, ValueError, TypeError):
+                return default if default is not None else None
+        elif isinstance(current_data, dict):
+            if chunk in current_data:
+                current_data = current_data[chunk]
+            else:
+                return default if default is not None else None
+        else:
+            return default if default is not None else None
+    return current_data if current_data is not None else default
 
 
 if sys.platform != 'emscripten':
@@ -461,7 +469,7 @@ def get(domain,dictionary={}):
                 if len(puntatore) != 0:
                     puntatore = puntatore[key]
 
-def get_safe(dictionary, domain):
+def get_safe(dictionary, domain, default=None):
     """
     Safe access to nested dict/list structures using dot notation.
     Supports wildcard '*' to map over lists.
@@ -478,10 +486,9 @@ def get_safe(dictionary, domain):
                 key = int(key)
 
             if key == '*':
-                # wildcard: iterate over current list
                 arr = _get('.'.join(parts[:idx]), d)
                 if not isinstance(arr, list):
-                    return None
+                    return default
                 for i in range(len(arr)):
                     new_parts = parts.copy()
                     new_parts[idx] = str(i)
@@ -494,11 +501,11 @@ def get_safe(dictionary, domain):
                 elif isinstance(current, dict):
                     current = current.get(key)
                 else:
-                    return None
+                    return default
             except (KeyError, IndexError, TypeError):
-                return None
+                return default
 
-        return current
+        return current if current is not None else default
 
     return _get(domain, dictionary)
 
