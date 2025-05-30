@@ -1152,7 +1152,7 @@ class adapter():
                             li = self.code('li',{'class':''},[item])
                             new.append(li)
 
-                        tab = self.code('details',{'class':''},[
+                        tab = self.code('details',{'class':'','open':'open'},[
                             self.code('summary',{'class':''},[inner[0]]),
                             self.code('ul',{'class':''},new)
                         ])

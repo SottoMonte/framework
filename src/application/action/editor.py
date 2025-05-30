@@ -432,7 +432,7 @@ async def move(messenger,presenter,**constants):
     #component['block-editor-'].moveCursorTo(int(row), int(col))
     component['block-editor-'].focus()
 
-    on_editor_change(component['block-editor-'])
+    #on_editor_change(component['block-editor-'])
 
     '''# Forza il movimento del cursore per scatenare l'evento
     cursor = component['block-editor-'].getCursorPosition()
@@ -524,7 +524,7 @@ def build_combined_input_tag(self_closing=True):
         # Usa il campo 'tag' per il nome del tag
         if name == "tag" or el.id == "editor-property-tag":
             tag_name = value or "Input"
-        elif value == '' or value == '#808080' or value == '0':
+        elif value == '' or value == '#808080' or value == '0' or value == 'None':
             continue
         else:
             attrs.append(f'{name}="{value}"')

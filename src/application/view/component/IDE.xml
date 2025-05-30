@@ -214,6 +214,9 @@
 </Row>
 {% else %}
 <Container padding="p-5" margin="my-5" expand="horizontal" background="#fafafa" class="border-top border-bottom">
+    <Action route="link:https://github.com/login/oauth/authorize?client_id=Ov23lidpWleO0KCHQVm0&amp;scope=repo,user,delete_repo&amp;state=xyz987">
+    <Text>GitHub OAuth Login</Text>
+</Action>
     <Table repository="repository" filter="{'eq':{'owner':'SottoMonte'}}" view="repository" >
         <Text click="table(id:'{{ component or '' }}',sortField:'name')">Repository</Text>
         <Text>Description</Text>

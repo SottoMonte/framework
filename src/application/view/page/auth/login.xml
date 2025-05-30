@@ -8,9 +8,6 @@
             <Input identifier="email" model="user.name" />
             <Input identifier="password" model="user.password" />
             <Action click="form(id:'form-login',action:'login')" ><Text>Login</Text></Action>
-            <Action route="link:https://github.com/login/oauth/authorize?client_id=Ov23lidpWleO0KCHQVm0&amp;scope=repo,user,delete_repo&amp;state=xyz987">
-                <Text>GitHub OAuth Login</Text>
-            </Action>
         </Action>
         <Action type="form" action="/registration" id="form-registration">
             <Input identifier="email" model="user.name" />

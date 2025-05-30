@@ -17,7 +17,7 @@
                 <Action route="application/view/page/cubute/overview.xml" class="d-inline-flex"><Graph icon="bi-gear-fill"/><Text padding="px-1">Operations</Text></Action>
                 -->
                 <Action route="application/view/page/inventory/overview.xml" class="d-inline-flex"><Graph icon="bi-basket3-fill"/><Text padding="px-1">Inventory</Text></Action>
-                <Action route="application/view/page/project/overview.xml" class="d-inline-flex"><Graph icon="bi-kanban-fill"/><Text padding="px-1">Planning</Text></Action>
+                <!--<Action route="application/view/page/project/overview.xml" class="d-inline-flex"><Graph icon="bi-kanban-fill"/><Text padding="px-1">Planning</Text></Action>-->
                 <Action route="application/view/page/cms/overview.xml" class="d-inline-flex"><Graph icon="bi-code-slash"/><Text padding="px-1">Development</Text></Action>
             </Column>
             <Column padding="pe-4" content="end" alignment-horizontal="center" >

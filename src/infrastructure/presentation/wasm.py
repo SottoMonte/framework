@@ -131,9 +131,10 @@ class adapter(starlette.adapter):
                 'text-color': lambda v: f"text-{v}",
                 'text-size': lambda v: f"fs-{v}" if v.isdigit() else None,
                 'shadow': lambda v: {
-                    'none': 'shadow-none', 'sm': 'shadow-sm',
-                    'md': 'shadow', 'lg': 'shadow-lg'
+                    '0': 'shadow-none', '1': 'shadow-sm',
+                    '2': 'shadow', '3': 'shadow-lg'
                 }.get(v, ''),
+                'opacity': lambda v: f"opacity-{v}" if v.isdigit() else None,
                 'border': lambda v: f"border-{v}",
                 'border-thickness': lambda v: f"border-{v}",
                 'border-radius-size': lambda v: f"rounded-{v}",

@@ -26,17 +26,12 @@
             <Group type="input">
                 <Graph icon="bi-layers-half" />
                 <Input type="select" id="{{ component.id }}-index" name="index" value="{{info|get('index','')}}">
-                    <Text>Auto</Text>
-                    <Text>Background</Text>
-                    <Text>Content</Text>
-                    <Text>Navbar</Text>
-                    <Text>Dropdown</Text>
-                    <Text>Tooltip</Text>
-                    <Text>Sidebar</Text>
-                    <Text>Modal</Text>
-                    <Text>Overlay</Text>
-                    <Text>Notification</Text>
-                    <Text>Critical</Text>
+                    <Text>{{info|get('index')}}</Text>
+                    {% for tag in ['Auto','Background','Content','Navbar','Dropdown','Tooltip','Sidebar','Modal','Overlay','Notification'] %}
+                        {% if info|get('index') != tag %}
+                            <Text>{{tag}}</Text>
+                        {% endif %}
+                    {% endfor %}
                 </Input>
             </Group>
             <Group type="input">
@@ -66,7 +61,7 @@
                     ('auto', 'bi-arrows-angle-expand'),
                     ('dynamic', 'bi-magic')] 
                 %}
-                    <Input type="radio" id="{{ component.id }}-position-{{value}}" class="btn-check" name="expand" value="{{value}}" selected="{% if info|get('expand','') == value %}true{% endif %}" change="editor.replace_tag">
+                    <Input type="radio" id="{{ component.id }}-expand-{{value}}" class="btn-check" name="expand" value="{{value}}" selected="{% if info|get('expand','') == value %}true{% endif %}" change="editor.replace_tag">
                         <Graph icon="{{icon}}" />
                     </Input>
                 {% endfor %}
@@ -80,7 +75,22 @@
                     ('auto', 'bi-arrows-angle-contract'),
                     ('dynamic', 'bi-magic')] 
                 %}
-                    <Input type="radio" id="{{ component.id }}-position-{{value}}" class="btn-check" name="collapse" value="{{value}}" selected="{% if info|get('expand','') == value %}true{% endif %}" change="editor.replace_tag">
+                    <Input type="radio" id="{{ component.id }}-collapse-{{value}}" class="btn-check" name="collapse" value="{{value}}" selected="{% if info|get('collapse','') == value %}true{% endif %}" change="editor.replace_tag">
+                        <Graph icon="{{icon}}" />
+                    </Input>
+                {% endfor %}
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-arrows-move" />
+                {% for value,icon in [
+                    ('sm', 'bi bi-arrows-expand-vertical'),
+                    ('md', 'bi bi-arrows-expand'),
+                    ('lg', 'bi bi-arrows'),
+                    ('xl', 'bi bi-arrows-angle-expand'),
+                    ('fullscreen', 'bi-arrows-fullscreen'),
+                    ]
+                %}
+                    <Input type="radio" id="{{ component.id }}-size-{{value}}" class="btn-check" name="size" value="{{value}}" selected="{% if info|get('size','') == value %}true{% endif %}" change="editor.replace_tag">
                         <Graph icon="{{icon}}" />
                     </Input>
                 {% endfor %}
@@ -165,10 +175,24 @@
                 <Graph icon="bi-ui-checks" />
                 <Input id="{{ component.id }}-type" name="type" onchange="editor.replace_tag" placeholder="value" value="{{info|get('type','')}}" />
             </Group>
+            {% if info|get('tag') == 'Action' %}
+            <Group type="input">
+                <Graph icon="bi-input-cursor-text" />
+                <Input id="{{ component.id }}-action" name="action" onchange="editor.replace_tag" placeholder="action" value="{{info|get('action','')}}" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-input-cursor-text" />
+                <Input id="{{ component.id }}-method" name="method" onchange="editor.replace_tag" placeholder="action method" value="{{info|get('method','')}}" />
+            </Group>
+            {% endif %}
             {% if info|get('tag') == 'Input' %}
             <Group type="input">
                 <Graph icon="bi-input-cursor-text" />
                 <Input id="{{ component.id }}-value" name="value" onchange="editor.replace_tag" placeholder="value" value="{{info|get('value','')}}" />
+            </Group>
+            <Group type="input">
+                <Graph icon="bi-input-cursor-text" />
+                <Input id="{{ component.id }}-placeholder" name="placeholder" onchange="editor.replace_tag" placeholder="placeholder" value="{{info|get('placeholder','')}}" />
             </Group>
             {% endif %}
             {% if info|get('tag') == 'Text' %}
@@ -204,27 +228,26 @@
             <Group type="input">
                 <Graph icon="bi-symmetry-horizontal" />
                 {% for align in [('start','bi-align-start'), ('center','bi-align-center'), ('end','bi-align-end'), ('stretch','bi-align-middle') ] %}
-                    {% if info|get('alignment-horizontal') == align[0] %}
-                        <Graph expand="dynamic" icon="{{align[1]}}" color="#fff" />
-                    {% else %}
-                        <Graph expand="dynamic" icon="{{align[1]}}" />
-                    {% endif %}
+                    <Input type="radio" id="{{ component.id }}-alignment-horizontal-{{align[0]}}" class="btn-check" name="alignment-horizontal" value="{{align[0]}}" selected="{% if info|get('alignment-horizontal','') == align[0] %}true{% endif %}" change="editor.replace_tag">
+                        <Graph icon="{{align[1]}}" />
+                    </Input>
                 {% endfor %}
             </Group>
             <Group type="input">
                 <Graph icon="bi-symmetry-vertical" />
                 {% for align in [('start','bi-align-top'), ('center','bi-align-middle'), ('end','bi-align-bottom'), ('stretch','bi-align-middle') ] %}
-                    {% if info|get('alignment-vertical') == align[0] %}
-                        <Icon expand="dynamic" name="{{align[1]}}" color="#fff" />
-                    {% else %}
-                        <Icon expand="dynamic" name="{{align[1]}}" />
-                    {% endif %}
+                    <Input type="radio" id="{{ component.id }}-alignment-vertical-{{align[0]}}" class="btn-check" name="alignment-vertical" value="{{align[0]}}" selected="{% if info|get('alignment-vertical','') == align[0] %}true{% endif %}" change="editor.replace_tag">
+                        <Graph icon="{{align[1]}}" />
+                    </Input>
                 {% endfor %}
             </Group>
             <Group type="input">
                 <Graph icon="bi-binoculars-fill" />
-                <Graph expand="dynamic" icon="bi-distribute-horizontal" />
-                <Graph expand="dynamic" icon="bi-distribute-vertical" />
+                {% for align in [('horizontal','bi-distribute-horizontal'), ('vertical','bi-distribute-vertical') ] %}
+                    <Input expand="dynamic" type="radio" id="{{ component.id }}-alignment-content-{{align[0]}}" class="btn-check" name="alignment-content" value="{{align[0]}}" selected="{% if info|get('alignment-content','') == align[0] %}true{% endif %}" change="editor.replace_tag">
+                        <Graph icon="{{align[1]}}" />
+                    </Input>
+                {% endfor %}
             </Group>
         </Container>
         <!-- Style -->
@@ -253,32 +276,13 @@
             </Group>
             <Group type="input">
                 <Graph icon="bi-fonts" />
-                <Input type="select" id="{{ component.id }}-font-style" name="font-style" expand="dynamic" class="rounded-0" value="{{info|get('font-style')}}">
-                    <Text value="" ></Text>
-                    <Text style="font-family: Arial;">Arial</Text>
-                    <Text style="font-family: Helvetica;">Helvetica</Text>
-                    <Text style="font-family: Verdana;">Verdana</Text>
-                    <Text style="font-family: Tahoma;">Tahoma</Text>
-                    <Text style="font-family: 'Trebuchet MS';">Trebuchet MS</Text>
-                    <Text style="font-family: 'Times New Roman';">Times New Roman</Text>
-                    <Text style="font-family: Georgia;">Georgia</Text>
-                    <Text style="font-family: Garamond;">Garamond</Text>
-                    <Text style="font-family: 'Courier New';">Courier New</Text>
-                    <Text style="font-family: 'Lucida Console';">Lucida Console</Text>
-                    <Text style="font-family: Monaco;">Monaco</Text>
-                    <Text style="font-family: Consolas;">Consolas</Text>
-                    <Text style="font-family: 'Comic Sans MS';">Comic Sans MS</Text>
-                    <Text style="font-family: Impact;">Impact</Text>
-                    <Text style="font-family: 'Palatino Linotype';">Palatino Linotype</Text>
-                    <Text style="font-family: 'Segoe UI';">Segoe UI</Text>
-                    <Text style="font-family: Roboto;">Roboto</Text>
-                    <Text style="font-family: 'Open Sans';">Open Sans</Text>
-                    <Text style="font-family: Lato;">Lato</Text>
-                    <Text style="font-family: Montserrat;">Montserrat</Text>
-                    <Text style="font-family: 'Source Sans Pro';">Source Sans Pro</Text>
-                    <Text style="font-family: Ubuntu;">Ubuntu</Text>
-                    <Text style="font-family: Raleway;">Raleway</Text>
-                    <Text style="font-family: Nunito;">Nunito</Text>
+                <Input type="select" id="{{ component.id }}-font-style" name="text-style" expand="dynamic" class="rounded-0" value="{{info|get('text-style')}}">
+                    <Text>{{info|get('text-style')}}</Text>
+                    {% for tag in ['Arial','Helvetica','Verdana','Tahoma','Trebuchet MS','Times New Roman','Georgia','Garamond','Courier New','Lucida Console','Ubuntu'] %}
+                        {% if info|get('text-style') != tag %}
+                            <Text>{{tag}}</Text>
+                        {% endif %}
+                    {% endfor %}
                 </Input>
             </Group>
             <Group type="input">
