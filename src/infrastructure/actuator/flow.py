@@ -35,7 +35,131 @@ else:
                     return {"state": False, "remark": f"Request failed with status {response.status}"}
 
 
-class adapter():
+import os
+import json
+import subprocess
+import datetime
+import xml.etree.ElementTree as ET
+from jinja2 import Template
+
+# Simulazione backend HTTP asincrono
+async def backend(method, url, headers, payload):
+    print(f"➡️  {method} {url}\nHeaders: {headers}\nPayload: {payload}")
+    return {"status": "success", "url": url}
+
+class adapter:
+    def __init__(self, **constants):
+        self.config = constants.get('config', {})
+        self.api_url = self.config.get('url', '')
+        self.token = self.config.get('token', '')
+        self.authorization = self.config.get('authorization', 'Bearer')
+        self.accept = self.config.get('accept', 'application/json')
+        self.scheduled_jobs = []
+
+        self.load_flow_config("src/application/action")  # tua directory XML
+
+    def load_flow_config(self, xml_dir_path):
+        self.scheduled_jobs.clear()
+
+        for filename in os.listdir(xml_dir_path):
+            if not filename.endswith('.xml'):
+                continue
+
+            filepath = os.path.join(xml_dir_path, filename)
+            try:
+                with open(filepath, 'r', encoding='utf-8') as file:
+                    template = Template(file.read())
+                    rendered = template.render(**self.config)
+                    root = ET.fromstring(rendered)
+
+                for case_elem in root.findall('case'):
+                    case_name = case_elem.attrib.get('name', 'unknown')
+                    description = case_elem.findtext('description', '')
+                    action_elem = case_elem.find('action')
+
+                    if action_elem is None or len(action_elem) == 0:
+                        continue
+
+                    action_type_elem = list(action_elem)[0]
+                    action_type = action_type_elem.tag.lower()
+
+                    job = {
+                        'name': case_name,
+                        'description': description,
+                        'type': action_type,
+                        'location': '',
+                        'method': '',
+                        'headers': {},
+                        'payload': {}
+                    }
+
+                    match action_type:
+                        case 'https':
+                            job['location'] = action_type_elem.findtext('url', '')
+                            job['method'] = action_type_elem.findtext('method', 'GET')
+
+                            for h in action_type_elem.findall('./headers/header'):
+                                name = h.attrib.get('name')
+                                value = h.text
+                                if name and value:
+                                    job['headers'][name] = value
+
+                            payload_text = action_type_elem.findtext('payload')
+                            if payload_text:
+                                try:
+                                    job['payload'] = json.loads(payload_text)
+                                except json.JSONDecodeError:
+                                    job['payload'] = {}
+
+                        case 'shell':
+                            job['location'] = action_type_elem.findtext('url', '')
+                            job['method'] = 'shell'
+
+                        case _:
+                            print(f"⚠️ Tipo azione non supportato: {action_type}")
+                            continue
+
+                    self.scheduled_jobs.append(job)
+
+            except Exception as e:
+                print(f"❌ Errore caricando {filepath}: {e}")
+
+    async def actuate(self, **job):
+        action_type = job.get("type", "")
+        match action_type:
+            case "https":
+                return await self._handle_https(job)
+            case "shell":
+                return await self._handle_shell(job)
+            case _:
+                raise NotImplementedError(f"Azione non supportata: {action_type}")
+
+    async def _handle_https(self, job):
+        headers = job.get("headers", {}).copy()
+        headers.setdefault("Authorization", f"{self.authorization} {self.token}")
+        headers.setdefault("Accept", self.accept)
+        headers.setdefault("Content-Type", "application/json")
+
+        method = job.get("method", "GET")
+        payload = job.get("payload", {})
+        url = job.get("location")
+
+        if not url.startswith("http"):
+            url = f"{self.api_url.rstrip('/')}/{url.lstrip('/')}"
+
+        return await backend(method, url, headers, payload)
+
+    async def _handle_shell(self, job):
+        command = job.get("location", "")
+        print(f"▶️ Shell: {command}")
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        return {
+            "stdout": result.stdout.strip(),
+            "stderr": result.stderr.strip(),
+            "returncode": result.returncode
+        }
+
+'''class adapter():
 
     def __init__(self, **constants):
         self.config = constants.get('config', {})
@@ -61,55 +185,6 @@ class adapter():
         payload = constants.get('payload', {})
         url = f"{self.api_url}/{location}"
         return await backend(method, url, headers, payload)
-
-    def load_cron_config2(self, xml_dir_path):
-        """Legge e renderizza con Jinja2 tutti i file XML in una cartella"""
-        #self.scheduled_jobs.clear()
-
-        for filename in os.listdir(xml_dir_path):
-            if filename.endswith('.xml'):
-                filepath = os.path.join(xml_dir_path, filename)
-
-                try:
-                    # Carica il contenuto del file
-                    with open(filepath, "r", encoding="utf-8") as file:
-                        raw_template = file.read()
-
-                    # Esegui rendering Jinja2 con le variabili
-                    rendered_xml = Template(raw_template).render(**self.config)
-
-                    # Fai parsing del contenuto XML
-                    root = ET.fromstring(rendered_xml)
-
-                    for job in root.findall('job'):
-                        config = {
-                            'weekday': int(job.findtext('day', default='-1')),
-                            'hour': int(job.findtext('hour', default='-1')),
-                            'minute': int(job.findtext('minute', default='-1')),
-                            'url': job.findtext('url'),
-                            'method': job.findtext('method', default='GET'),
-                            'token': job.findtext('token'),
-                            'headers': {},
-                            'payload': {}
-                        }
-
-                        headers_elem = job.find('headers')
-                        if headers_elem is not None:
-                            for h in headers_elem.findall('header'):
-                                config['headers'][h.attrib['name']] = h.text
-
-                        payload_text = job.findtext('payload')
-                        if payload_text:
-                            try:
-                                config['payload'] = json.loads(payload_text)
-                            except json.JSONDecodeError:
-                                config['payload'] = {}
-
-                        if config['url'] and config['weekday'] >= 0:
-                            self.scheduled_jobs.append(config)
-
-                except Exception as e:
-                    print(f"❌ Errore nel file {filepath}: {e}")
     
     def load_flow_config(self, xml_dir_path):
         """Carica tutti i file XML nella cartella e aggiunge i job definiti nei <case>"""
@@ -186,12 +261,7 @@ class adapter():
                 await backend(job['method'], job['url'], headers, {})
                 self.scheduled_jobs.remove(job)
             #else:
-            #    print("falso",now.weekday(),now.date())
-
-    async def event_loop(self):
-        while True:
-            await self.run_cron_jobs()
-            await asyncio.sleep(60)
+            #    print("falso",now.weekday(),now.date())'''
 
 
 

@@ -22,7 +22,7 @@
             </Column>
             <Column padding="pe-4" content="end" alignment-horizontal="center" >
                 <Messenger id="login-msg" domain="success,error" view="Toast" />
-                <Action size="sm" show="offcanvas:profile" padding="p-0">
+                <Action size="sm" route="offcanvas:profile" padding="p-0">
                     <Column alignment-vertical="center" space="1">
                         <Action route="tab:tab-notifications" click="tab(id:'tab-notifications')" padding="p-0">
                             <Graph icon="bi-inbox-fill" color="white"/> 
@@ -43,7 +43,7 @@
                             </Action>
                         </Column>
                         <Column expand="auto" padding="p-0">
-                            <Action id="button2" icon="REMOVE" size="auto" show="modal:window-logout" class=" d-inline" ><Graph icon="bi-box-arrow-right"/></Action>
+                            <Action id="button2" icon="REMOVE" size="auto" route="modal:window-logout" class=" d-inline" ><Graph icon="bi-box-arrow-right"/></Action>
                         </Column>
                     </Column>
                     <Container class="border-top" padding="p-0">

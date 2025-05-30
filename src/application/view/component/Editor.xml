@@ -169,7 +169,7 @@
             </Group>
             <Group type="input">
                 <Graph icon="bi-fingerprint" />
-                <Input id="{{ component.id }}-identifier" name="identifier" onchange="editor.replace_tag" placeholder="identifier" value="{{info|get('identifier','')}}" />
+                <Input id="{{ component.id }}-name" name="name" onchange="editor.replace_tag" placeholder="name" value="{{info|get('name','')}}" />
             </Group>
             <Group type="input">
                 <Graph icon="bi-ui-checks" />

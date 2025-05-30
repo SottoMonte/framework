@@ -36,12 +36,13 @@ async def form(messenger,presenter,executor,**constants):
                 item[key] = value
         items.append(item)
 
-    print('items:', items)
+    print('items:', items,form_data)
     #await executor.act(action=action,**form_data|{'items':items})
     '''for item in items:
         await executor.act(action=action,**item)'''
 
     if not any(isinstance(v, list) for v in form_data.values()):
+        print('Single item submission')
         await executor.act(action=action, **form_data)
     else:
         for item in items:

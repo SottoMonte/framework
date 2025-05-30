@@ -11,10 +11,10 @@ class executor:
         self.sessions: Dict[str, Any] = {}
         self.providers = constants.get('providers', [])
         #print('EXE-',self.providers)
-        asyncio.create_task(self.action())
+        #asyncio.create_task(self.action())
     
     @flow.asynchronous(managers=('messenger',))
-    async def action(self, messenger, **constants):
+    async def action2(self, messenger, **constants):
         await asyncio.sleep(5)
         #print('EXE2-',self.providers)
         tasks = [x.load() for x in self.providers]
@@ -22,6 +22,11 @@ class executor:
         #print(tasks)
         await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
         #await self.all_completed(tasks=tasks)
+    
+    @flow.asynchronous(managers=('messenger',))
+    async def action(self, messenger, **constants):
+        case_name = constants.get('case', '')
+
         
 
     '''@flow.asynchronous(managers=('messenger',))
@@ -88,7 +93,7 @@ class executor:
             if params_str:
                 params = language.extract_params(f"{key}({params_str})")
             else:
-                params = {}
+                params = constants
             result[key] = params
             lista.append(result)
 

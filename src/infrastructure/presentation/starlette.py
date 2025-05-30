@@ -175,6 +175,7 @@ class adapter():
 
         # Autenticazione tramite defender
         session = await defender.authenticate(ip=client_ip, identifier=session_identifier, **credentials)
+        print(session,credentials,'session.defender')
         provider = credentials.get('provider', 'undefined')
 
         

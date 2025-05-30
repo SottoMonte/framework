@@ -4,15 +4,15 @@
         <Messenger id="login-msg" domain="error" view="Banner">
         </Messenger>
         <Action type="form" action="/login" id="form-login">
-            <Input identifier="provider" value="supabase" />
-            <Input identifier="email" model="user.name" />
-            <Input identifier="password" model="user.password" />
+            <Input name="provider" value="supabase" />
+            <Input name="email" model="user.name" />
+            <Input name="password" model="user.password" />
             <Action click="form(id:'form-login',action:'login')" ><Text>Login</Text></Action>
         </Action>
         <Action type="form" action="/registration" id="form-registration">
-            <Input identifier="email" model="user.name" />
-            <Input identifier="password" model="user.password" />
-            <Input identifier="passwordRepeat" model="user.password" />
+            <Input name="email" model="user.name" />
+            <Input name="password" model="user.password" />
+            <Input name="passwordRepeat" model="user.password" />
             <Action act="submit" click="form(id:'form-registration',action:'registration')" ><Text>Registrazione</Text></Action>
         </Action>
     </Row>

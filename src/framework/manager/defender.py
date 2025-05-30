@@ -20,7 +20,8 @@ class defender:
             self.sessions[id] |= constants.get('session', {})
 
         print(self.sessions,'session.updated')
-    async def authenticate(self,**constants):
+    
+    '''async def authenticate(self,**constants):
         """
         Autentica un utente utilizzando i provider configurati.
 
@@ -37,7 +38,46 @@ class defender:
             print(session,backend,'auth.defender')
             if session:
                 self.sessions[identifier] |= {backend.config.get('profile',''): session}
-        return self.sessions[identifier]
+        return self.sessions[identifier]'''
+    
+    async def authenticate(self, **constants):
+        """
+        Autentica un utente utilizzando i provider configurati.
+
+        :param constants: Deve includere 'identifier', 'ip' e credenziali.
+        :return: Dizionario di sessione aggiornato se l'autenticazione ha successo, altrimenti None.
+        """
+        identifier = constants.get('identifier')
+        ip = constants.get('ip')
+
+        if not identifier or not ip:
+            print("Errore: 'identifier' e 'ip' sono obbligatori per l'autenticazione.")
+            return None
+
+        # Inizializza la sessione se non esiste
+        session = self.sessions.setdefault(identifier, {'ip': ip})
+
+        authenticated = False
+        for backend in self.providers:
+            try:
+                backend_session = await backend.authenticate(**constants)
+                print(f"[auth.defender] Risultato: {backend_session} | Provider: {backend}",constants)
+                if backend_session:
+                    profile = backend.config.get('profile', '')
+                    if profile:
+                        session[profile] = backend_session
+                    else:
+                        session.update(backend_session)
+                    authenticated = True
+            except Exception as e:
+                print(f"Errore durante l'autenticazione con {backend}: {e}")
+
+        if authenticated:
+            self.sessions[identifier] = session
+            return session
+        else:
+            print(f"Autenticazione fallita per identifier: {identifier}")
+            return None
 
     async def registration(self, **constants) -> Any:
         """

@@ -19,9 +19,11 @@ if sys.platform == 'emscripten':
         return user_dict.get('session',{}).get('access_token',None)
     
     async def backend_login(supabase,**data):
+        print("SERVIZIO DI LOGIN2",data)
         data_js = pyodide.ffi.to_js(data)
         user = await supabase.auth.signInWithPassword(data_js)
         user_dict = user.to_py()
+        print(user_dict,'login')
         return user_dict.get('data',{})
 else:
     import supabase
@@ -89,5 +91,6 @@ class adapter:
             #print(dir(result),result)
             return result
         except Exception as e:
+            print(f"Errore di autenticazione: {e}")
             #await messenger.post(domain="error", message=f"Errore di autenticazione: {e}")
             return None
