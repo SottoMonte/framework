@@ -11,7 +11,7 @@ class executor:
         self.sessions: Dict[str, Any] = {}
         self.providers = constants.get('providers', [])
         #print('EXE-',self.providers)
-        #asyncio.create_task(self.action())
+        #asyncio.create_task(self.action(case="github.invite-collaborator"))
     
     @flow.asynchronous(managers=('messenger',))
     async def action2(self, messenger, **constants):
@@ -25,7 +25,12 @@ class executor:
     
     @flow.asynchronous(managers=('messenger',))
     async def action(self, messenger, **constants):
-        case_name = constants.get('case', '')
+        #await asyncio.sleep(5)
+
+        await self.providers[-1].actuate(**constants)
+        '''await self.providers[-1].actuate(case_name,owner="SottoMonte",
+        repo="framework",
+        username= "SottoMonte",)'''
 
         
 

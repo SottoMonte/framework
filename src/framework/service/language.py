@@ -416,6 +416,7 @@ def validate_toml(content):
 
 def get_confi(**constants):
     jinjaEnv = Environment()
+    jinjaEnv.filters['get'] = get_safe
     if sys.platform != 'emscripten':
         with open('src/application/pyproject.toml', 'r') as f:
             text = f.read()

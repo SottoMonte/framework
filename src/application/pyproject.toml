@@ -118,7 +118,12 @@ extra_vars = ""
 inventory_file = ""
 timeout = ""
 
-[actuator.functions]
+[aactuator.functions]
 adapter = "flow"
 url = "https://ljeowpqmovaavxghpsne.supabase.co/functions/v1/scrum-release"
 token = "{{ SUPABASE_SECRET }}"
+
+[actuator.github]
+adapter = "flow"
+url = "https://ljeowpqmovaavxghpsne.supabase.co/functions/v1/scrum-release"
+token = "{{  session|get('github.access_token') }}"
