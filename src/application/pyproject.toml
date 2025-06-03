@@ -55,7 +55,7 @@ username = "default"
 password = ""
 
 # Configurazione della presentazione
-[presentation.web]
+[apresentation.web]
 adapter = "wasm"
 host = "0.0.0.0"
 port = "8000"
@@ -63,6 +63,11 @@ view = "src/domain/view/layout/page.xml"
 routes = "src/application/policy/presentation/web.xml"
 #ssl_keyfile = "key.pem"
 #ssl_certfile = "cert.pem"
+
+# Configurazione della presentazione
+[presentation.native]
+adapter = "flutter"
+view = "src/domain/view/layout/page.xml"
 
 # Configurazione dell'autenticazione
 [authentication.supabase]

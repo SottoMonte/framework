@@ -369,6 +369,7 @@ ADAPTER_FIELDS = {
     "jwt": ["url", "app_id", "installation_id", "key", "autologin"],
     "supabase": ["url", "key"],
     "fs": [],
+    "flutter": [],
     "ansible": ['playbook_path','inventory_file','extra_vars','timeout'],
     "log": ['format','level','file'],
     "console": ['format','level','file'],
