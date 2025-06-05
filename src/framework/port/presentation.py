@@ -2,17 +2,21 @@ from abc import ABC, abstractmethod
 import xml.etree.ElementTree as ET
 from jinja2 import Environment, select_autoescape,FileSystemLoader,BaseLoader,ChoiceLoader,Template,DebugUndefined
 from html import escape
+import uuid
 
 modules = {'flow': 'framework.service.flow'}
 
 class port(ABC):
     tags = {
-        'Resource':{},
+        'Data':{},
+        'Resource':{'type': ['image','video','audio']},
         'Media':{'type': ['image', 'video', 'audio', 'embed']},
         'View':{},
         'Messenger':{},
         'Defender':{},
-        'Graph':{},
+        'Column':{},
+        'Column':{},
+        'Row':{},
         'Storekeeper':{},
         'Input':{'type': ['text', 'select', 'checkbox', 'textarea', 'radio', 'switch', 'color', 'range']},
         'Action':{},
@@ -22,23 +26,77 @@ class port(ABC):
         'Layout':{},
     }
 
-    elements = [
-        'Text',
-        'Icon',
-        'Video',
-        'Row',
-        'Column',
-        'Container',
-        'TextField',
-        'Button',
-        'List',
-    ]
+    widgets = {
+        'Text':{'attributes':['expand']},
+        'Video':{'attributes':['expand']},
+        'Row':{},
+        'Column':{},
+        'Container':{},
+        'Input':{},
+        'Button':{},
+        'List':{},
+    }
+
+    attributes = {
+        # ------ matter -----
+        'id':{},
+        'name':{},
+        'tooltip':{},
+        'placeholder':{},
+        'value':{},
+        'state':{'options':['readonly','disabled','selected','enabled']},
+        # ------ Event ------
+        'click': {},
+        'change': {},
+        'route': {},
+        'init': {},
+        # ------ layout -----
+        'width':{},
+        'height':{},
+        'space':{},
+        'expand':{'options':['fill','vertical','horizontal','auto']},
+        'collapse':{},
+        'border':{},
+        'border-top': {},
+        'border-bottom': {},
+        'border-left': {},
+        'border-right': {},
+        #'border-radius': lambda v: f"rounded-{v}",
+        'margin':{'unit':['px','enum']},
+        'margin-top': {},
+        'margin-bottom': {},
+        'margin-left': {},
+        'margin-right': {},
+        'padding':{},
+        'padding-top': {},
+        'padding-bottom': {},
+        'padding-left': {},
+        'padding-right': {},
+        'collapse':{},
+        'size':{'unit':['px','enum','rem','%']},
+        'alignment-horizontal':{'options':['start', 'end', 'center', 'between', 'around', 'evenly']},
+        'alignment-vertical':{'options':['start', 'end', 'center', 'baseline', 'stretch']},
+        'alignment-content':{'options':['vertical','horizontal','center','between','around','evenly']},
+        'position':{'options':['sticky','static','relative','absolute','fixed']},
+        # --- STYLE ----
+        'style':{},
+        'shadow':{},
+        'opacity':{},
+        'background-color':{},
+        'class':{},
+    }
 
 
     def initialize(self):
+        self.components = {}
+        self.data = {}
         fs_loader = FileSystemLoader("src/application/view/layout/")
         #http_loader = MyLoader()
         #choice_loader = ChoiceLoader([fs_loader, http_loader])
+        
+        #for widget in self.widgets:
+        #    if widget not in self.widget_map:
+        #        raise NotImplementedError(f"Tag '{widget}' non gestito in compose_view")
         self.env = Environment(loader=fs_loader,autoescape=select_autoescape(["html", "xml"]),undefined=DebugUndefined)
 
     @abstractmethod
@@ -62,6 +120,8 @@ class port(ABC):
         pass
 
     async def host(self,constants):
+        #import os
+        #print(os.getcwd())
         with open('src/'+constants['url'], 'r', encoding='utf-8') as file:
             text = file.read()
             return text
@@ -87,15 +147,31 @@ class port(ABC):
         #    constants['user'] = self.user
 
         content = template.render(constants)
-        print('CONTENT',content)
+        #print('CONTENT',content)
         xml = ET.fromstring(content)
-        print(xml)
+        #print(xml)
         view = await self.mount_view(xml,constants)
         #await self.mount_css(view)
         return view
     
     async def rebuild(self, *services, **constants):
         pass
+
+    async def mount_property(self, tag, widget, attributes):
+        #print('Mount:',widget,attributes)
+        for key in attributes:
+            value = attributes[key]
+            method_name = f"attribute_{key.replace('-', '_')}"
+            method = getattr(self, method_name, None)
+            if method:
+                await method(widget, attributes, value)
+
+    async def compose_view(self, tag, inner, **props):
+        method_name = f"widget_{tag.lower().replace('-', '_')}"
+        factory = getattr(self, method_name, None)
+        if factory:
+            return factory(inner, props)
+        raise NotImplementedError(f"Tag '{tag}' non gestito in compose_view data-driven")
 
     @flow.asynchronous(managers=('storekeeper','messenger'))
     async def mount_view(self,root,data,storekeeper,messenger):
@@ -106,7 +182,8 @@ class port(ABC):
         text = root.text
         elements = list(root)
 
-        if len(elements) > 0 and tag in self.tags:
+        #and tag in self.tags
+        if len(elements) > 0:
             for element in elements:
                 mounted = await self.mount_view(element, data)
                 inner.append(mounted)
@@ -157,14 +234,10 @@ class port(ABC):
                     #self.components[id]['inner'] = f"<{tag} id='{id}' model='repository'>{markupsafe.Markup(xml_string)}</{tag}>"
                     self.components[id]['attributes'] = att
                 
-                if data.get('url') != self.components[id]['view']:
-                    item = await self.builder(**data|{'component':self.components[id],'url':self.components[id]['view']})
-                    self.att(item,att)
-                    return item
-                else:
-                    item = self.code('div',{'id':id,'class':'container-fluid'},inner)
-                    self.att(item,att)
-                    return item
+                #item = await self.builder(**data|{'component':self.components[id],'url':self.components[id]['view']})
+                output = await self.compose_view('Container',inner,**att)
+                await self.mount_property('Container',output,att)
+                return output
             case 'Storekeeper':
                 method = att['method'] if 'method' in att else 'overview'
                 new = []
@@ -204,7 +277,9 @@ class port(ABC):
                     inner.append(resource)
 
                 if kind == 'video':
-                    return await self.compose_view('Video',inner)
+                    media = await self.compose_view('Video',inner)
+                    await self.mount_property('Video',media,att)
+                    return media
             case 'View':
                 
                 if 'storekeeper' in data and 'storekeeper' in att:
@@ -247,13 +322,17 @@ class port(ABC):
                 match model:
                     case 'form':
                         action = att['action'] if 'action' in att else '#'
-                        form = self.code('form',{'action':action,'method':'POST'},inner)
-                        self.att(form,att)
-                        return form
+                        #form = self.code('form',{'action':action,'method':'POST'},inner)
+                        #self.att(form,att)
+                        
+                        output = await self.compose_view('Container',inner)
+                        await self.mount_property('Container',output,att)
+                        return output
                     case 'button':
-                        button = self.code('a',{'class':'btn rounded-0','value':valor},inner)
-                        self.att(button,att)
-                        return button
+                        print("OOOOOOOOOOOOOK")
+                        output = await self.compose_view('Button',inner)
+                        await self.mount_property('Button',output,att)
+                        return output
                     case 'submit':
                         button = self.code('button',{'class':'btn rounded-0','type':'submit','value':valor},inner)
                         self.att(button,att)
@@ -446,81 +525,22 @@ class port(ABC):
                     case _:
                         return self.code('div',{'class':'container-fluid p-0 m-0'},inner)
             case 'Input':
-                id = att['id'] if 'id' in att else str(uuid.uuid4())
-                tipo = att['type'] if 'type' in att else 'None'
-                tipi = ["button","checkbox","color","date","datetime-local","email","file","hidden","image","month","number","password","radio","range","reset","search","submit","tel","text","time","url","week"]
-                valor = att['value'] if 'value' in att else ''
-                if 'storekeeper' in data and 'storekeeper' in att:
-                    if type(data['storekeeper']) == type(dict()):
-                        valor = str(language.get(att['storekeeper'],data['storekeeper']))
-                    else:
-                        valor = str(data['storekeeper'])
-                placeholder = att['placeholder'] if 'placeholder' in att else ''
+                #id = att['id'] if 'id' in att else str(uuid.uuid4())
+                print("siamo dentro",att)
+                tipo = att['type'] if 'type' in att else 'text'
+                
                 match tipo:
-                    case 'select':
-                        options = []
-                        for x in inner:
-                            if 'selected' in x.className:
-                                option = self.code('option',{'selected':'selected'},[x])
-                            else:
-                                option = self.code('option',{},[x])
-                            options.append(option)
-                        input = self.code('select',{'class':'form-select'},options)
-                        self.att(input,att)
-                        return input
-                    case 'checkbox':
-                        if 'selected' in att and att['selected'] == 'true':
-                            input = self.code('input',{'class':'form-check form-check-input','type':'checkbox','value':valor,'checked':'checked'})
-                        else:
-                            input = self.code('input',{'class':'form-check form-check-input','type':'checkbox','value':valor})
-                        self.att(input,att)
-                        return input
-                    case 'textarea':
-                        input = self.code('textarea',{'class':'form-control','rows':'3','placeholder':placeholder},inner)
-                        self.att(input,att)
-                        return input
-                    case 'radio':
-                        if 'selected' in att and att['selected'] == 'true':
-                            input = self.code('input',{'class':'form-check form-check-input','type':'radio','value':valor,'checked':'checked'})
-                        else:
-                            input = self.code('input',{'class':'form-check form-check-input','type':'radio','value':valor})
-                        self.att(input,att)
-                        if inner and len(inner) > 0:
-                            label = self.code('label',{'class':'btn','for':id},inner)
-                            return self.code('div',{'class':''},[input,label])
-                        return input
-                    case 'switch':
-                        input = self.code('input',{'class':'form-check form-switch form-check-input','type':'checkbox','role':'switch'})
-                        self.att(input,att)
-                        return input
-                    case 'color':
-                        input = self.code('input',{'class':'form-control form-control-color','type':'color','value':valor})
-                        self.att(input,att)
-                        return input
-                    case 'range':
-                        plus = {}
-                        if 'min' in att:
-                            plus['min'] = att['min']
-                        if 'max' in att:
-                            plus['max'] = att['max']
-                        if 'step' in att:
-                            plus['step'] = att['step']
-                        input = self.code('input',{'class':'form-range','type':'range','value':valor}|plus)
-                        self.att(input,att)
-                        return input
+                    case 'text':
+                        output = await self.compose_view('Input',inner,**att)
+                        await self.mount_property('Input',output,att)
+                        return output
                     case _:
-                        input = self.code('input',{'class':'form-control','type':'text','value':valor,'placeholder':placeholder})
-                        self.att(input,att)
-                        return input
+                        output = await self.compose_view('Input',inner,**att)
+                        await self.mount_property('Input',output,att)
+                        return output
             case 'Text':
                 #text-muted text-truncate
-                tipo = att['type'] if 'type' in att else 'None'
-                if 'storekeeper' in data and 'storekeeper' in att:
-                    if type(data['storekeeper']) == type(dict()):
-                        text = str(language.get(att['storekeeper'],data['storekeeper']))
-                    else:
-                        text = str(data['storekeeper'])
-                    #print(att['storekeeper'],'text',data['storekeeper'])
+                tipo = att['type'] if 'type' in att else 'text'
                 
                 match tipo:
                     case 'editable':
@@ -537,11 +557,9 @@ class port(ABC):
                         self.att(pre,att)
                         return pre
                     case 'text':
-                        if text:
-                            text = escape(text)
-                        obj = self.code('p',{'class':'fw-lighter p-0 m-0','type':'data'},text)
-                        self.att(obj,att)
-                        return obj
+                        output = await self.compose_view('Text',[text])
+                        await self.mount_property('Text',output,att)
+                        return output
                     case 'data':
                         if text:
                             text = escape(text)
@@ -557,6 +575,21 @@ class port(ABC):
                         obj = self.code('p',{'class':'text-truncate fw-lighter p-0 m-0','type':'data'},inner)
                         self.att(obj,att)
                         return obj
+            case 'Data':
+                return await self.compose_view('VideoMedia',text)
+            case 'Row':
+                output = await self.compose_view('Row',inner)
+                await self.mount_property('Row',output,att)
+                return output
+            case 'Container':
+                print('dentro cin',inner)
+                output = await self.compose_view('Container',inner)
+                await self.mount_property('Container',output,att)
+                return output
+            case 'Column':
+                output = await self.compose_view('Column',inner)
+                await self.mount_property('Column',output,att)
+                return output
             case _:
                 def elements_to_xml_string(elements):
                     # Crea un elemento root temporaneo
