@@ -3,52 +3,26 @@ class presenter():
     def __init__(self,**constants):
         self.providers = constants['providers']
 
-    def __call__(self,**constants):
-        if 'adapter' in constants:
-            return di['presentation'][0].tree_view[constants['id']]
-           # return await self.services[0].read(file=constants['url'])
-        pass
+    async def selector(self,**constants):
+        name = constants.get('name','')
+        driver = language.last(self.providers)
+        return await driver.selector(**constants)
 
-    async def builder(self,**constants):
-        print('qui',constants)
-        b = language.last(self.providers)
-        out = await b.builder(**constants)
+    async def get_attribute(self,**constants):
+        driver = language.last(self.providers)
+        out = await driver.get_attribute(constants.get('widget'),constants.get('field'))
         return out
 
-    def info(self,**constants):
-        print('ok')
-
-    async def description(self,**constants):
-        b = language.last(self.providers)
-        out = await b.host(constants)
+    async def builder(self,**constants):
+        driver = language.last(self.providers)
+        out = await driver.builder(**constants)
         return out
 
     async def component(self,**constants):
         name = constants.get('name','')
-        return self.providers[0].components[name]
-    
-    async def Upcomponent(self,**constants):
-        name = constants.get('name','')
-        va = constants.get('value','')
-        self.providers[0].components[name] |= va
-    
-    async def DOM(self,**constants):
-        id = constants.get('id','')
-        dom = self.providers[0].document
-        if 'id' in constants:
-            return dom.getElementById(id)
+        driver = language.last(self.providers)
+        return driver.components[name]
         
     async def rebuild(self,**constants):
-        provider = language.last(self.providers)
-        await provider.rebuild(constants.get('id',''),constants.get('view',''),**constants.get('data',dict()))
-
-
-    async def benchmark(self,**constants):
-        if 'module' in constants:
-            return await di['persistence'].read(file=constants['module'])
-        pass
-
-    async def effort(self,**constants):
-        if 'module' in constants:
-            return await di['persistence'].read(file=constants['module'])
-        pass
+        driver = language.last(self.providers)
+        await driver.rebuild(constants.get('id',''),constants.get('view',''),**constants.get('data',dict()))

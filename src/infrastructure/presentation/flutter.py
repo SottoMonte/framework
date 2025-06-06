@@ -2,27 +2,93 @@ import flet as ft
 import flet_video as fv
 import importlib
 import asyncio
+import tinycss2
 
 modules = {'flow': 'framework.service.flow','presentation': 'framework.port.presentation'}
 
+
+CSS_TO_FLET = {
+    "background-color": "bgcolor",
+    "color": "color",
+    "padding": "padding",
+    "border-radius": "border_radius",
+}
+
+MAPPA = {
+    "background-color": {'css':'bgcolor'},
+    "color": {'css':'color'},
+    "padding": {'css':'padding'},
+    "border-radius": {'css':'border_radius'},
+}
+
+COLOR_MAP = {
+    "white": ft.Colors.WHITE,
+    "blue": ft.Colors.BLUE,
+    "red": ft.Colors.RED,
+    "black": ft.Colors.BLACK,
+    "green": ft.Colors.GREEN,
+    # Aggiungi altri colori se servono
+}
+
+def convert_value(prop, val):
+    if val.endswith("px"):
+        return int(val.replace("px", "").strip())
+    if val.lower() in COLOR_MAP:
+        return COLOR_MAP[val.lower()]
+    return val
+
+def parse_css_tinycss2(css_text):
+    rules = tinycss2.parse_stylesheet(css_text, skip_whitespace=True)
+    styles = {}
+
+    for rule in rules:
+        if rule.type != "qualified-rule":
+            continue
+
+        selector_raw = "".join([t.serialize() for t in rule.prelude]).strip()
+        selectors = [s.strip() for s in selector_raw.split(",")]
+
+        declarations = tinycss2.parse_declaration_list(rule.content)
+        style_dict = {}
+
+        for decl in declarations:
+            if decl.type != "declaration":
+                continue
+            name = decl.name.strip()
+            value = "".join([v.serialize() for v in decl.value if hasattr(v, "serialize")]).strip()
+            if name in CSS_TO_FLET:
+                prop = CSS_TO_FLET[name]
+                style_dict[prop] = convert_value(prop, value)
+
+        for selector in selectors:
+            parts = selector.replace(".", " .").replace("#", " #").split()
+            for part in parts:
+                if part.startswith("."):
+                    key = f"class:{part[1:]}"
+                elif part.startswith("#"):
+                    key = f"id:{part[1:]}"
+                else:
+                    key = f"tag:{part}"
+                styles.setdefault(key, {}).update(style_dict)
+
+    return styles
+
 class adapter(presentation.port):
-    @staticmethod
-    async def attribute_id(widget, pr, value): widget.id = value
 
-    @staticmethod
-    async def attribute_name(widget, pr, value): widget.name = value
+    @flow.asynchronous()
+    async def attribute_id(self, widget, pr, value):
+        self.document[value] = widget
+        widget.id = value
 
-    @staticmethod
-    async def attribute_tooltip(widget, pr, value): widget.tooltip = value
+    async def attribute_name(self, widget, pr, value): widget.name = value
 
-    @staticmethod
-    async def attribute_placeholder(widget, pr, value): widget.hint_text = value
+    async def attribute_tooltip(self, widget, pr, value): widget.tooltip = value
 
-    @staticmethod
-    async def attribute_value(widget, pr, value): widget.value = value
+    async def attribute_placeholder(self, widget, pr, value): widget.hint_text = value
 
-    @staticmethod
-    async def attribute_state(widget, pr, value):
+    async def attribute_value(self, widget, pr, value): widget.value = value
+
+    async def attribute_state(self, widget, pr, value):
         if value == "readonly":
             widget.read_only = True
         elif value == "disabled":
@@ -32,34 +98,27 @@ class adapter(presentation.port):
         elif value == "enabled":
             widget.enabled = True
 
+    
     @flow.asynchronous(managers=('executor',))
-    @staticmethod
-    async def attribute_click(self,widget, pr, value,executor):
+    async def attribute_click(self, widget, pr, value, executor):
         async def on_click(e):
             await executor.act(action=value)
         
         widget.on_click = on_click
 
-    @staticmethod
-    async def attribute_change(widget, pr, value): widget.on_change = value
+    async def attribute_change(self, widget, pr, value): widget.on_change = value
 
-    @staticmethod
-    async def attribute_route(widget, pr, value): widget.route = value
+    async def attribute_route(self, widget, pr, value): widget.route = value
 
-    @staticmethod
-    async def attribute_init(widget, pr, value): widget.on_init = value
+    async def attribute_init(self, widget, pr, value): widget.on_init = value
 
-    @staticmethod
-    async def attribute_width(widget, pr, value): widget.width = int(value)
+    async def attribute_width(self, widget, pr, value): widget.width = int(value)
 
-    @staticmethod
-    async def attribute_height(widget, pr, value): widget.height = int(value)
+    async def attribute_height(self, widget, pr, value): widget.height = int(value)
 
-    @staticmethod
-    async def attribute_space(widget, pr, value): widget.space = value
+    async def attribute_space(self, widget, pr, value): widget.spacing = value
 
-    @staticmethod
-    async def attribute_expand(widget, pr, value):
+    async def attribute_expand(self, widget, pr, value):
         if value == "fill":
             widget.expand = True
         elif value == "vertical":
@@ -69,200 +128,82 @@ class adapter(presentation.port):
         else:
             widget.expand = False
 
-    @staticmethod
-    async def attribute_collapse(widget, pr, value): widget.collapse = value
+    async def attribute_collapse(self, widget, pr, value): widget.collapse = value
 
-    @staticmethod
-    async def attribute_border(widget, pr, value): widget.border = value
+    async def attribute_border(self, widget, pr, value): widget.border = value
 
-    @staticmethod
-    async def attribute_border_top(widget, pr, value): widget.border_top = value
+    async def attribute_border_top(self, widget, pr, value): widget.border_top = value
 
-    @staticmethod
-    async def attribute_border_bottom(widget, pr, value): widget.border_bottom = value
+    async def attribute_border_bottom(self, widget, pr, value): widget.border_bottom = value
 
-    @staticmethod
-    async def attribute_border_left(widget, pr, value): widget.border_left = value
+    async def attribute_border_left(self, widget, pr, value): widget.border_left = value
 
-    @staticmethod
-    async def attribute_border_right(widget, pr, value): widget.border_right = value
+    async def attribute_border_right(self, widget, pr, value): widget.border_right = value
 
-    @staticmethod
-    async def attribute_margin(widget, pr, value): widget.margin = value
+    async def attribute_margin(self, widget, pr, value): widget.margin = value
 
-    @staticmethod
-    async def attribute_margin_top(widget, pr, value): widget.margin_top = value
+    async def attribute_margin_top(self, widget, pr, value): widget.margin_top = value
 
-    @staticmethod
-    async def attribute_margin_bottom(widget, pr, value): widget.margin_bottom = value
+    async def attribute_margin_bottom(self, widget, pr, value): widget.margin_bottom = value
 
-    @staticmethod
-    async def attribute_margin_left(widget, pr, value): widget.margin_left = value
+    async def attribute_margin_left(self, widget, pr, value): widget.margin_left = value
 
-    @staticmethod
-    async def attribute_margin_right(widget, pr, value): widget.margin_right = value
+    async def attribute_margin_right(self, widget, pr, value): widget.margin_right = value
 
-    @staticmethod
-    async def attribute_padding(widget, pr, value): widget.padding = int(value)
+    async def attribute_padding(self, widget, pr, value): widget.padding = int(value)
 
-    @staticmethod
-    async def attribute_padding_top(widget, pr, value): widget.padding_top = value
+    async def attribute_padding_top(self, widget, pr, value): widget.padding_top = value
 
-    @staticmethod
-    async def attribute_padding_bottom(widget, pr, value): widget.padding_bottom = value
+    async def attribute_padding_bottom(self, widget, pr, value): widget.padding_bottom = value
 
-    @staticmethod
-    async def attribute_padding_left(widget, pr, value): widget.padding_left = value
+    async def attribute_padding_left(self, widget, pr, value): widget.padding_left = value
 
-    @staticmethod
-    async def attribute_padding_right(widget, pr, value): widget.padding_right = value
+    async def attribute_padding_right(self, widget, pr, value): widget.padding_right = value
 
-    @staticmethod
-    async def attribute_size(widget, pr, value): widget.size = value
+    async def attribute_size(self, widget, pr, value): widget.size = value
 
-    @staticmethod
-    async def attribute_alignment_horizontal(widget, pr, value): widget.alignment_horizontal = value
+    async def attribute_alignment_horizontal(self, widget, pr, value): widget.alignment_horizontal = value
 
-    @staticmethod
-    async def attribute_alignment_vertical(widget, pr, value): widget.alignment_vertical = value
+    async def attribute_alignment_vertical(self, widget, pr, value): widget.alignment_vertical = value
 
-    @staticmethod
-    async def attribute_alignment_content(widget, pr, value): widget.alignment_content = value
+    async def attribute_alignment_content(self, widget, pr, value): widget.alignment_content = value
 
-    @staticmethod
-    async def attribute_position(widget, pr, value): widget.position = value
+    async def attribute_position(self, widget, pr, value): widget.position = value
 
-    @staticmethod
-    async def attribute_style(widget, pr, value): widget.style = value
+    async def attribute_style(self, widget, pr, value): widget.style = value
 
-    @staticmethod
-    async def attribute_shadow(widget, pr, value): widget.shadow = value
+    async def attribute_shadow(self, widget, pr, value): widget.shadow = value
 
-    @staticmethod
-    async def attribute_opacity(widget, pr, value): widget.opacity = float(value)
+    async def attribute_opacity(self, widget, pr, value): widget.opacity = float(value)
 
-    @staticmethod
-    async def attribute_background_color(widget, pr, value): widget.bgcolor = value
+    async def attribute_background_color(self, widget, pr, value): widget.bgcolor = value
 
-    @staticmethod
-    async def attribute_class(widget, pr, value): widget.class_name = value  # "class" is reserved
+    async def attribute_class(self, widget, pr, value): widget.class_name = value  # "class" is reserved
 
+    async def set_attribute(self, widget, pr, value): 
+        widget.class_name = value  # "class" is reserved
 
-    # Mappa dei costruttori data-driven
-    '''widget_map = {
-        'Button': lambda inner, props: (
-            lambda variant: {
-                'icon': ft.IconButton(
-                    icon=props.get('icon', ft.icons.PLAY_ARROW),
-                    icon_size=props.get('icon_size', 24),
-                    on_click=props.get('on_click'),
-                    tooltip=props.get('tooltip', "Play"),
-                    **props
-                ),
-                'text': ft.TextButton(
-                    text=props.get('text', "Click Me"),
-                    on_click=props.get('on_click'),
-                    tooltip=props.get('tooltip', "Click to perform an action"),
-                    **props
-                ),
-            }.get(variant, ft.TextButton(text="Default", **props))
-        )(props.get('variant', 'text')),
-        'Video': lambda inner, props: fv.Video(
-            expand=props.get('expand', True),
-            playlist=inner,
-            playlist_mode=props.get('playlist_mode', ft.PlaylistMode.LOOP),
-            fill_color=props.get('fill_color', ft.Colors.BLUE_400),
-            aspect_ratio=props.get('aspect_ratio', 16 / 9),
-            volume=props.get('volume', 100),
-            autoplay=props.get('autoplay', True),
-            filter_quality=props.get('filter_quality', ft.FilterQuality.HIGH),
-            muted=props.get('muted', False),
-            on_loaded=props.get('on_loaded', lambda e: print("Video loaded successfully!")),
-            on_enter_fullscreen=props.get('on_enter_fullscreen', lambda e: print("Video entered fullscreen!")),
-            on_exit_fullscreen=props.get('on_exit_fullscreen', lambda e: print("Video exited fullscreen!")),
-        ),
-        'VideoMedia': lambda inner, props: fv.VideoMedia(inner),
-        'Container': lambda inner, props: ft.Container(
-            content=inner,
-            expand=props.get('expand', True),
-            bgcolor=props.get('bgcolor', ft.colors.with_opacity(1, 'white')),
-            border_radius=props.get('border_radius', 10),
-            padding=props.get('padding', 10),
-            margin=props.get('margin', 10)
-        ),
-        'Text': lambda inner, props: ft.Text(inner, **props),
-        'Column': lambda inner, props: ft.Column(controls=inner, **props),
-        'Row': lambda inner, props: ft.Row(
-            controls=inner,
-            expand=props.get('expand', True),
-            alignment=props.get('alignment', ft.MainAxisAlignment.CENTER),
-            spacing=props.get('spacing', 10)
-        ),
-        'IconButton': lambda inner, props: ft.IconButton(
-            icon=props.get('icon', ft.icons.PLAY_ARROW),
-            icon_size=props.get('icon_size', 24),
-            on_click=props.get('on_click', lambda e: print("Icon button clicked!")),
-            tooltip=props.get('tooltip', "Play")
-        ),
-        'TextButton': lambda inner, props: ft.TextButton(
-            text=props.get('text', "Click Me"),
-            on_click=props.get('on_click', lambda e: print("Text button clicked!")),
-            tooltip=props.get('tooltip', "Click to perform an action")
-        ),
-        'TextField': lambda inner, props: ft.TextField(
-            label=props.get('label', "Enter text"),
-            on_change=props.get('on_change', lambda e: print("Text field changed:", e.control.value)),
-            on_submit=props.get('on_submit', lambda e: print("Text submitted:", e.control.value))
-        ),
-        'Dropdown': lambda inner, props: ft.Dropdown(
-            options=inner,
-            label=props.get('label', "Select an option"),
-            on_change=props.get('on_change', lambda e: print("Dropdown changed:", e.control.value))
-        ),
-        'DropdownOption': lambda inner, props: ft.dropdown.Option(inner),
-        'WindowDragArea': lambda inner, props: ft.WindowDragArea(
-            content=ft.ListView(inner, expand=True),
-            maximizable=props.get('maximizable', False),
-            bgcolor=props.get('bgcolor', ft.colors.with_opacity(1, 'white')),
-            border_radius=props.get('border_radius', 10),
-            padding=props.get('padding', 10),
-            margin=props.get('margin', 10)
-        ),
-        'NavigationRail': lambda inner, props: ft.NavigationRail(
-            destinations=inner,
-            selected_index=props.get('selected_index', 0),
-            on_change=props.get('on_change', lambda e: print("Navigation rail changed:", e.control.selected_index)),
-            bgcolor=props.get('bgcolor', ft.colors.with_opacity(1, 'white')),
-            elevation=props.get('elevation', 4)
-        ),
-        'Tabs': lambda inner, props: ft.Tabs(
-            tabs=inner,
-            selected_index=props.get('selected_index', 0),
-            on_change=props.get('on_change', lambda e: print("Tab changed:", e.control.selected_index)),
-            expand=props.get('expand', True)
-        ),
-        'Tab': lambda inner, props: ft.Tab(
-            content=ft.Column(inner, expand=True),
-            text=props.get('text', "Tab Title"),
-            icon=props.get('icon', ft.icons.TAB)
-        ),
-        'Stack': lambda inner, props: ft.Stack(
-            controls=inner,
-            expand=props.get('expand', True),
-            alignment=props.get('alignment', ft.alignment.center)
-        ),
-        'List': lambda inner, props: ft.ListView(
-            controls=inner,
-            expand=props.get('expand', True),
-            spacing=props.get('spacing', 10),
-            padding=props.get('padding', 10)
-        ),
-        'Divider': lambda inner, props: ft.Divider(
-            thickness=props.get('thickness', 1),
-            color=props.get('color', ft.colors.with_opacity(1, 'grey')),
-            padding=props.get('padding', 10)
-        ),
-    }'''
+    async def get_attribute(self, widget, field, value=None):
+        match field:
+            case 'elements':
+                a = getattr(widget,'controls',None)
+                if a:
+                    return a
+                a = getattr(widget,'content',None)
+                if a:
+                    return await self.get_attribute(a,'elements')
+            case 'class':
+                return getattr(widget,'class_name',None)
+            case _:
+                return getattr(widget,field,None)
+
+    async def selector(self, **constants):
+        for key in constants:
+            value = constants[key]
+            match key:
+                case 'id':
+                    return [self.document[value]]
+        
 
     def __init__(self,**constants):
         self.tree_view = dict()
@@ -287,49 +228,64 @@ class adapter(presentation.port):
         asyncio.create_task(ft.app_async(main))
 
     @staticmethod
-    def widget_button(inner, props):
+    def widget_button(tag, inner, props):
         variant = props.get("variant", "text")
         if variant == "icon":
-            return ft.IconButton(
+            widget = ft.IconButton(
                 icon=props.get("icon", ft.icons.PLAY_ARROW),
                 icon_size=props.get("icon_size", 24),
                 on_click=props.get("on_click"),
             )
-        return ft.TextButton(
+        widget = ft.TextButton(
             text=props.get("text", "Click Me"),
             on_click=props.get("on_click"),
         )
+    
+        widget.tag = tag
+        return widget
 
     @staticmethod
-    def widget_video(inner, props):
-        return fv.Video(playlist=inner)
+    def widget_video(tag, inner, props):
+        widget = fv.Video(playlist=inner)
+        widget.tag = tag
+        return widget
 
     @staticmethod
-    def widget_videomedia(inner, props):
-        return fv.VideoMedia(inner)
+    def widget_videomedia(tag, inner, props):
+        widget = fv.VideoMedia(inner)
+        widget.tag = tag
+        return widget
     
     @staticmethod
-    def widget_column(inner, props):
+    def widget_column(tag, inner, props):
         print(inner)
-        return ft.Column(controls=inner)
+        widget = ft.Column(controls=inner)
+        widget.tag = tag
+        return widget
     
     @staticmethod
-    def widget_row(inner, props):
+    def widget_row(tag, inner, props):
         print('Row',inner)
-        return ft.Row(controls=inner)
+        widget = ft.Row(controls=inner)
+        widget.tag = tag
+        return widget
     
     @staticmethod
-    def widget_container(inner, props):
+    def widget_container(tag, inner, props):
         print('Container',inner,props)
-        return ft.Container(content=ft.ResponsiveRow(expand=True,controls=inner))
+        widget = ft.Container(content=ft.ResponsiveRow(expand=True,controls=inner))
+        widget.tag = tag
+        return widget
     
-    @staticmethod
-    def widget_button(inner, props):
+    
+    def widget_button(self, tag, inner, props):
         print('Button',inner)
-        return ft.FilledButton(content=ft.ResponsiveRow(expand=True,controls=inner))
+        widget = ft.FilledButton(content=ft.ResponsiveRow(expand=True,controls=inner))
+        widget.tag = tag
+        return widget
     
     @staticmethod
-    def widget_text(inner, props):
+    def widget_text(tag, inner, props):
         print('Text',inner)
         text = ''
         for x in inner:
@@ -337,19 +293,24 @@ class adapter(presentation.port):
                 text += x
                 inner.remove(x)
 
-        return ft.Text(value=text)
+        widget = ft.Text(value=text)
+        widget.tag = tag
+        return widget
     
     @staticmethod
-    def widget_input(inner, props):
+    def widget_input(tag, inner, props):
         print('Input',inner,props)
         ttype = props.get('type','text')
         match ttype:
             case 'text':
-                return ft.TextField()
+                widget = ft.TextField()
             case 'password':
-                return ft.TextField(password=True, can_reveal_password=True)
+                widget = ft.TextField(password=True, can_reveal_password=True)
             case _:
-                return ft.TextField()
+                widget = ft.TextField()
+        
+        widget.tag = tag
+        return widget
     
     
     async def mount_route(self, *services, **constants):
@@ -359,6 +320,54 @@ class adapter(presentation.port):
     async def render_view(self, *services, **constants):
         pass
 
-    
+    async def apply_style(self ,widget, styles=None):
+        if styles is None:
+            return
+        applied = {}
+        tag = await self.get_attribute(widget,'tag')
+        id = await self.get_attribute(widget,'id')
+        classes = await self.get_attribute(widget,'class')
+        
+        # Applica per tag (es: button)
+        if tag and f"tag:{tag}" in styles:
+            applied.update(styles[f"tag:{tag}"])
+
+        # Applica per classi
+        if classes:
+            classes = classes.split(' ')
+            for cls in classes:
+                key = f"class:{cls}"
+                if key in styles:
+                    applied.update(styles[key])
+
+        # Applica per ID
+        if id and f"id:{id}" in styles:
+            applied.update(styles[f"id:{id}"])
+
+        # Imposta attributi sul widget
+        for attr, val in applied.items():
+            setattr(widget, attr, val)
+
     async def mount_css(self, *services, **constants):
-        pass
+        ttt = """
+.primary {
+  background-color: #ff0000;
+  color: #444444;
+  padding: 10px;
+  border-radius: 0px;
+}
+
+Container {
+  background-color: red;
+  color: white;
+  padding: 12px;
+  border-radius: 4px;
+}
+"""
+        styles = parse_css_tinycss2(ttt)
+        #print('style:',styles)
+        for key in self.document:
+            widget = self.document[key]
+            await self.apply_style(widget, styles)
+                
+        

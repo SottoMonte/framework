@@ -90,6 +90,8 @@ class port(ABC):
     def initialize(self):
         self.components = {}
         self.data = {}
+        # DOM
+        self.document = {}
         fs_loader = FileSystemLoader("src/application/view/layout/")
         #http_loader = MyLoader()
         #choice_loader = ChoiceLoader([fs_loader, http_loader])
@@ -98,6 +100,14 @@ class port(ABC):
         #    if widget not in self.widget_map:
         #        raise NotImplementedError(f"Tag '{widget}' non gestito in compose_view")
         self.env = Environment(loader=fs_loader,autoescape=select_autoescape(["html", "xml"]),undefined=DebugUndefined)
+
+    @abstractmethod
+    async def get_attribute(self, widget, field, value=None):
+        pass
+
+    @abstractmethod
+    async def selector(self, **constants):
+        pass
 
     @abstractmethod
     async def mount_property(self, *services, **constants):
@@ -151,7 +161,7 @@ class port(ABC):
         xml = ET.fromstring(content)
         #print(xml)
         view = await self.mount_view(xml,constants)
-        #await self.mount_css(view)
+        await self.mount_css(view)
         return view
     
     async def rebuild(self, *services, **constants):
@@ -165,12 +175,16 @@ class port(ABC):
             method = getattr(self, method_name, None)
             if method:
                 await method(widget, attributes, value)
+        id = await self.get_attribute(widget,'id')
+        
+        if not id:
+            await self.attribute_id(widget,attributes,str(uuid.uuid4()))
 
     async def compose_view(self, tag, inner, **props):
         method_name = f"widget_{tag.lower().replace('-', '_')}"
         factory = getattr(self, method_name, None)
         if factory:
-            return factory(inner, props)
+            return factory(tag,inner, props)
         raise NotImplementedError(f"Tag '{tag}' non gestito in compose_view data-driven")
 
     @flow.asynchronous(managers=('storekeeper','messenger'))
