@@ -5,6 +5,53 @@ loader = language.load_main(language,area="framework",service='service',adapter=
 
 #modules = {'loader': 'framework.service.loader','language': 'framework.service.language'}
 
+import os
+import requests
+import hashlib
+
+def get_remote_file_sha(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        return hashlib.sha256(response.content).hexdigest(), response.content
+    return None, None
+
+def get_local_file_sha(filepath):
+    if not os.path.exists(filepath):
+        return None
+    with open(filepath, 'rb') as f:
+        return hashlib.sha256(f.read()).hexdigest()
+
+def sync_directory_recursive(api_url, local_dir):
+    response = requests.get(api_url)
+    if response.status_code != 200:
+        raise Exception("GitHub API error:", response.json())
+    
+    files = response.json()
+
+    for item in files:
+        if item['type'] == 'dir':
+            # Ricorsione per le sottocartelle
+            sub_local_dir = os.path.join(local_dir, item['name'])
+            sync_directory_recursive(item['url'], sub_local_dir)
+        elif item['type'] == 'file':
+            file_path = os.path.join(local_dir, item['name'])
+            remote_sha, remote_content = get_remote_file_sha(item['download_url'])
+            local_sha = get_local_file_sha(file_path)
+
+            if local_sha != remote_sha:
+                print(f"[Updating] {file_path}")
+                os.makedirs(local_dir, exist_ok=True)
+                with open(file_path, 'wb') as f:
+                    f.write(remote_content)
+            else:
+                print(f"[OK] {file_path} is up to date.")
+        else:
+            print(f"[Skipping] {item['type']}: {item['path']}")
+
+def sync_github_repo(local_base_dir, github_user, repo, branch='main'):
+    api_url = f"https://api.github.com/repos/{github_user}/{repo}/contents/src?ref={branch}"
+    sync_directory_recursive(api_url, local_base_dir)
+
 def build():
     pass
 
@@ -13,6 +60,8 @@ def application(tester=None, **constants):
     try:
         if tester and '--test' in constants.get('args',[]):
             tester.run()
+        if '--update' in constants.get('args',[]):
+            sync_github_repo("src", "SottoMonte", "framework", "main")
         event_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(event_loop)
         event_loop.create_task(loader.bootstrap())
