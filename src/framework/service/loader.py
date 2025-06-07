@@ -73,7 +73,7 @@ async def bootstrap() -> None:
         if module in config:
             for driver, setting in config[module].items():
                 adapter = setting["adapter"]
-                payload = {**setting, "profile": driver, "project": config["app"]}
+                payload = {**setting, "profile": driver, "project": config["project"]}
                 
                 tasks.append(asyncio.create_task(
                     language.load_provider(language,path=f"infrastructure.{module}.{adapter}",area="infrastructure", service=module, adapter=adapter, payload=payload)

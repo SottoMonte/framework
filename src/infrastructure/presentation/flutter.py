@@ -352,7 +352,7 @@ class adapter(presentation.port):
         ttt = """
 .primary {
   background-color: #ff0000;
-  color: #444444;
+  color: white;
   padding: 10px;
   border-radius: 0px;
 }

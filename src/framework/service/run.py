@@ -5,6 +5,9 @@ loader = language.load_main(language,area="framework",service='service',adapter=
 
 #modules = {'loader': 'framework.service.loader','language': 'framework.service.language'}
 
+def build():
+    pass
+
 #@flow.synchronous(managers=('tester',))
 def application(tester=None, **constants):
     try:

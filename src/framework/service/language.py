@@ -385,7 +385,7 @@ def validate_toml(content):
 
     errors = []
     for section, zone in config.items():
-        if section == "app":
+        if section in ['project','tool']:
             continue
         for name in zone:
             fields = zone[name]
@@ -419,7 +419,7 @@ def get_confi(**constants):
     jinjaEnv = Environment()
     jinjaEnv.filters['get'] = get_safe
     if sys.platform != 'emscripten':
-        with open('src/application/pyproject.toml', 'r') as f:
+        with open('pyproject.toml', 'r') as f:
             text = f.read()
             template = jinjaEnv.from_string(text)
             content = template.render(constants)
@@ -428,7 +428,7 @@ def get_confi(**constants):
             return config
     else:
         req = js.XMLHttpRequest.new()
-        req.open("GET", "application/pyproject.toml", False)
+        req.open("GET", "pyproject.toml", False)
         req.send()
         text = str(req.response)
         template = jinjaEnv.from_string(text)
